@@ -111,8 +111,6 @@ select = [
     "B",   # flake8-bugbear
     "C4",  # flake8-comprehensions
     "F",   # pyflake
-    "E",   # pycodestyle
-    "W",   # pycodestyle
     "UP",  # pyupgrade
     "I",   # isort
     "RUF", # ruff specific

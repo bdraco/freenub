@@ -10,7 +10,7 @@ class Subscribe(Endpoint):
     SUBSCRIBE_PATH = "/v2/subscribe/%s/%s/0"
 
     def __init__(self, pubnub):
-        super(Subscribe, self).__init__(pubnub)
+        super().__init__(pubnub)
         self._channels = []
         self._groups = []
 

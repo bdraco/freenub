@@ -3,7 +3,7 @@ from pubnub.models.consumer.v3.pn_resource import PNResource
 
 class UUID(PNResource):
     def __init__(self, resource_name=None, resource_pattern=None):
-        super(UUID, self).__init__(resource_name, resource_pattern)
+        super().__init__(resource_name, resource_pattern)
 
     @staticmethod
     def id(user_id):

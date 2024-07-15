@@ -44,4 +44,4 @@ class PNChannelMetadataResult:
         self.event = event
 
     def __str__(self):
-        return "Channel %s event with data: %s" % (self.event, self.data)
+        return f"Channel {self.event} event with data: {self.data}"

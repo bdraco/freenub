@@ -12,7 +12,7 @@ class PubNubException(Exception):
         else:
             msg = str(pn_error)
 
-        super(PubNubException, self).__init__(msg)
+        super().__init__(msg)
 
     @property
     def _status(self):

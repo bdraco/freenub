@@ -60,7 +60,7 @@ class PNHistoryItemResult:
         self.crypto = crypto
 
     def __str__(self):
-        return "History item with tt: %s and content: %s" % (self.timetoken, self.entry)
+        return f"History item with tt: {self.timetoken} and content: {self.entry}"
 
     def decrypt(self, cipher_key):
         self.entry = self.crypto.decrypt(cipher_key, self.entry)
@@ -123,7 +123,6 @@ class PNFetchMessageItem:
         self.actions = actions
 
     def __str__(self):
-        return "Fetch message item with tt: %s and content: %s" % (
-            self.timetoken,
-            self.message,
+        return (
+            f"Fetch message item with tt: {self.timetoken} and content: {self.message}"
         )

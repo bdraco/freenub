@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 
 from pubnub.enums import PNStatusCategory
 from pubnub.event_engine.models import effects, events
@@ -41,13 +41,13 @@ class PNState:
 class PNTransition:
     context: PNContext
     state: PNState
-    effect: Union[None, List[PNEffect]]
+    effect: Union[None, list[PNEffect]]
 
     def __init__(
         self,
         state: PNState,
         context: Union[None, PNContext] = None,
-        effect: Union[None, List[PNEffect]] = None,
+        effect: Union[None, list[PNEffect]] = None,
     ) -> None:
         self.context = context
         self.state = state

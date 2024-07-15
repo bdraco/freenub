@@ -109,7 +109,7 @@ class PubNub(PubNubCore):
 
 class NativeReconnectionManager(ReconnectionManager):
     def __init__(self, pubnub):
-        super(NativeReconnectionManager, self).__init__(pubnub)
+        super().__init__(pubnub)
 
     def _register_heartbeat_timer(self):
         self.stop_heartbeat_timer()
@@ -160,7 +160,7 @@ class NativeReconnectionManager(ReconnectionManager):
 
 class NativePublishSequenceManager(PublishSequenceManager):
     def __init__(self, provided_max_sequence):
-        super(NativePublishSequenceManager, self).__init__(provided_max_sequence)
+        super().__init__(provided_max_sequence)
         self._lock = threading.Lock()
 
     def get_next_sequence(self):
@@ -183,7 +183,7 @@ class NativeSubscriptionManager(SubscriptionManager):
         self._heartbeat_periodic_callback = None
         self._reconnection_manager = NativeReconnectionManager(pubnub_instance)
 
-        super(NativeSubscriptionManager, self).__init__(pubnub_instance)
+        super().__init__(pubnub_instance)
         self._start_worker()
 
         class NativeReconnectionCallback(ReconnectionCallback):
@@ -211,7 +211,7 @@ class NativeSubscriptionManager(SubscriptionManager):
         ).pn_async(leave_callback)
 
     def _register_heartbeat_timer(self):
-        super(NativeSubscriptionManager, self)._register_heartbeat_timer()
+        super()._register_heartbeat_timer()
 
         self._perform_heartbeat_loop()
 
@@ -510,5 +510,5 @@ class NonSubscribeListener:
 
 class NativeTelemetryManager(TelemetryManager):
     def store_latency(self, latency, operation_type):
-        super(NativeTelemetryManager, self).store_latency(latency, operation_type)
+        super().store_latency(latency, operation_type)
         self.clean_up_telemetry_data()

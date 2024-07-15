@@ -85,4 +85,4 @@ class PNMembershipResult:
         self.event = event
 
     def __str__(self):
-        return "Membership %s event with data: %s" % (self.event, self.data)
+        return f"Membership {self.event} event with data: {self.data}"

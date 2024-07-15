@@ -241,7 +241,7 @@ def url_decode(data):
 
 
 def gen_channel(prefix):
-    return "%s-%s" % (prefix, gen_string(8))
+    return f"{prefix}-{gen_string(8)}"
 
 
 def gen_string(length):

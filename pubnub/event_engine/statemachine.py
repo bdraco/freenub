@@ -1,5 +1,5 @@
 import logging
-from typing import List, Optional
+from typing import Optional
 
 from pubnub.event_engine.dispatcher import Dispatcher
 from pubnub.event_engine.models import effects, events, states
@@ -8,7 +8,7 @@ from pubnub.event_engine.models import effects, events, states
 class StateMachine:
     _current_state: states.PNState
     _context: states.PNContext
-    _effect_list: List[effects.PNEffect]
+    _effect_list: list[effects.PNEffect]
     _enabled: bool
 
     def __init__(

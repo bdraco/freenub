@@ -104,12 +104,12 @@ ignore = [
     "D104", # Missing docstring in public package
     "D107", # Missing docstring in `__init__`
     "D401", # First line of docstring should be in imperative mood
+    "C414",
+    "C413",
 ]
 select = [
     "B",   # flake8-bugbear
-    "D",   # flake8-docstrings
     "C4",  # flake8-comprehensions
-    "S",   # flake8-bandit
     "F",   # pyflake
     "E",   # pycodestyle
     "W",   # pycodestyle

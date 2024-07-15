@@ -47,10 +47,7 @@ class BasePathManager:
         if self.config.origin:
             return self.config.origin
         else:
-            return "%s.%s" % (
-                BasePathManager.DEFAULT_SUBDOMAIN,
-                BasePathManager.DEFAULT_BASE_PATH,
-            )
+            return f"{BasePathManager.DEFAULT_SUBDOMAIN}.{BasePathManager.DEFAULT_BASE_PATH}"
 
 
 class ReconnectionManager:

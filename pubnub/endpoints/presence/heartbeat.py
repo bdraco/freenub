@@ -10,7 +10,7 @@ class Heartbeat(Endpoint):
     HEARTBEAT_PATH = "/v2/presence/sub-key/%s/channel/%s/heartbeat"
 
     def __init__(self, pubnub):
-        super(Heartbeat, self).__init__(pubnub)
+        super().__init__(pubnub)
         self._channels = []
         self._groups = []
         self._state = None

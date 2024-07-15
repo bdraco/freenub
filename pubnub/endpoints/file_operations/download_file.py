@@ -80,7 +80,7 @@ class DownloadFileNative(FileOperationEndpoint):
             .sync()
         )
 
-        return super(DownloadFileNative, self).sync()
+        return super().sync()
 
     def pn_async(self, callback):
         return RequestsRequestHandler(self._pubnub).async_file_based_operation(

@@ -54,9 +54,7 @@ class PNFileMessageResult(PNMessageResult):
         file_id,
         file_name,
     ):
-        super(PNFileMessageResult, self).__init__(
-            message, subscription, channel, timetoken, publisher=publisher
-        )
+        super().__init__(message, subscription, channel, timetoken, publisher=publisher)
         self.file_url = file_url
         self.file_id = file_id
         self.file_name = file_name
@@ -111,7 +109,7 @@ class PNPresenceEventResult:
 
 class PNMessageActionResult(PNMessageAction):
     def __init__(self, result):
-        super(PNMessageActionResult, self).__init__(result)
+        super().__init__(result)
 
 
 class PNPublishResult:

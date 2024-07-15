@@ -78,7 +78,7 @@ class ObjectsEndpoint(Endpoint):
                 joined_sort_params_array = []
                 for sort_key in self._sort_keys:
                     joined_sort_params_array.append(
-                        "%s:%s" % (sort_key.key_str(), sort_key.dir_str())
+                        f"{sort_key.key_str()}:{sort_key.dir_str()}"
                     )
 
                 params["sort"] = ",".join(joined_sort_params_array)

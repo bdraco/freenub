@@ -28,7 +28,7 @@ class PNFetchSpacesResult(PNEntityPageableResult):
 
 class PNSpaceResult(PNEntityResult):
     def __str__(self):
-        return "Space %s event with data: %s" % (self.event, self.data)
+        return f"Space {self.event} event with data: {self.data}"
 
 
 class Space:

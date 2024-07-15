@@ -51,11 +51,11 @@ class VCR599Listener(SubscribeListener):
         self.silent_limit = raise_times
         self.raised_times = 0
 
-        super(VCR599Listener, self).__init__()
+        super().__init__()
 
     async def _wait_for(self, coro):
         try:
-            res = await super(VCR599Listener, self)._wait_for(coro)
+            res = await super()._wait_for(coro)
             return res
         except CannotOverwriteExistingCassetteException as e:
             if "Can't overwrite existing cassette" in str(e):
@@ -74,7 +74,7 @@ class VCR599Listener(SubscribeListener):
 
 class VCR599ReconnectionManager(AsyncioReconnectionManager):
     def __init__(self, pubnub):
-        super(VCR599ReconnectionManager, self).__init__(pubnub)
+        super().__init__(pubnub)
 
     def start_polling(self):
         print(">>> Skip polling after 599 Error")

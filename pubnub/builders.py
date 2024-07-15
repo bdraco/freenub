@@ -30,7 +30,7 @@ class PubSubBuilder:
 
 class SubscribeBuilder(PubSubBuilder):
     def __init__(self, subscription_manager):
-        super(SubscribeBuilder, self).__init__(subscription_manager)
+        super().__init__(subscription_manager)
         self._presence_enabled = False
         self._timetoken = 0
 

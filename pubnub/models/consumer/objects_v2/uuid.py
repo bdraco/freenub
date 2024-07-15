@@ -44,4 +44,4 @@ class PNUUIDMetadataResult:
         self.event = event
 
     def __str__(self):
-        return "UUID %s event with data: %s" % (self.event, self.data)
+        return f"UUID {self.event} event with data: {self.data}"

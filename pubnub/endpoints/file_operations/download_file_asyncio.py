@@ -18,7 +18,7 @@ class DownloadFileAsyncio(DownloadFileNative):
             .future()
         )
 
-        downloaded_file = await super(DownloadFileAsyncio, self).future()
+        downloaded_file = await super().future()
         return downloaded_file
 
     async def result(self):

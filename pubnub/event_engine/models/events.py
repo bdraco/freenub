@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Optional
 
 from pubnub.exceptions import PubNubException
 
@@ -22,13 +22,13 @@ class PNCursorEvent(PNEvent):
 
 
 class PNChannelGroupsEvent(PNEvent):
-    def __init__(self, channels: List[str], groups: List[str]) -> None:
+    def __init__(self, channels: list[str], groups: list[str]) -> None:
         self.channels = channels
         self.groups = groups
 
 
 class SubscriptionChangedEvent(PNChannelGroupsEvent):
-    def __init__(self, channels: List[str], groups: List[str]) -> None:
+    def __init__(self, channels: list[str], groups: list[str]) -> None:
         PNChannelGroupsEvent.__init__(self, channels, groups)
 
 
@@ -36,8 +36,8 @@ class SubscriptionRestoredEvent(PNCursorEvent, PNChannelGroupsEvent):
     def __init__(
         self,
         timetoken: str,
-        channels: List[str],
-        groups: List[str],
+        channels: list[str],
+        groups: list[str],
         region: Optional[int] = None,
     ) -> None:
         PNCursorEvent.__init__(self, timetoken, region)

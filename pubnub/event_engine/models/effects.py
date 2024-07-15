@@ -1,4 +1,4 @@
-from typing import List, Union
+from typing import Union
 
 from pubnub.enums import PNStatusCategory
 from pubnub.exceptions import PubNubException
@@ -19,8 +19,8 @@ class PNCancelEffect(PNEffect):
 class HandshakeEffect(PNManageableEffect):
     def __init__(
         self,
-        channels: Union[None, List[str]] = None,
-        groups: Union[None, List[str]] = None,
+        channels: Union[None, list[str]] = None,
+        groups: Union[None, list[str]] = None,
     ) -> None:
         super().__init__()
         self.channels = channels
@@ -34,8 +34,8 @@ class CancelHandshakeEffect(PNCancelEffect):
 class ReceiveMessagesEffect(PNManageableEffect):
     def __init__(
         self,
-        channels: Union[None, List[str]] = None,
-        groups: Union[None, List[str]] = None,
+        channels: Union[None, list[str]] = None,
+        groups: Union[None, list[str]] = None,
         timetoken: Union[None, str] = None,
         region: Union[None, int] = None,
     ) -> None:
@@ -53,8 +53,8 @@ class CancelReceiveMessagesEffect(PNCancelEffect):
 class ReconnectEffect(PNManageableEffect):
     def __init__(
         self,
-        channels: Union[None, List[str]] = None,
-        groups: Union[None, List[str]] = None,
+        channels: Union[None, list[str]] = None,
+        groups: Union[None, list[str]] = None,
         timetoken: Union[None, str] = None,
         region: Union[None, int] = None,
         attempts: Union[None, int] = None,
@@ -89,7 +89,7 @@ class PNEmittableEffect(PNEffect):
 
 
 class EmitMessagesEffect(PNEmittableEffect):
-    def __init__(self, messages: Union[None, List[str]]) -> None:
+    def __init__(self, messages: Union[None, list[str]]) -> None:
         super().__init__()
         self.messages = messages
 

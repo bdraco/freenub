@@ -14,11 +14,7 @@ class PNMessageAction:
             self.action_timetoken = None
 
     def __str__(self):
-        return "Message action with tt: %s for uuid %s with value %s " % (
-            self.action_timetoken,
-            self.uuid,
-            self.value,
-        )
+        return f"Message action with tt: {self.action_timetoken} for uuid {self.uuid} with value {self.value} "
 
 
 class PNGetMessageActionsResult:
@@ -37,7 +33,7 @@ class PNGetMessageActionsResult:
 
 class PNAddMessageActionResult(PNMessageAction):
     def __init__(self, message_action):
-        super(PNAddMessageActionResult, self).__init__(message_action)
+        super().__init__(message_action)
 
 
 class PNRemoveMessageActionResult:

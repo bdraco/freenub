@@ -10,7 +10,7 @@ from pubnub.request_handlers.requests_handler import RequestsRequestHandler
 
 class SendFileNative(FileOperationEndpoint, TimeTokenOverrideMixin):
     def __init__(self, pubnub):
-        super(SendFileNative, self).__init__(pubnub)
+        super().__init__(pubnub)
         self._file_name = None
         self._pubnub = pubnub
         self._file_upload_envelope = None
@@ -128,7 +128,7 @@ class SendFileNative(FileOperationEndpoint, TimeTokenOverrideMixin):
             .sync()
         )
 
-        response_envelope = super(SendFileNative, self).sync()
+        response_envelope = super().sync()
 
         publish_file_response = (
             PublishFileMessage(self._pubnub)

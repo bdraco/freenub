@@ -9,7 +9,7 @@ class PublishFileMessage(FileOperationEndpoint, TimeTokenOverrideMixin):
     PUBLISH_FILE_MESSAGE = "/v1/files/publish-file/%s/%s/0/%s/0/%s"
 
     def __init__(self, pubnub):
-        super(PublishFileMessage, self).__init__(pubnub)
+        super().__init__(pubnub)
         self._file_id = None
         self._file_name = None
         self._pubnub = pubnub

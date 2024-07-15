@@ -52,7 +52,7 @@ class PubNubAsyncio(PubNubCore):
     """
 
     def __init__(self, config, custom_event_loop=None, subscription_manager=None):
-        super(PubNubAsyncio, self).__init__(config)
+        super().__init__(config)
         self.event_loop = custom_event_loop or asyncio.get_event_loop()
 
         self._connector = None
@@ -196,7 +196,7 @@ class PubNubAsyncio(PubNubCore):
 
         url = URL(url, encoded=True)
 
-        logger.debug("%s %s %s" % (options.method_string, url, options.data))
+        logger.debug(f"{options.method_string} {url} {options.data}")
 
         if options.request_headers:
             request_headers = {**self.headers, **options.request_headers}
@@ -329,7 +329,7 @@ class PubNubAsyncio(PubNubCore):
 class AsyncioReconnectionManager(ReconnectionManager):
     def __init__(self, pubnub):
         self._task = None
-        super(AsyncioReconnectionManager, self).__init__(pubnub)
+        super().__init__(pubnub)
 
     async def _register_heartbeat_timer(self):
         while True:
@@ -370,7 +370,7 @@ class AsyncioReconnectionManager(ReconnectionManager):
 
 class AsyncioPublishSequenceManager(PublishSequenceManager):
     def __init__(self, ioloop, provided_max_sequence):
-        super(AsyncioPublishSequenceManager, self).__init__(provided_max_sequence)
+        super().__init__(provided_max_sequence)
         self._lock = asyncio.Lock()
         self._event_loop = ioloop
 
@@ -395,7 +395,7 @@ class AsyncioSubscriptionManager(SubscriptionManager):
         self._heartbeat_periodic_callback = None
         self._reconnection_manager = AsyncioReconnectionManager(pubnub_instance)
 
-        super(AsyncioSubscriptionManager, self).__init__(pubnub_instance)
+        super().__init__(pubnub_instance)
         self._start_worker()
 
         class AsyncioReconnectionCallback(ReconnectionCallback):
@@ -442,7 +442,7 @@ class AsyncioSubscriptionManager(SubscriptionManager):
         self._stop_subscribe_loop()
 
     def stop(self):
-        super(AsyncioSubscriptionManager, self).stop()
+        super().stop()
         self._reconnection_manager.stop_polling()
         if self._subscribe_loop_task and not self._subscribe_loop_task.cancelled():
             self._subscribe_loop_task.cancel()
@@ -521,7 +521,7 @@ class AsyncioSubscriptionManager(SubscriptionManager):
             self._heartbeat_periodic_callback.stop()
 
     def _register_heartbeat_timer(self):
-        super(AsyncioSubscriptionManager, self)._register_heartbeat_timer()
+        super()._register_heartbeat_timer()
 
         self._heartbeat_periodic_callback = AsyncioPeriodicCallback(
             self._perform_heartbeat_loop,

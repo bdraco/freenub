@@ -127,7 +127,7 @@ class PNHereNowOccupantsData:
         self.state = state
 
     def __str__(self):
-        return "HereNow Occupants Data for '%s': %s" % (self.uuid, self.state)
+        return f"HereNow Occupants Data for '{self.uuid}': {self.state}"
 
 
 class PNWhereNowResult:

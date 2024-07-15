@@ -13,7 +13,7 @@ class Publish(Endpoint, TimeTokenOverrideMixin):
     PUBLISH_POST_PATH = "/publish/%s/%s/0/%s/%s"
 
     def __init__(self, pubnub):
-        super(Publish, self).__init__(pubnub)
+        super().__init__(pubnub)
         self._channel = None
         self._message = None
         self._should_store = None

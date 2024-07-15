@@ -1,3 +1,5 @@
+"""StateMachine."""
+
 import logging
 from typing import Optional
 
@@ -93,7 +95,6 @@ class StateMachine:
         self._enabled = False
 
 
-""" TODO: Remove before prodction """
 if __name__ == "__main__":
     machine = StateMachine(states.UnsubscribedState)
     logging.debug(f"machine initialized. Current state: {machine.get_state_name()}")

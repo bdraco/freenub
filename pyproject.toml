@@ -23,10 +23,20 @@ packages = [
 
 [tool.poetry.dependencies]
 python = "^3.8"
+pycryptodomex = ">=3.3"
+requests = ">=2.4"
+cbor2 = "^5.6.4"
+aiohttp = "^3.9.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
 pytest-cov = "^5.0.0"
+pyyaml = "^6.0.1"
+pytest-asyncio = "^0.23.7"
+behave = "^1.2.6"
+vcrpy = "^6.0.1"
+urllib3 = "<2"
+busypie = "^0.5.1"
 
 [tool.semantic_release]
 version_toml = ["pyproject.toml:tool.poetry.version"]

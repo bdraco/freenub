@@ -1,9 +1,9 @@
 class PNGetFilesResult:
     def __init__(self, result):
-        self.data = result['data']
-        self.count = result.get('count', None)
-        self.next = result.get('next', None)
-        self.prev = result.get('prev', None)
+        self.data = result["data"]
+        self.count = result.get("count", None)
+        self.next = result.get("next", None)
+        self.prev = result.get("prev", None)
 
     def __str__(self):
         return "Get files success with data: %s" % self.data
@@ -11,7 +11,7 @@ class PNGetFilesResult:
 
 class PNDeleteFileResult:
     def __init__(self, result):
-        self.status = result['status']
+        self.status = result["status"]
 
     def __str__(self):
         return "Delete files success with status: %s" % self.status

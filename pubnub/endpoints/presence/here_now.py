@@ -35,13 +35,13 @@ class HereNow(Endpoint):
         params = {}
 
         if len(self._channel_groups) > 0:
-            params['channel-group'] = utils.join_items_and_encode(self._channel_groups)
+            params["channel-group"] = utils.join_items_and_encode(self._channel_groups)
 
         if self._include_state:
-            params['state'] = "1"
+            params["state"] = "1"
 
         if not self._include_uuids:
-            params['disable_uuids'] = "1"
+            params["disable_uuids"] = "1"
 
         return params
 
@@ -49,8 +49,10 @@ class HereNow(Endpoint):
         if len(self._channels) == 0 and len(self._channel_groups) == 0:
             return HereNow.HERE_NOW_GLOBAL_PATH % self.pubnub.config.subscribe_key
         else:
-            return HereNow.HERE_NOW_PATH % (self.pubnub.config.subscribe_key,
-                                            utils.join_channels(self._channels))
+            return HereNow.HERE_NOW_PATH % (
+                self.pubnub.config.subscribe_key,
+                utils.join_channels(self._channels),
+            )
 
     def http_method(self):
         return HttpMethod.GET

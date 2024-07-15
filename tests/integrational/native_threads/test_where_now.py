@@ -1,13 +1,13 @@
-import unittest
 import logging
-import pubnub
 import threading
+import unittest
 
-from pubnub.pubnub import PubNub, SubscribeListener, NonSubscribeListener
-from tests.integrational.vcr_helper import pn_vcr
+import pubnub
+from pubnub.pubnub import NonSubscribeListener, PubNub, SubscribeListener
 from tests.helper import mocked_config_copy
+from tests.integrational.vcr_helper import pn_vcr
 
-pubnub.set_stream_logger('pubnub', logging.DEBUG)
+pubnub.set_stream_logger("pubnub", logging.DEBUG)
 
 
 class TestPubNubState(unittest.TestCase):
@@ -19,11 +19,13 @@ class TestPubNubState(unittest.TestCase):
         self.status = status
         self.event.set()
 
-    @pn_vcr.use_cassette('tests/integrational/fixtures/native_threads/where_now/single_channel.yaml',
-                         filter_query_parameters=['seqn', 'pnsdk', 'tr', 'tt'],
-                         allow_playback_repeats=True)
+    @pn_vcr.use_cassette(
+        "tests/integrational/fixtures/native_threads/where_now/single_channel.yaml",
+        filter_query_parameters=["seqn", "pnsdk", "tr", "tt"],
+        allow_playback_repeats=True,
+    )
     def test_single_channel(self):
-        print('test_single_channel')
+        print("test_single_channel")
         pubnub = PubNub(mocked_config_copy())
         ch = "wherenow-asyncio-channel"
         uuid = "wherenow-asyncio-uuid"
@@ -35,9 +37,7 @@ class TestPubNubState(unittest.TestCase):
         pubnub.subscribe().channels(ch).execute()
         subscribe_listener.wait_for_connect()
 
-        pubnub.where_now() \
-            .uuid(uuid) \
-            .pn_async(where_now_listener.callback)
+        pubnub.where_now().uuid(uuid).pn_async(where_now_listener.callback)
 
         if where_now_listener.pn_await() is False:
             self.fail("WhereNow operation timeout")
@@ -53,9 +53,11 @@ class TestPubNubState(unittest.TestCase):
 
         pubnub.stop()
 
-    @pn_vcr.use_cassette('tests/integrational/fixtures/native_threads/where_now/multiple_channels.yaml',
-                         filter_query_parameters=['seqn', 'pnsdk', 'tr', 'tt'],
-                         allow_playback_repeats=True)
+    @pn_vcr.use_cassette(
+        "tests/integrational/fixtures/native_threads/where_now/multiple_channels.yaml",
+        filter_query_parameters=["seqn", "pnsdk", "tr", "tt"],
+        allow_playback_repeats=True,
+    )
     def test_multiple_channels(self):
         pubnub = PubNub(mocked_config_copy())
         ch1 = "state-native-sync-ch-1"
@@ -70,9 +72,7 @@ class TestPubNubState(unittest.TestCase):
 
         subscribe_listener.wait_for_connect()
 
-        pubnub.where_now() \
-            .uuid(uuid) \
-            .pn_async(where_now_listener.callback)
+        pubnub.where_now().uuid(uuid).pn_async(where_now_listener.callback)
 
         if where_now_listener.pn_await() is False:
             self.fail("WhereNow operation timeout")

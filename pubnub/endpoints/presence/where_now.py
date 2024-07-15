@@ -1,8 +1,8 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
+from pubnub.endpoints.mixins import UUIDValidatorMixin
 from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.presence import PNWhereNowResult
-from pubnub.endpoints.mixins import UUIDValidatorMixin
 
 
 class WhereNow(Endpoint, UUIDValidatorMixin):
@@ -21,7 +21,10 @@ class WhereNow(Endpoint, UUIDValidatorMixin):
         return {}
 
     def build_path(self):
-        return WhereNow.WHERE_NOW_PATH % (self.pubnub.config.subscribe_key, utils.url_encode(self._uuid))
+        return WhereNow.WHERE_NOW_PATH % (
+            self.pubnub.config.subscribe_key,
+            utils.url_encode(self._uuid),
+        )
 
     def http_method(self):
         return HttpMethod.GET

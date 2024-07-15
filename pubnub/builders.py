@@ -1,9 +1,10 @@
 from abc import ABCMeta, abstractmethod
-from .dtos import SubscribeOperation, UnsubscribeOperation
+
 from . import utils
+from .dtos import SubscribeOperation, UnsubscribeOperation
 
 
-class PubSubBuilder(object):
+class PubSubBuilder:
     __metaclass__ = ABCMeta
 
     def __init__(self, subscription_manager):
@@ -52,7 +53,7 @@ class SubscribeBuilder(PubSubBuilder):
             channels=self._channel_subscriptions,
             channel_groups=self._channel_group_subscriptions,
             timetoken=self._timetoken,
-            presence_enabled=self._presence_enabled
+            presence_enabled=self._presence_enabled,
         )
 
         self._subscription_manager.adapt_subscribe_builder(subscribe_operation)
@@ -62,7 +63,7 @@ class UnsubscribeBuilder(PubSubBuilder):
     def execute(self):
         unsubscribe_operation = UnsubscribeOperation(
             channels=self._channel_subscriptions,
-            channel_groups=self._channel_group_subscriptions
+            channel_groups=self._channel_group_subscriptions,
         )
 
         self._subscription_manager.adapt_unsubscribe_builder(unsubscribe_operation)

@@ -1,6 +1,6 @@
 from pubnub import utils
-from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.endpoints.endpoint import Endpoint
+from pubnub.enums import HttpMethod, PNOperationType
 
 
 class HistoryDelete(Endpoint):  # pylint: disable=W0612
@@ -28,17 +28,17 @@ class HistoryDelete(Endpoint):  # pylint: disable=W0612
         params = {}
 
         if self._start is not None:
-            params['start'] = str(self._start)
+            params["start"] = str(self._start)
 
         if self._end is not None:
-            params['end'] = str(self._end)
+            params["end"] = str(self._end)
 
         return params
 
     def build_path(self):
         return HistoryDelete.HISTORY_DELETE_PATH % (
             self.pubnub.config.subscribe_key,
-            utils.url_encode(self._channel)
+            utils.url_encode(self._channel),
         )
 
     def http_method(self):

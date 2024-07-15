@@ -1,7 +1,7 @@
 from datetime import date
 
 
-class PNTimeResponse(object):
+class PNTimeResponse:
     MULTIPLIER = 10000000
 
     def __init__(self, server_response):

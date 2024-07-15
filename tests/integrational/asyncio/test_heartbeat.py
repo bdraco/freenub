@@ -1,5 +1,6 @@
-import logging
 import asyncio
+import logging
+
 import pytest
 
 import pubnub as pn
@@ -7,7 +8,7 @@ from pubnub.pubnub_asyncio import PubNubAsyncio, SubscribeListener
 from tests import helper
 from tests.helper import pnconf_sub_copy
 
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 
 
 messenger_config = pnconf_sub_copy()
@@ -36,7 +37,7 @@ async def test_timeout_event_on_broken_heartbeat(event_loop):
 
     envelope = await callback_presence.wait_for_presence_on(ch)
     assert ch == envelope.channel
-    assert 'join' == envelope.event
+    assert "join" == envelope.event
     assert pubnub_listener.uuid == envelope.uuid
 
     # - connect to :ch
@@ -53,7 +54,7 @@ async def test_timeout_event_on_broken_heartbeat(event_loop):
     prs_envelope = presence_future.result()
 
     assert ch == prs_envelope.channel
-    assert 'join' == prs_envelope.event
+    assert "join" == prs_envelope.event
     assert pubnub.uuid == prs_envelope.uuid
 
     # wait for one heartbeat call
@@ -65,7 +66,7 @@ async def test_timeout_event_on_broken_heartbeat(event_loop):
     # - assert for timeout
     envelope = await callback_presence.wait_for_presence_on(ch)
     assert ch == envelope.channel
-    assert 'timeout' == envelope.event
+    assert "timeout" == envelope.event
     assert pubnub.uuid == envelope.uuid
 
     pubnub.unsubscribe().channels(ch).execute()

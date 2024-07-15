@@ -1,12 +1,17 @@
 from pubnub import utils
-from pubnub.endpoints.objects_v2.objects_endpoint import ObjectsEndpoint, UuidEndpoint, \
-    IncludeCustomEndpoint, CustomAwareEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.objects_v2.objects_endpoint import (
+    CustomAwareEndpoint,
+    IncludeCustomEndpoint,
+    ObjectsEndpoint,
+    UuidEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.objects_v2.uuid import PNSetUUIDMetadataResult
 
 
-class SetUuid(ObjectsEndpoint, UuidEndpoint, IncludeCustomEndpoint, CustomAwareEndpoint):
+class SetUuid(
+    ObjectsEndpoint, UuidEndpoint, IncludeCustomEndpoint, CustomAwareEndpoint
+):
     SET_UID_PATH = "/v2/objects/%s/uuids/%s"
 
     def __init__(self, pubnub):
@@ -37,7 +42,10 @@ class SetUuid(ObjectsEndpoint, UuidEndpoint, IncludeCustomEndpoint, CustomAwareE
         return self
 
     def build_path(self):
-        return SetUuid.SET_UID_PATH % (self.pubnub.config.subscribe_key, self._effective_uuid())
+        return SetUuid.SET_UID_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._effective_uuid(),
+        )
 
     def build_data(self):
         payload = {
@@ -45,7 +53,7 @@ class SetUuid(ObjectsEndpoint, UuidEndpoint, IncludeCustomEndpoint, CustomAwareE
             "email": self._email,
             "externalId": self._external_id,
             "profileUrl": self._profile_url,
-            "custom": self._custom
+            "custom": self._custom,
         }
         return utils.write_value_as_string(payload)
 

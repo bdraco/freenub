@@ -10,10 +10,10 @@ class SubscribeEnvelope:
     def from_json(cls, json_input):
         messages = []
 
-        for raw_message in json_input['m']:
+        for raw_message in json_input["m"]:
             messages.append(SubscribeMessage.from_json(raw_message))
 
-        metadata = SubscribeMetadata.from_json(json_input['t'])
+        metadata = SubscribeMetadata.from_json(json_input["t"])
         return SubscribeEnvelope(messages, metadata)
 
 
@@ -34,21 +34,21 @@ class SubscribeMessage:
     @classmethod
     def from_json(cls, json_input):
         message = SubscribeMessage()
-        if 'a' in json_input:
-            message.shard = json_input['a']
-        if 'b' in json_input:
-            message.subscription_match = json_input['b']
-        message.channel = json_input['c']
-        message.payload = json_input['d']
-        message.flags = json_input['f']
-        if 'i' in json_input:
-            message.issuing_client_id = json_input['i']
-        message.subscribe_key = json_input['k']
-        if 'o' in json_input:
-            message.origination_timetoken = json_input['o']
-        message.publish_metadata = PublishMetadata.from_json(json_input['p'])
-        if 'e' in json_input:
-            message.type = json_input['e']
+        if "a" in json_input:
+            message.shard = json_input["a"]
+        if "b" in json_input:
+            message.subscription_match = json_input["b"]
+        message.channel = json_input["c"]
+        message.payload = json_input["d"]
+        message.flags = json_input["f"]
+        if "i" in json_input:
+            message.issuing_client_id = json_input["i"]
+        message.subscribe_key = json_input["k"]
+        if "o" in json_input:
+            message.origination_timetoken = json_input["o"]
+        message.publish_metadata = PublishMetadata.from_json(json_input["p"])
+        if "e" in json_input:
+            message.type = json_input["e"]
         return message
 
 
@@ -60,10 +60,10 @@ class SubscribeMetadata:
     @classmethod
     def from_json(cls, json_input):
         assert isinstance(json_input, dict)
-        assert 'r' in json_input
-        assert 't' in json_input
+        assert "r" in json_input
+        assert "t" in json_input
 
-        return SubscribeMetadata(json_input['t'], json_input['r'])
+        return SubscribeMetadata(json_input["t"], json_input["r"])
 
 
 class PresenceEnvelope:
@@ -90,11 +90,11 @@ class PresenceEnvelope:
     @classmethod
     def from_json_payload(cls, json):
         return PresenceEnvelope(
-            action=cls.extract_value(json, 'action'),
-            uuid=cls.extract_value(json, 'uuid'),
-            occupancy=cls.extract_value(json, 'occupancy'),
-            timestamp=cls.extract_value(json, 'timestamp'),
-            data=cls.extract_value(json, 'data')
+            action=cls.extract_value(json, "action"),
+            uuid=cls.extract_value(json, "uuid"),
+            occupancy=cls.extract_value(json, "occupancy"),
+            timestamp=cls.extract_value(json, "timestamp"),
+            data=cls.extract_value(json, "data"),
         )
 
 
@@ -105,7 +105,7 @@ class PublishMetadata:
 
     @classmethod
     def from_json(cls, json_input):
-        assert 'r' in json_input
-        assert 't' in json_input
+        assert "r" in json_input
+        assert "t" in json_input
 
-        return PublishMetadata(int(json_input['t']), int(json_input['r']))
+        return PublishMetadata(int(json_input["t"]), int(json_input["r"]))

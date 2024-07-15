@@ -1,8 +1,18 @@
 from pubnub import utils
-from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, SpaceEndpoint, SpacesEndpoint, UserEndpoint, \
-    UsersEndpoint
-from pubnub.enums import PNOperationType, HttpMethod
-from pubnub.errors import PNERR_INVALID_SPACE, PNERR_INVALID_USER, PNERR_USER_ID_MISSING, PNERR_SPACE_MISSING
+from pubnub.endpoints.entities.endpoint import (
+    EntitiesEndpoint,
+    SpaceEndpoint,
+    SpacesEndpoint,
+    UserEndpoint,
+    UsersEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.errors import (
+    PNERR_INVALID_SPACE,
+    PNERR_INVALID_USER,
+    PNERR_SPACE_MISSING,
+    PNERR_USER_ID_MISSING,
+)
 from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.entities.membership import PNMembershipsResult
 from pubnub.models.consumer.entities.space import Space
@@ -27,15 +37,15 @@ class RemoveSpaceMembers(EntitiesEndpoint, SpaceEndpoint, UsersEndpoint):
             raise PubNubException(pn_error=PNERR_INVALID_USER)
 
     def build_path(self):
-        return RemoveSpaceMembers.MEMBERSHIP_PATH % (self.pubnub.config.subscribe_key, self.pubnub.uuid)
+        return RemoveSpaceMembers.MEMBERSHIP_PATH % (
+            self.pubnub.config.subscribe_key,
+            self.pubnub.uuid,
+        )
 
     def build_data(self):
         users = [user.to_payload_dict() for user in self._users]
 
-        payload = {
-            "set": [],
-            "delete": users
-        }
+        payload = {"set": [], "delete": users}
         return utils.write_value_as_string(payload)
 
     def create_response(self, envelope):
@@ -69,15 +79,15 @@ class RemoveUserSpaces(EntitiesEndpoint, UserEndpoint, SpacesEndpoint):
             raise PubNubException(pn_error=PNERR_INVALID_SPACE)
 
     def build_path(self):
-        return RemoveUserSpaces.MEMBERSHIP_PATH % (self.pubnub.config.subscribe_key, self._user_id)
+        return RemoveUserSpaces.MEMBERSHIP_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._user_id,
+        )
 
     def build_data(self):
         spaces = [space.to_payload_dict() for space in self._spaces]
 
-        payload = {
-            "set": [],
-            "delete": spaces
-        }
+        payload = {"set": [], "delete": spaces}
         return utils.write_value_as_string(payload)
 
     def create_response(self, envelope):

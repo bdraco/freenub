@@ -1,7 +1,7 @@
 from pubnub.models.consumer.objects_v2.page import PNPageable
 
 
-class PNEntityResult(object):
+class PNEntityResult:
     def __init__(self, result):
         self.data = result["data"]
         self.status = result["status"]

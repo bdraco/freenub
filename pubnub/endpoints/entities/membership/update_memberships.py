@@ -1,15 +1,31 @@
 from pubnub import utils
-from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, IncludeCustomEndpoint, SpaceEndpoint, SpacesEndpoint, \
-    UserEndpoint, UsersEndpoint
-from pubnub.enums import PNOperationType, HttpMethod
-from pubnub.errors import PNERR_INVALID_SPACE, PNERR_INVALID_USER, PNERR_USER_ID_MISSING, PNERR_SPACE_MISSING
+from pubnub.endpoints.entities.endpoint import (
+    EntitiesEndpoint,
+    IncludeCustomEndpoint,
+    SpaceEndpoint,
+    SpacesEndpoint,
+    UserEndpoint,
+    UsersEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.errors import (
+    PNERR_INVALID_SPACE,
+    PNERR_INVALID_USER,
+    PNERR_SPACE_MISSING,
+    PNERR_USER_ID_MISSING,
+)
 from pubnub.exceptions import PubNubException
-from pubnub.models.consumer.entities.membership import PNMembershipsResult, PNSpaceMembershipsResult
+from pubnub.models.consumer.entities.membership import (
+    PNMembershipsResult,
+    PNSpaceMembershipsResult,
+)
 from pubnub.models.consumer.entities.space import Space
 from pubnub.models.consumer.entities.user import User
 
 
-class UpdateSpaceMembers(EntitiesEndpoint, SpaceEndpoint, UsersEndpoint, IncludeCustomEndpoint):
+class UpdateSpaceMembers(
+    EntitiesEndpoint, SpaceEndpoint, UsersEndpoint, IncludeCustomEndpoint
+):
     MEMBERSHIP_PATH = "/v2/objects/%s/channels/%s/uuids"
 
     def __init__(self, pubnub):
@@ -28,15 +44,15 @@ class UpdateSpaceMembers(EntitiesEndpoint, SpaceEndpoint, UsersEndpoint, Include
             raise PubNubException(pn_error=PNERR_INVALID_USER)
 
     def build_path(self):
-        return UpdateSpaceMembers.MEMBERSHIP_PATH % (self.pubnub.config.subscribe_key, self._space_id)
+        return UpdateSpaceMembers.MEMBERSHIP_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._space_id,
+        )
 
     def build_data(self):
         users = [user.to_payload_dict() for user in self._users]
 
-        payload = {
-            "set": users,
-            "delete": []
-        }
+        payload = {"set": users, "delete": []}
         return utils.write_value_as_string(payload)
 
     def create_response(self, envelope):
@@ -70,15 +86,15 @@ class UpdateUserSpaces(EntitiesEndpoint, UserEndpoint, SpacesEndpoint):
             raise PubNubException(pn_error=PNERR_INVALID_SPACE)
 
     def build_path(self):
-        return UpdateUserSpaces.MEMBERSHIP_PATH % (self.pubnub.config.subscribe_key, self._user_id)
+        return UpdateUserSpaces.MEMBERSHIP_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._user_id,
+        )
 
     def build_data(self):
         spaces = [space.to_payload_dict() for space in self._spaces]
 
-        payload = {
-            "set": spaces,
-            "delete": []
-        }
+        payload = {"set": spaces, "delete": []}
         return utils.write_value_as_string(payload)
 
     def create_response(self, envelope):

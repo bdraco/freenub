@@ -1,17 +1,17 @@
-import logging
 import asyncio
+import logging
 
 import aiohttp
 import pytest
+
 import pubnub as pn
 from pubnub.callbacks import SubscribeCallback
 from pubnub.enums import PNReconnectionPolicy
-
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub_asyncio import PubNubAsyncio
 from tests.helper import pnconf_sub_copy
 
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 
 
 class MySubscribeCallback(SubscribeCallback):
@@ -40,7 +40,11 @@ async def test_blah():
 
     async def open_again():
         await asyncio.sleep(time_until_open_again)
-        await pubnub.set_connector(aiohttp.TCPConnector(conn_timeout=pubnub.config.connect_timeout, verify_ssl=True))
+        await pubnub.set_connector(
+            aiohttp.TCPConnector(
+                conn_timeout=pubnub.config.connect_timeout, verify_ssl=True
+            )
+        )
         print(">>> connection is open again")
 
     async def countdown():
@@ -57,7 +61,7 @@ async def test_blah():
 
     my_listener = MySubscribeCallback()
     pubnub.add_listener(my_listener)
-    pubnub.subscribe().channels('my_channel').execute()
+    pubnub.subscribe().channels("my_channel").execute()
 
     asyncio.ensure_future(close_soon())
     asyncio.ensure_future(open_again())

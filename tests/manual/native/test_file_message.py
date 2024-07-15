@@ -6,12 +6,12 @@ d = os.path.dirname
 PUBNUB_ROOT = d(d(d(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.append(PUBNUB_ROOT)
 
-from tests.helper import pnconf_file_copy
 import pubnub as pn
 from pubnub.callbacks import SubscribeCallback
 from pubnub.pubnub import PubNub
+from tests.helper import pnconf_file_copy
 
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 logger = logging.getLogger("file_upload")
 
 

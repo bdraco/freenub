@@ -1,5 +1,6 @@
-from pubnub.exceptions import PubNubException
 from typing import List, Optional
+
+from pubnub.exceptions import PubNubException
 
 
 class PNEvent:
@@ -32,7 +33,13 @@ class SubscriptionChangedEvent(PNChannelGroupsEvent):
 
 
 class SubscriptionRestoredEvent(PNCursorEvent, PNChannelGroupsEvent):
-    def __init__(self, timetoken: str, channels: List[str], groups: List[str], region: Optional[int] = None) -> None:
+    def __init__(
+        self,
+        timetoken: str,
+        channels: List[str],
+        groups: List[str],
+        region: Optional[int] = None,
+    ) -> None:
         PNCursorEvent.__init__(self, timetoken, region)
         PNChannelGroupsEvent.__init__(self, channels, groups)
 
@@ -63,7 +70,9 @@ class HandshakeReconnectRetryEvent(PNEvent):
 
 
 class ReceiveSuccessEvent(PNCursorEvent):
-    def __init__(self, timetoken: str, messages: list, region: Optional[int] = None) -> None:
+    def __init__(
+        self, timetoken: str, messages: list, region: Optional[int] = None
+    ) -> None:
         PNCursorEvent.__init__(self, timetoken, region)
         self.messages = messages
 
@@ -73,7 +82,9 @@ class ReceiveFailureEvent(PNFailureEvent):
 
 
 class ReceiveReconnectSuccessEvent(PNCursorEvent):
-    def __init__(self, timetoken: str, messages: list, region: Optional[int] = None) -> None:
+    def __init__(
+        self, timetoken: str, messages: list, region: Optional[int] = None
+    ) -> None:
         PNCursorEvent.__init__(self, timetoken, region)
         self.messages = messages
 

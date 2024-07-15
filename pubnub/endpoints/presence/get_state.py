@@ -1,8 +1,8 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
+from pubnub.endpoints.mixins import UUIDValidatorMixin
 from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.presence import PNGetStateResult
-from pubnub.endpoints.mixins import UUIDValidatorMixin
 
 
 class GetState(Endpoint, UUIDValidatorMixin):
@@ -31,7 +31,7 @@ class GetState(Endpoint, UUIDValidatorMixin):
         params = {}
 
         if len(self._groups) > 0:
-            params['channel-group'] = utils.join_items(self._groups)
+            params["channel-group"] = utils.join_items(self._groups)
 
         return params
 
@@ -39,7 +39,7 @@ class GetState(Endpoint, UUIDValidatorMixin):
         return GetState.GET_STATE_PATH % (
             self.pubnub.config.subscribe_key,
             utils.join_channels(self._channels),
-            utils.url_encode(self._uuid)
+            utils.url_encode(self._uuid),
         )
 
     def http_method(self):
@@ -52,9 +52,9 @@ class GetState(Endpoint, UUIDValidatorMixin):
 
     def create_response(self, envelope):
         if len(self._channels) == 1 and len(self._groups) == 0:
-            channels = {self._channels[0]: envelope['payload']}
+            channels = {self._channels[0]: envelope["payload"]}
         else:
-            channels = envelope['payload']['channels']
+            channels = envelope["payload"]["channels"]
 
         return PNGetStateResult(channels)
 

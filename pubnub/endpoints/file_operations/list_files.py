@@ -1,6 +1,6 @@
+from pubnub import utils
 from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
 from pubnub.enums import HttpMethod, PNOperationType
-from pubnub import utils
 from pubnub.models.consumer.file import PNGetFilesResult
 
 
@@ -13,7 +13,7 @@ class ListFiles(FileOperationEndpoint):
     def build_path(self):
         return ListFiles.LIST_FILES_URL % (
             self.pubnub.config.subscribe_key,
-            utils.url_encode(self._channel)
+            utils.url_encode(self._channel),
         )
 
     def http_method(self):

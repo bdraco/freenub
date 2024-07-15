@@ -1,22 +1,37 @@
 from .enums import HttpMethod
 
 
-class RequestOptions(object):
+class RequestOptions:
     def __init__(
-            self, path, params_callback,
-            method, request_timeout, connect_timeout,
-            create_response, create_status, create_exception,
-            operation_type, data=None, sort_arguments=False,
-            allow_redirects=True, use_base_path=None, files=None,
-            request_headers=None, non_json_response=False
+        self,
+        path,
+        params_callback,
+        method,
+        request_timeout,
+        connect_timeout,
+        create_response,
+        create_status,
+        create_exception,
+        operation_type,
+        data=None,
+        sort_arguments=False,
+        allow_redirects=True,
+        use_base_path=None,
+        files=None,
+        request_headers=None,
+        non_json_response=False,
     ):
         assert len(path) > 0
         assert callable(params_callback)
         assert isinstance(method, int)
         assert isinstance(request_timeout, int)
         assert isinstance(connect_timeout, int)
-        if not (method is HttpMethod.GET or method is HttpMethod.POST or method is HttpMethod.DELETE
-                or method is HttpMethod.PATCH):  # noqa
+        if not (
+            method is HttpMethod.GET
+            or method is HttpMethod.POST
+            or method is HttpMethod.DELETE
+            or method is HttpMethod.PATCH
+        ):
             raise AssertionError()
 
         self.params = None
@@ -54,7 +69,7 @@ class RequestOptions(object):
         return self._method is HttpMethod.PATCH
 
     def query_list(self):
-        """ All query keys and values should be already encoded inside a build_params() method"""
+        """All query keys and values should be already encoded inside a build_params() method"""
         s = []
 
         for k, v in self.params.items():
@@ -67,20 +82,29 @@ class RequestOptions(object):
 
     @property
     def query_string(self):
-        return str('&'.join(self.query_list()))
+        return str("&".join(self.query_list()))
 
     def __str__(self):
-        return "path: {0}, qs: {1}".format(self.path, self.query_string)
+        return f"path: {self.path}, qs: {self.query_string}"
 
 
-class PlatformOptions(object):
+class PlatformOptions:
     def __init__(self, headers, pn_config):
         self.headers = headers
         self.pn_config = pn_config
 
 
-class ResponseInfo(object):
-    def __init__(self, status_code, tls_enabled, origin, uuid, auth_key, client_request, client_response=None):
+class ResponseInfo:
+    def __init__(
+        self,
+        status_code,
+        tls_enabled,
+        origin,
+        uuid,
+        auth_key,
+        client_request,
+        client_response=None,
+    ):
         self.status_code = status_code
         self.tls_enabled = tls_enabled
         self.origin = origin
@@ -90,7 +114,7 @@ class ResponseInfo(object):
         self.client_response = client_response
 
 
-class Envelope(object):
+class Envelope:
     def __init__(self, result, status):
         self.result = result
         self.status = status

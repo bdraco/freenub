@@ -1,16 +1,16 @@
 import asyncio
 import logging
 import math
-
 from queue import SimpleQueue
 from typing import Union
+
 from pubnub.endpoints.pubsub.subscribe import Subscribe
 from pubnub.enums import PNReconnectionPolicy
+from pubnub.event_engine.models import effects, events
+from pubnub.models.consumer.common import PNStatus
 from pubnub.models.consumer.pubsub import PNMessageResult
 from pubnub.models.server.subscribe import SubscribeMessage
 from pubnub.pubnub import PubNub
-from pubnub.event_engine.models import effects, events
-from pubnub.models.consumer.common import PNStatus
 
 
 class ManagedEffect:
@@ -22,8 +22,12 @@ class ManagedEffect:
     def set_pn(self, pubnub: PubNub):
         self.pubnub = pubnub
 
-    def __init__(self, pubnub_instance, event_engine_instance,
-                 effect: Union[effects.PNManageableEffect, effects.PNCancelEffect]) -> None:
+    def __init__(
+        self,
+        pubnub_instance,
+        event_engine_instance,
+        effect: Union[effects.PNManageableEffect, effects.PNCancelEffect],
+    ) -> None:
         self.effect = effect
         self.event_engine = event_engine_instance
         self.pubnub = pubnub_instance
@@ -35,14 +39,18 @@ class ManagedEffect:
         pass
 
     def stop(self):
-        logging.debug(f'stop called on {self.__class__.__name__}')
+        logging.debug(f"stop called on {self.__class__.__name__}")
         if self.stop_event:
-            logging.debug(f'stop_event({id(self.stop_event)}).set() called on {self.__class__.__name__}')
+            logging.debug(
+                f"stop_event({id(self.stop_event)}).set() called on {self.__class__.__name__}"
+            )
             self.stop_event.set()
 
     def get_new_stop_event(self):
         event = asyncio.Event()
-        logging.debug(f'creating new stop_event({id(event)}) for {self.__class__.__name__}')
+        logging.debug(
+            f"creating new stop_event({id(event)}) for {self.__class__.__name__}"
+        )
         return event
 
 
@@ -50,30 +58,41 @@ class ManageHandshakeEffect(ManagedEffect):
     def run(self):
         channels = self.effect.channels
         groups = self.effect.groups
-        if hasattr(self.pubnub, 'event_loop'):
+        if hasattr(self.pubnub, "event_loop"):
             self.stop_event = self.get_new_stop_event()
 
             loop: asyncio.AbstractEventLoop = self.pubnub.event_loop
             if loop.is_running():
-                loop.create_task(self.handshake_async(channels, groups, self.stop_event))
+                loop.create_task(
+                    self.handshake_async(channels, groups, self.stop_event)
+                )
             else:
-                loop.run_until_complete(self.handshake_async(channels, groups, self.stop_event))
+                loop.run_until_complete(
+                    self.handshake_async(channels, groups, self.stop_event)
+                )
         else:
             # TODO:  the synchronous way
             pass
 
     async def handshake_async(self, channels, groups, stop_event):
-        request = Subscribe(self.pubnub).channels(channels).channel_groups(groups).cancellation_event(stop_event)
+        request = (
+            Subscribe(self.pubnub)
+            .channels(channels)
+            .channel_groups(groups)
+            .cancellation_event(stop_event)
+        )
         handshake = await request.future()
 
         if handshake.status.error:
-            logging.warning(f'Handshake failed: {handshake.status.error_data.__dict__}')
-            handshake_failure = events.HandshakeFailureEvent(handshake.status.error_data, 1)
+            logging.warning(f"Handshake failed: {handshake.status.error_data.__dict__}")
+            handshake_failure = events.HandshakeFailureEvent(
+                handshake.status.error_data, 1
+            )
             self.event_engine.trigger(handshake_failure)
         else:
-            cursor = handshake.result['t']
-            timetoken = cursor['t']
-            region = cursor['r']
+            cursor = handshake.result["t"]
+            timetoken = cursor["t"]
+            region = cursor["r"]
             handshake_success = events.HandshakeSuccessEvent(timetoken, region)
             self.event_engine.trigger(handshake_success)
 
@@ -87,13 +106,17 @@ class ManagedReceiveMessagesEffect(ManagedEffect):
         timetoken = self.effect.timetoken
         region = self.effect.region
 
-        if hasattr(self.pubnub, 'event_loop'):
+        if hasattr(self.pubnub, "event_loop"):
             self.stop_event = self.get_new_stop_event()
             loop: asyncio.AbstractEventLoop = self.pubnub.event_loop
             if loop.is_running():
-                loop.create_task(self.receive_messages_async(channels, groups, timetoken, region))
+                loop.create_task(
+                    self.receive_messages_async(channels, groups, timetoken, region)
+                )
             else:
-                loop.run_until_complete(self.receive_messages_async(channels, groups, timetoken, region))
+                loop.run_until_complete(
+                    self.receive_messages_async(channels, groups, timetoken, region)
+                )
         else:
             # TODO:  the synchronous way
             pass
@@ -114,11 +137,13 @@ class ManagedReceiveMessagesEffect(ManagedEffect):
 
         if response and response.result:
             if not response.status.error:
-                cursor = response.result['t']
-                timetoken = cursor['t']
-                region = cursor['r']
-                messages = response.result['m']
-                recieve_success = events.ReceiveSuccessEvent(timetoken, region=region, messages=messages)
+                cursor = response.result["t"]
+                timetoken = cursor["t"]
+                region = cursor["r"]
+                messages = response.result["m"]
+                recieve_success = events.ReceiveSuccessEvent(
+                    timetoken, region=region, messages=messages
+                )
                 self.event_engine.trigger(recieve_success)
         self.stop_event.set()
 
@@ -130,8 +155,12 @@ class ManagedReconnectEffect(ManagedEffect):
     failure_event: events.PNFailureEvent
     success_event: events.PNCursorEvent
 
-    def __init__(self, pubnub_instance, event_engine_instance,
-                 effect: Union[effects.PNManageableEffect, effects.PNCancelEffect]) -> None:
+    def __init__(
+        self,
+        pubnub_instance,
+        event_engine_instance,
+        effect: Union[effects.PNManageableEffect, effects.PNCancelEffect],
+    ) -> None:
         super().__init__(pubnub_instance, event_engine_instance, effect)
         self.reconnection_policy = pubnub_instance.config.reconnect_policy
         self.interval = pubnub_instance.config.RECONNECTION_INTERVAL
@@ -150,20 +179,25 @@ class ManagedReconnectEffect(ManagedEffect):
 
     def run(self):
         if self.reconnection_policy is PNReconnectionPolicy.NONE:
-            self.event_engine.trigger(self.give_up_event(
-                reason=self.effect.reason,
-                attempt=self.effect.attempts
-            ))
+            self.event_engine.trigger(
+                self.give_up_event(
+                    reason=self.effect.reason, attempt=self.effect.attempts
+                )
+            )
         else:
             attempt = self.effect.attempts
             delay = self.calculate_reconnection_delay(attempt)
-            logging.warning(f'will reconnect in {delay}s')
-            if hasattr(self.pubnub, 'event_loop'):
+            logging.warning(f"will reconnect in {delay}s")
+            if hasattr(self.pubnub, "event_loop"):
                 loop: asyncio.AbstractEventLoop = self.pubnub.event_loop
                 if loop.is_running():
-                    self.delayed_reconnect_coro = loop.create_task(self.delayed_reconnect_async(delay, attempt))
+                    self.delayed_reconnect_coro = loop.create_task(
+                        self.delayed_reconnect_async(delay, attempt)
+                    )
                 else:
-                    self.delayed_reconnect_coro = loop.run_until_complete(self.delayed_reconnect_async(delay, attempt))
+                    self.delayed_reconnect_coro = loop.run_until_complete(
+                        self.delayed_reconnect_async(delay, attempt)
+                    )
             else:
                 # TODO:  the synchronous way
                 pass
@@ -172,8 +206,12 @@ class ManagedReconnectEffect(ManagedEffect):
         self.stop_event = self.get_new_stop_event()
         await asyncio.sleep(delay)
 
-        request = Subscribe(self.pubnub).channels(self.effect.channels).channel_groups(self.effect.groups) \
+        request = (
+            Subscribe(self.pubnub)
+            .channels(self.effect.channels)
+            .channel_groups(self.effect.groups)
             .cancellation_event(self.stop_event)
+        )
 
         if self.effect.timetoken:
             request.timetoken(self.effect.timetoken)
@@ -183,20 +221,22 @@ class ManagedReconnectEffect(ManagedEffect):
         reconnect = await request.future()
 
         if reconnect.status.error:
-            logging.warning(f'Reconnect failed: {reconnect.status.error_data.__dict__}')
+            logging.warning(f"Reconnect failed: {reconnect.status.error_data.__dict__}")
             reconnect_failure = self.failure_event(reconnect.status.error_data, attempt)
             self.event_engine.trigger(reconnect_failure)
         else:
-            cursor = reconnect.result['t']
-            timetoken = cursor['t']
-            region = cursor['r']
+            cursor = reconnect.result["t"]
+            timetoken = cursor["t"]
+            region = cursor["r"]
             reconnect_success = self.success_event(timetoken, region)
             self.event_engine.trigger(reconnect_success)
 
     def stop(self):
-        logging.debug(f'stop called on {self.__class__.__name__}')
+        logging.debug(f"stop called on {self.__class__.__name__}")
         if self.stop_event:
-            logging.debug(f'stop_event({id(self.stop_event)}).set() called on {self.__class__.__name__}')
+            logging.debug(
+                f"stop_event({id(self.stop_event)}).set() called on {self.__class__.__name__}"
+            )
             self.stop_event.set()
             if self.delayed_reconnect_coro:
                 try:
@@ -206,8 +246,12 @@ class ManagedReconnectEffect(ManagedEffect):
 
 
 class ManagedHandshakeReconnectEffect(ManagedReconnectEffect):
-    def __init__(self, pubnub_instance, event_engine_instance,
-                 effect: Union[effects.PNManageableEffect, effects.PNCancelEffect]) -> None:
+    def __init__(
+        self,
+        pubnub_instance,
+        event_engine_instance,
+        effect: Union[effects.PNManageableEffect, effects.PNCancelEffect],
+    ) -> None:
         self.give_up_event = events.HandshakeReconnectGiveupEvent
         self.failure_event = events.HandshakeReconnectFailureEvent
         self.success_event = events.HandshakeReconnectSuccessEvent
@@ -215,8 +259,12 @@ class ManagedHandshakeReconnectEffect(ManagedReconnectEffect):
 
 
 class ManagedReceiveReconnectEffect(ManagedReconnectEffect):
-    def __init__(self, pubnub_instance, event_engine_instance,
-                 effect: Union[effects.PNManageableEffect, effects.PNCancelEffect]) -> None:
+    def __init__(
+        self,
+        pubnub_instance,
+        event_engine_instance,
+        effect: Union[effects.PNManageableEffect, effects.PNCancelEffect],
+    ) -> None:
         self.give_up_event = events.HandshakeReconnectGiveupEvent
         self.failure_event = events.HandshakeReconnectFailureEvent
         self.success_event = events.HandshakeReconnectSuccessEvent
@@ -238,7 +286,9 @@ class ManagedEffectFactory:
         if effect.__class__.__name__ not in self._managed_effects:
             # TODO replace below with raise unsupported managed effect exception
             return ManagedEffect(self._pubnub, self._event_engine, effect)
-        return self._managed_effects[effect.__class__.__name__](self._pubnub, self._event_engine, effect)
+        return self._managed_effects[effect.__class__.__name__](
+            self._pubnub, self._event_engine, effect
+        )
 
 
 class EmitEffect:
@@ -261,11 +311,13 @@ class EmitEffect:
                 message=subscribe_message.payload,
                 subscription=subscribe_message.subscription_match,
                 channel=subscribe_message.channel,
-                timetoken=int(message['p']['t']),
+                timetoken=int(message["p"]["t"]),
                 user_metadata=subscribe_message.publish_metadata,
-                publisher=subscribe_message.issuing_client_id
+                publisher=subscribe_message.issuing_client_id,
             )
-            self.pubnub._subscription_manager._listener_manager.announce_message(pn_message_result)
+            self.pubnub._subscription_manager._listener_manager.announce_message(
+                pn_message_result
+            )
 
     def emit_status(self, effect: effects.EmitStatusEffect):
         pn_status = PNStatus()

@@ -1,5 +1,5 @@
-import unittest
 import threading
+import unittest
 
 from pubnub.pubnub import PubNub
 from tests.helper import pnconf
@@ -23,19 +23,15 @@ class TestPubNubSuccessHistoryDelete(unittest.TestCase):  # pylint: disable=W061
         self.status = None
 
     def test_success(self):
-        PubNub(pnconf).delete_messages() \
-            .channel("my-ch") \
-            .start(123) \
-            .end(456) \
-            .pn_async(self.callback)
+        PubNub(pnconf).delete_messages().channel("my-ch").start(123).end(456).pn_async(
+            self.callback
+        )
 
         self.assert_success()
 
     def test_super_call(self):
-        PubNub(pnconf).delete_messages() \
-            .channel("my-ch- |.* $") \
-            .start(123) \
-            .end(456) \
-            .pn_async(self.callback)
+        PubNub(pnconf).delete_messages().channel("my-ch- |.* $").start(123).end(
+            456
+        ).pn_async(self.callback)
 
         self.assert_success()

@@ -1,9 +1,12 @@
 from pubnub import utils
 from pubnub.dtos import StateOperation
 from pubnub.endpoints.endpoint import Endpoint
-from pubnub.errors import PNERR_STATE_MISSING, PNERR_STATE_SETTER_FOR_GROUPS_NOT_SUPPORTED_YET
-from pubnub.exceptions import PubNubException
 from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.errors import (
+    PNERR_STATE_MISSING,
+    PNERR_STATE_SETTER_FOR_GROUPS_NOT_SUPPORTED_YET,
+)
+from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.presence import PNSetStateResult
 
 
@@ -31,22 +34,22 @@ class SetState(Endpoint):
         return self
 
     def encoded_params(self):
-        return {
-            "state": utils.url_write(self._state)
-        }
+        return {"state": utils.url_write(self._state)}
 
     def custom_params(self):
         if self._subscription_manager is not None:
-            self._subscription_manager.adapt_state_builder(StateOperation(
-                channels=self._channels,
-                channel_groups=self._groups,
-                state=self._state
-            ))
+            self._subscription_manager.adapt_state_builder(
+                StateOperation(
+                    channels=self._channels,
+                    channel_groups=self._groups,
+                    state=self._state,
+                )
+            )
 
-        params = {'state': utils.write_value_as_string(self._state)}
+        params = {"state": utils.write_value_as_string(self._state)}
 
         if len(self._groups) > 0:
-            params['channel-group'] = utils.join_items_and_encode(self._groups)
+            params["channel-group"] = utils.join_items_and_encode(self._groups)
 
         return params
 
@@ -54,7 +57,7 @@ class SetState(Endpoint):
         return SetState.SET_STATE_PATH % (
             self.pubnub.config.subscribe_key,
             utils.join_channels(self._channels),
-            utils.url_encode(self.pubnub.uuid)
+            utils.url_encode(self.pubnub.uuid),
         )
 
     def http_method(self):
@@ -65,14 +68,16 @@ class SetState(Endpoint):
         self.validate_channels_and_groups()
 
         if len(self._channels) == 0 and len(self._groups) > 0:
-            raise PubNubException(pn_error=PNERR_STATE_SETTER_FOR_GROUPS_NOT_SUPPORTED_YET)
+            raise PubNubException(
+                pn_error=PNERR_STATE_SETTER_FOR_GROUPS_NOT_SUPPORTED_YET
+            )
 
         if self._state is None or not isinstance(self._state, dict):
             raise PubNubException(pn_error=PNERR_STATE_MISSING)
 
     def create_response(self, envelope):
-        if 'status' in envelope and envelope['status'] == 200:
-            return PNSetStateResult(envelope['payload'])
+        if "status" in envelope and envelope["status"] == 200:
+            return PNSetStateResult(envelope["payload"])
         else:
             return envelope
 

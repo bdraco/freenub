@@ -1,7 +1,9 @@
-from pubnub.endpoints.objects_v2.objects_endpoint import ObjectsEndpoint, ListEndpoint, \
-    IncludeCustomEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.objects_v2.objects_endpoint import (
+    IncludeCustomEndpoint,
+    ListEndpoint,
+    ObjectsEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.objects_v2.uuid import PNGetAllUUIDMetadataResult
 
 

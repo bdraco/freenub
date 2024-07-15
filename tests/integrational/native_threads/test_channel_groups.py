@@ -4,13 +4,17 @@ import time
 import unittest
 
 import pubnub
-from pubnub.models.consumer.channel_group import PNChannelGroupsAddChannelResult, PNChannelGroupsListResult, \
-    PNChannelGroupsRemoveChannelResult, PNChannelGroupsRemoveGroupResult
+from pubnub.models.consumer.channel_group import (
+    PNChannelGroupsAddChannelResult,
+    PNChannelGroupsListResult,
+    PNChannelGroupsRemoveChannelResult,
+    PNChannelGroupsRemoveGroupResult,
+)
 from pubnub.pubnub import PubNub
 from tests.helper import pnconf_copy
 from tests.integrational.vcr_helper import use_cassette_and_stub_time_sleep_native
 
-pubnub.set_stream_logger('pubnub', logging.DEBUG)
+pubnub.set_stream_logger("pubnub", logging.DEBUG)
 
 
 class TestPubNubChannelGroups(unittest.TestCase):
@@ -23,18 +27,18 @@ class TestPubNubChannelGroups(unittest.TestCase):
         self.event.set()
 
     @use_cassette_and_stub_time_sleep_native(
-        'tests/integrational/fixtures/native_threads/channel_groups/single_channel.yaml',
-        filter_query_parameters=['uuid', 'pnsdk', 'l_cg'])
+        "tests/integrational/fixtures/native_threads/channel_groups/single_channel.yaml",
+        filter_query_parameters=["uuid", "pnsdk", "l_cg"],
+    )
     def test_single_channel(self):
         ch = "channel-groups-unit-ch"
         gr = "channel-groups-unit-cg"
         pubnub = PubNub(pnconf_copy())
 
         # add
-        pubnub.add_channel_to_channel_group() \
-            .channels(ch) \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.add_channel_to_channel_group().channels(ch).channel_group(gr).pn_async(
+            self.callback
+        )
 
         self.event.wait()
         assert not self.status.is_error()
@@ -44,9 +48,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         time.sleep(1)
 
         # list
-        pubnub.list_channels_in_channel_group() \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.list_channels_in_channel_group().channel_group(gr).pn_async(
+            self.callback
+        )
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsListResult)
@@ -55,10 +59,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         self.event.clear()
 
         # remove
-        pubnub.remove_channel_from_channel_group() \
-            .channels(ch) \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.remove_channel_from_channel_group().channels(ch).channel_group(
+            gr
+        ).pn_async(self.callback)
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsRemoveChannelResult)
@@ -67,9 +70,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         time.sleep(1)
 
         # list
-        pubnub.list_channels_in_channel_group() \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.list_channels_in_channel_group().channel_group(gr).pn_async(
+            self.callback
+        )
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsListResult)
@@ -77,8 +80,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         self.event.clear()
 
     @use_cassette_and_stub_time_sleep_native(
-        'tests/integrational/fixtures/native_threads/channel_groups/add_remove_multiple_channels.yaml',
-        filter_query_parameters=['uuid', 'pnsdk', 'l_cg'])
+        "tests/integrational/fixtures/native_threads/channel_groups/add_remove_multiple_channels.yaml",
+        filter_query_parameters=["uuid", "pnsdk", "l_cg"],
+    )
     def test_add_remove_multiple_channels(self):
         ch1 = "channel-groups-unit-ch1"
         ch2 = "channel-groups-unit-ch2"
@@ -86,10 +90,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         pubnub = PubNub(pnconf_copy())
 
         # add
-        pubnub.add_channel_to_channel_group() \
-            .channels([ch1, ch2]) \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.add_channel_to_channel_group().channels([ch1, ch2]).channel_group(
+            gr
+        ).pn_async(self.callback)
 
         self.event.wait()
         assert not self.status.is_error()
@@ -99,9 +102,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         time.sleep(1)
 
         # list
-        pubnub.list_channels_in_channel_group() \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.list_channels_in_channel_group().channel_group(gr).pn_async(
+            self.callback
+        )
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsListResult)
@@ -111,10 +114,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         self.event.clear()
 
         # remove
-        pubnub.remove_channel_from_channel_group() \
-            .channels([ch1, ch2]) \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.remove_channel_from_channel_group().channels([ch1, ch2]).channel_group(
+            gr
+        ).pn_async(self.callback)
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsRemoveChannelResult)
@@ -123,9 +125,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         time.sleep(1)
 
         # list
-        pubnub.list_channels_in_channel_group() \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.list_channels_in_channel_group().channel_group(gr).pn_async(
+            self.callback
+        )
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsListResult)
@@ -133,18 +135,18 @@ class TestPubNubChannelGroups(unittest.TestCase):
         self.event.clear()
 
     @use_cassette_and_stub_time_sleep_native(
-        'tests/integrational/fixtures/native_threads/channel_groups/add_channel_remove_group.yaml',
-        filter_query_parameters=['uuid', 'pnsdk', 'l_cg'])
+        "tests/integrational/fixtures/native_threads/channel_groups/add_channel_remove_group.yaml",
+        filter_query_parameters=["uuid", "pnsdk", "l_cg"],
+    )
     def test_add_channel_remove_group(self):
         ch = "channel-groups-unit-ch"
         gr = "channel-groups-unit-cg"
         pubnub = PubNub(pnconf_copy())
 
         # add
-        pubnub.add_channel_to_channel_group() \
-            .channels(ch) \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.add_channel_to_channel_group().channels(ch).channel_group(gr).pn_async(
+            self.callback
+        )
 
         self.event.wait()
         assert not self.status.is_error()
@@ -154,9 +156,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         time.sleep(1)
 
         # list
-        pubnub.list_channels_in_channel_group() \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.list_channels_in_channel_group().channel_group(gr).pn_async(
+            self.callback
+        )
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsListResult)
@@ -165,9 +167,7 @@ class TestPubNubChannelGroups(unittest.TestCase):
         self.event.clear()
 
         # remove
-        pubnub.remove_channel_group() \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.remove_channel_group().channel_group(gr).pn_async(self.callback)
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsRemoveGroupResult)
@@ -176,9 +176,9 @@ class TestPubNubChannelGroups(unittest.TestCase):
         time.sleep(1)
 
         # list
-        pubnub.list_channels_in_channel_group() \
-            .channel_group(gr) \
-            .pn_async(self.callback)
+        pubnub.list_channels_in_channel_group().channel_group(gr).pn_async(
+            self.callback
+        )
 
         self.event.wait()
         assert isinstance(self.response, PNChannelGroupsListResult)

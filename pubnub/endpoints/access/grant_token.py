@@ -1,8 +1,8 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
-from pubnub.errors import PNERR_TTL_MISSING, PNERR_INVALID_META, PNERR_RESOURCES_MISSING
-from pubnub.exceptions import PubNubException
 from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.errors import PNERR_INVALID_META, PNERR_RESOURCES_MISSING, PNERR_TTL_MISSING
+from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.v3.access_manager import PNGrantTokenResult
 
 
@@ -60,7 +60,7 @@ class GrantToken(Endpoint):
         return {}
 
     def build_data(self):
-        params = {'ttl': int(self._ttl)}
+        params = {"ttl": int(self._ttl)}
 
         permissions = {}
         resources = {}
@@ -72,21 +72,21 @@ class GrantToken(Endpoint):
         utils.parse_resources(self._uuids, "users", resources, patterns)
         utils.parse_resources(self._channels, "spaces", resources, patterns)
 
-        permissions['resources'] = resources
-        permissions['patterns'] = patterns
+        permissions["resources"] = resources
+        permissions["patterns"] = patterns
 
         if self._meta:
             if isinstance(self._meta, dict):
-                permissions['meta'] = self._meta
+                permissions["meta"] = self._meta
             else:
                 raise PubNubException(pn_error=PNERR_INVALID_META)
         else:
-            permissions['meta'] = {}
+            permissions["meta"] = {}
 
         if self._authorized_uuid:
             permissions["uuid"] = self._authorized_uuid
 
-        params['permissions'] = permissions
+        params["permissions"] = permissions
 
         return utils.write_value_as_string(params)
 
@@ -103,7 +103,7 @@ class GrantToken(Endpoint):
         self.validate_resources()
 
     def create_response(self, envelope):
-        return PNGrantTokenResult.from_json(envelope['data'])
+        return PNGrantTokenResult.from_json(envelope["data"])
 
     def is_auth_required(self):
         return False

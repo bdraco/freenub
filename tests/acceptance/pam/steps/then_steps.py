@@ -1,5 +1,7 @@
 import json
+
 from behave import then
+
 from pubnub.exceptions import PubNubException
 
 
@@ -15,7 +17,9 @@ def step_impl(context):
 
 @then("the token has {channel} CHANNEL resource access permissions")
 def step_impl(context, channel):
-    context.token_resource = context.parsed_token["resources"]["channels"].get(channel.strip("'"))
+    context.token_resource = context.parsed_token["resources"]["channels"].get(
+        channel.strip("'")
+    )
     assert context.token_resource
 
 
@@ -31,37 +35,49 @@ def step_impl(context, authorized_uuid):
 
 @then("the token has {uuid} UUID resource access permissions")
 def step_impl(context, uuid):
-    context.token_resource = context.parsed_token["resources"]["uuids"].get(uuid.strip("'"))
+    context.token_resource = context.parsed_token["resources"]["uuids"].get(
+        uuid.strip("'")
+    )
     assert context.token_resource
 
 
 @then("the token has {pattern} UUID pattern access permissions")
 def step_impl(context, pattern):
-    context.token_resource = context.parsed_token["patterns"]["uuids"].get(pattern.strip("'"))
+    context.token_resource = context.parsed_token["patterns"]["uuids"].get(
+        pattern.strip("'")
+    )
 
 
 @then("the token has {channel_group} CHANNEL_GROUP resource access permissions")
 def step_impl(context, channel_group):
-    context.token_resource = context.parsed_token["resources"]["groups"].get(channel_group.strip("'"))
+    context.token_resource = context.parsed_token["resources"]["groups"].get(
+        channel_group.strip("'")
+    )
     assert context.token_resource
 
 
 @then("the token has {channel_pattern} CHANNEL pattern access permissions")
 def step_impl(context, channel_pattern):
-    context.token_resource = context.parsed_token["patterns"]["channels"].get(channel_pattern.strip("'"))
+    context.token_resource = context.parsed_token["patterns"]["channels"].get(
+        channel_pattern.strip("'")
+    )
     assert context.token_resource
 
 
 @then("the token has {channel_group} CHANNEL_GROUP pattern access permissions")
 def step_impl(context, channel_group):
-    context.token_resource = context.parsed_token["patterns"]["groups"].get(channel_group.strip("'"))
+    context.token_resource = context.parsed_token["patterns"]["groups"].get(
+        channel_group.strip("'")
+    )
     assert context.token_resource
 
 
 @then("I see the error message {error} and details {error_details}")
 def step_impl(context, error, error_details):
     assert context.pam_call_error["error"]["message"] == error.strip("'")
-    assert context.pam_call_error["error"]["details"][0]["message"] == error_details.strip("'")
+    assert context.pam_call_error["error"]["details"][0][
+        "message"
+    ] == error_details.strip("'")
 
 
 @then("an error is returned")

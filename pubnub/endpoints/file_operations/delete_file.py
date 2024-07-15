@@ -1,6 +1,6 @@
+from pubnub import utils
 from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
 from pubnub.enums import HttpMethod, PNOperationType
-from pubnub import utils
 from pubnub.models.consumer.file import PNDeleteFileResult
 
 
@@ -17,7 +17,7 @@ class DeleteFile(FileOperationEndpoint):
             self.pubnub.config.subscribe_key,
             utils.url_encode(self._channel),
             self._file_id,
-            self._file_name
+            self._file_name,
         )
 
     def file_id(self, file_id):

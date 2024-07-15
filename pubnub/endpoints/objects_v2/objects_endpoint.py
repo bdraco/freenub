@@ -3,7 +3,7 @@ from abc import ABCMeta
 
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
-from pubnub.errors import PNERR_UUID_MISSING, PNERR_CHANNEL_MISSING
+from pubnub.errors import PNERR_CHANNEL_MISSING, PNERR_UUID_MISSING
 from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.objects_v2.page import Next, Previous
 
@@ -58,7 +58,10 @@ class ObjectsEndpoint(Endpoint):
             if self._channel_details_level:
                 if self._channel_details_level == ChannelIncludeEndpoint.CHANNEL:
                     inclusions.append("channel")
-                elif self._channel_details_level == ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM:
+                elif (
+                    self._channel_details_level
+                    == ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM
+                ):
                     inclusions.append("channel.custom")
 
         if isinstance(self, ListEndpoint):
@@ -74,7 +77,9 @@ class ObjectsEndpoint(Endpoint):
             if self._sort_keys:
                 joined_sort_params_array = []
                 for sort_key in self._sort_keys:
-                    joined_sort_params_array.append("%s:%s" % (sort_key.key_str(), sort_key.dir_str()))
+                    joined_sort_params_array.append(
+                        "%s:%s" % (sort_key.key_str(), sort_key.dir_str())
+                    )
 
                 params["sort"] = ",".join(joined_sort_params_array)
 

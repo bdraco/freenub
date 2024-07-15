@@ -1,6 +1,9 @@
-from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, SpaceEndpoint, IncludeCustomEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.entities.endpoint import (
+    EntitiesEndpoint,
+    IncludeCustomEndpoint,
+    SpaceEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.entities.space import PNFetchSpaceResult
 
 
@@ -13,7 +16,10 @@ class FetchSpace(EntitiesEndpoint, SpaceEndpoint, IncludeCustomEndpoint):
         IncludeCustomEndpoint.__init__(self)
 
     def build_path(self):
-        return FetchSpace.FETCH_SPACE_PATH % (self.pubnub.config.subscribe_key, self._space_id)
+        return FetchSpace.FETCH_SPACE_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._space_id,
+        )
 
     def validate_specific_params(self):
         self._validate_space_id()

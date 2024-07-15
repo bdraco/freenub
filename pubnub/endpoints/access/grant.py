@@ -1,8 +1,8 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
-from pubnub.errors import PNERR_PAM_NO_FLAGS, PNERR_PAM_INVALID_ARGUMENTS
-from pubnub.exceptions import PubNubException
 from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.errors import PNERR_PAM_INVALID_ARGUMENTS, PNERR_PAM_NO_FLAGS
+from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.access_manager import PNAccessManagerGrantResult
 
 
@@ -78,13 +78,13 @@ class Grant(Endpoint):
         params = {}
 
         if self._auth_keys:
-            params['auth'] = utils.join_items_and_encode(self._auth_keys)
+            params["auth"] = utils.join_items_and_encode(self._auth_keys)
 
         if self._channels:
-            params['channel'] = utils.join_channels(self._channels)
+            params["channel"] = utils.join_channels(self._channels)
 
         if self._groups:
-            params['channel-group'] = utils.join_items_and_encode(self._groups)
+            params["channel-group"] = utils.join_items_and_encode(self._groups)
 
         return params
 
@@ -92,34 +92,34 @@ class Grant(Endpoint):
         params = {}
 
         if self._read is not None:
-            params['r'] = '1' if self._read is True else '0'
+            params["r"] = "1" if self._read is True else "0"
         if self._write is not None:
-            params['w'] = '1' if self._write is True else '0'
+            params["w"] = "1" if self._write is True else "0"
         if self._manage is not None:
-            params['m'] = '1' if self._manage is True else '0'
+            params["m"] = "1" if self._manage is True else "0"
         if self._delete is not None:
-            params['d'] = '1' if self._delete is True else '0'
+            params["d"] = "1" if self._delete is True else "0"
         if self._get is not None:
-            params['g'] = '1' if self._get is True else '0'
+            params["g"] = "1" if self._get is True else "0"
         if self._update is not None:
-            params['u'] = '1' if self._update is True else '0'
+            params["u"] = "1" if self._update is True else "0"
         if self._join is not None:
-            params['j'] = '1' if self._join is True else '0'
+            params["j"] = "1" if self._join is True else "0"
 
         if self._auth_keys:
-            params['auth'] = utils.join_items(self._auth_keys)
+            params["auth"] = utils.join_items(self._auth_keys)
 
         if self._channels:
-            params['channel'] = utils.join_items(self._channels)
+            params["channel"] = utils.join_items(self._channels)
 
         if self._groups:
-            params['channel-group'] = utils.join_items(self._groups)
+            params["channel-group"] = utils.join_items(self._groups)
 
         if self._uuids:
-            params['target-uuid'] = utils.join_items(self._uuids)
+            params["target-uuid"] = utils.join_items(self._uuids)
 
         if self._ttl is not None:
-            params['ttl'] = str(int(self._ttl))
+            params["ttl"] = str(int(self._ttl))
 
         return params
 
@@ -138,19 +138,28 @@ class Grant(Endpoint):
         if self._channels and self._groups and self._uuids:
             raise PubNubException(
                 pn_error=PNERR_PAM_INVALID_ARGUMENTS,
-                errormsg="Grants for channels or channelGroups can't be changed together with grants for UUIDs")
+                errormsg="Grants for channels or channelGroups can't be changed together with grants for UUIDs",
+            )
 
         if self._uuids and not self._auth_keys:
-            raise PubNubException(pn_error=PNERR_PAM_INVALID_ARGUMENTS, errormsg="UUIDs grant management require "
-                                                                                 "providing non empty authKeys"
-                                  )
+            raise PubNubException(
+                pn_error=PNERR_PAM_INVALID_ARGUMENTS,
+                errormsg="UUIDs grant management require "
+                "providing non empty authKeys",
+            )
 
-        if self._write is None and self._read is None and self._manage is None and self._get is None \
-                and self._update is None and self._join is None:
+        if (
+            self._write is None
+            and self._read is None
+            and self._manage is None
+            and self._get is None
+            and self._update is None
+            and self._join is None
+        ):
             raise PubNubException(pn_error=PNERR_PAM_NO_FLAGS)
 
     def create_response(self, envelope):
-        return PNAccessManagerGrantResult.from_json(envelope['payload'])
+        return PNAccessManagerGrantResult.from_json(envelope["payload"])
 
     def is_auth_required(self):
         return False

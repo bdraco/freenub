@@ -1,12 +1,17 @@
 from pubnub.endpoints.endpoint import Endpoint
-from pubnub.endpoints.objects_v2.objects_endpoint import ChannelIncludeEndpoint
 from pubnub.endpoints.objects_v2.memberships.get_memberships import GetMemberships
 from pubnub.endpoints.objects_v2.memberships.manage_memberships import ManageMemberships
 from pubnub.endpoints.objects_v2.memberships.remove_memberships import RemoveMemberships
 from pubnub.endpoints.objects_v2.memberships.set_memberships import SetMemberships
+from pubnub.endpoints.objects_v2.objects_endpoint import ChannelIncludeEndpoint
 from pubnub.models.consumer.common import PNStatus
-from pubnub.models.consumer.objects_v2.memberships import PNChannelMembership, PNSetMembershipsResult, \
-    PNGetMembershipsResult, PNRemoveMembershipsResult, PNManageMembershipsResult
+from pubnub.models.consumer.objects_v2.memberships import (
+    PNChannelMembership,
+    PNGetMembershipsResult,
+    PNManageMembershipsResult,
+    PNRemoveMembershipsResult,
+    PNSetMembershipsResult,
+)
 from pubnub.pubnub import PubNub
 from pubnub.structures import Envelope
 from tests.helper import pnconf_copy
@@ -32,44 +37,38 @@ class TestObjectsV2Memberships:
         assert isinstance(set_memberships, SetMemberships)
         assert isinstance(set_memberships, Endpoint)
 
-    @pn_vcr.use_cassette('tests/integrational/fixtures/native_sync/objects_v2/memberships/set_memberships.yaml',
-                         filter_query_parameters=['uuid', 'pnsdk'])
+    @pn_vcr.use_cassette(
+        "tests/integrational/fixtures/native_sync/objects_v2/memberships/set_memberships.yaml",
+        filter_query_parameters=["uuid", "pnsdk"],
+    )
     def test_set_memberships_happy_path(self):
         pn = _pubnub()
 
         some_channel = "somechannel"
         some_channel_with_custom = "somechannel_with_custom"
 
-        pn.set_channel_metadata()\
-            .channel(some_channel)\
-            .set_name("some name")\
-            .sync()
+        pn.set_channel_metadata().channel(some_channel).set_name("some name").sync()
 
-        custom_1 = {
-            "key3": "val1",
-            "key4": "val2"}
-        pn.set_channel_metadata() \
-            .channel(some_channel_with_custom) \
-            .set_name("some name with custom") \
-            .custom(custom_1) \
-            .sync()
+        custom_1 = {"key3": "val1", "key4": "val2"}
+        pn.set_channel_metadata().channel(some_channel_with_custom).set_name(
+            "some name with custom"
+        ).custom(custom_1).sync()
 
-        custom_2 = {
-            "key5": "val1",
-            "key6": "val2"
-        }
+        custom_2 = {"key5": "val1", "key6": "val2"}
 
         channel_memberships_to_set = [
             PNChannelMembership.channel(some_channel),
-            PNChannelMembership.channel_with_custom(some_channel_with_custom, custom_2)
+            PNChannelMembership.channel_with_custom(some_channel_with_custom, custom_2),
         ]
 
-        set_memberships_result = pn.set_memberships()\
-            .uuid(TestObjectsV2Memberships._some_uuid)\
-            .channel_memberships(channel_memberships_to_set)\
-            .include_custom(True)\
-            .include_channel(ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM)\
+        set_memberships_result = (
+            pn.set_memberships()
+            .uuid(TestObjectsV2Memberships._some_uuid)
+            .channel_memberships(channel_memberships_to_set)
+            .include_custom(True)
+            .include_channel(ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM)
             .sync()
+        )
 
         assert isinstance(set_memberships_result, Envelope)
         assert isinstance(set_memberships_result.result, PNSetMembershipsResult)
@@ -78,10 +77,19 @@ class TestObjectsV2Memberships:
         data = set_memberships_result.result.data
         assert isinstance(data, list)
 
-        assert len([e for e in data if
-                    e['channel']['id'] == some_channel or e['channel']['id'] == some_channel_with_custom]) == 2
-        assert custom_1 in [e['channel'].get('custom', None) for e in data]
-        assert len([e for e in data if e['custom'] == custom_2]) != 0
+        assert (
+            len(
+                [
+                    e
+                    for e in data
+                    if e["channel"]["id"] == some_channel
+                    or e["channel"]["id"] == some_channel_with_custom
+                ]
+            )
+            == 2
+        )
+        assert custom_1 in [e["channel"].get("custom", None) for e in data]
+        assert len([e for e in data if e["custom"] == custom_2]) != 0
 
     def test_get_memberships_endpoint_available(self):
         pn = _pubnub()
@@ -94,38 +102,32 @@ class TestObjectsV2Memberships:
         assert isinstance(get_memberships, GetMemberships)
         assert isinstance(get_memberships, Endpoint)
 
-    @pn_vcr.use_cassette('tests/integrational/fixtures/native_sync/objects_v2/memberships/get_memberships.yaml',
-                         filter_query_parameters=['uuid', 'pnsdk'])
+    @pn_vcr.use_cassette(
+        "tests/integrational/fixtures/native_sync/objects_v2/memberships/get_memberships.yaml",
+        filter_query_parameters=["uuid", "pnsdk"],
+    )
     def test_get_memberships_happy_path(self):
         pn = _pubnub()
 
         some_channel = "somechannel"
         some_channel_with_custom = "somechannel_with_custom"
 
-        pn.set_channel_metadata() \
-            .channel(some_channel) \
-            .set_name("some name") \
-            .sync()
+        pn.set_channel_metadata().channel(some_channel).set_name("some name").sync()
 
-        custom_1 = {
-            "key3": "val1",
-            "key4": "val2"}
-        pn.set_channel_metadata() \
-            .channel(some_channel_with_custom) \
-            .set_name("some name with custom") \
-            .custom(custom_1) \
-            .sync()
+        custom_1 = {"key3": "val1", "key4": "val2"}
+        pn.set_channel_metadata().channel(some_channel_with_custom).set_name(
+            "some name with custom"
+        ).custom(custom_1).sync()
 
-        custom_2 = {
-            "key5": "val1",
-            "key6": "val2"
-        }
+        custom_2 = {"key5": "val1", "key6": "val2"}
 
-        get_memberships_result = pn.get_memberships()\
-            .uuid(TestObjectsV2Memberships._some_uuid)\
-            .include_custom(True)\
-            .include_channel(ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM)\
+        get_memberships_result = (
+            pn.get_memberships()
+            .uuid(TestObjectsV2Memberships._some_uuid)
+            .include_custom(True)
+            .include_channel(ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM)
             .sync()
+        )
 
         assert isinstance(get_memberships_result, Envelope)
         assert isinstance(get_memberships_result.result, PNGetMembershipsResult)
@@ -134,10 +136,19 @@ class TestObjectsV2Memberships:
         data = get_memberships_result.result.data
         assert isinstance(data, list)
 
-        assert len([e for e in data if
-                    e['channel']['id'] == some_channel or e['channel']['id'] == some_channel_with_custom]) == 2
-        assert custom_1 in [e['channel'].get('custom', None) for e in data]
-        assert len([e for e in data if e['custom'] == custom_2]) != 0
+        assert (
+            len(
+                [
+                    e
+                    for e in data
+                    if e["channel"]["id"] == some_channel
+                    or e["channel"]["id"] == some_channel_with_custom
+                ]
+            )
+            == 2
+        )
+        assert custom_1 in [e["channel"].get("custom", None) for e in data]
+        assert len([e for e in data if e["custom"] == custom_2]) != 0
 
     def test_remove_memberships_endpoint_available(self):
         pn = _pubnub()
@@ -150,20 +161,24 @@ class TestObjectsV2Memberships:
         assert isinstance(remove_memberships, RemoveMemberships)
         assert isinstance(remove_memberships, Endpoint)
 
-    @pn_vcr.use_cassette('tests/integrational/fixtures/native_sync/objects_v2/memberships/remove_memberships.yaml',
-                         filter_query_parameters=['uuid', 'pnsdk'])
+    @pn_vcr.use_cassette(
+        "tests/integrational/fixtures/native_sync/objects_v2/memberships/remove_memberships.yaml",
+        filter_query_parameters=["uuid", "pnsdk"],
+    )
     def test_remove_memberships_happy_path(self):
         pn = _pubnub()
 
         some_channel = "somechannel"
         some_channel_with_custom = "somechannel_with_custom"
 
-        remove_memberships_result = pn.remove_memberships()\
-            .uuid(TestObjectsV2Memberships._some_uuid)\
-            .channel_memberships([PNChannelMembership.channel(some_channel)])\
-            .include_custom(True)\
-            .include_channel(ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM)\
+        remove_memberships_result = (
+            pn.remove_memberships()
+            .uuid(TestObjectsV2Memberships._some_uuid)
+            .channel_memberships([PNChannelMembership.channel(some_channel)])
+            .include_custom(True)
+            .include_channel(ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM)
             .sync()
+        )
 
         assert isinstance(remove_memberships_result, Envelope)
         assert isinstance(remove_memberships_result.result, PNRemoveMembershipsResult)
@@ -172,8 +187,11 @@ class TestObjectsV2Memberships:
         data = remove_memberships_result.result.data
         assert isinstance(data, list)
 
-        assert len([e for e in data if e['channel']['id'] == some_channel]) == 0
-        assert len([e for e in data if e['channel']['id'] == some_channel_with_custom]) == 1
+        assert len([e for e in data if e["channel"]["id"] == some_channel]) == 0
+        assert (
+            len([e for e in data if e["channel"]["id"] == some_channel_with_custom])
+            == 1
+        )
 
     def test_manage_memberships_endpoint_available(self):
         pn = _pubnub()
@@ -186,21 +204,25 @@ class TestObjectsV2Memberships:
         assert isinstance(manage_memberships, ManageMemberships)
         assert isinstance(manage_memberships, Endpoint)
 
-    @pn_vcr.use_cassette('tests/integrational/fixtures/native_sync/objects_v2/memberships/manage_memberships.yaml',
-                         filter_query_parameters=['uuid', 'pnsdk'])
+    @pn_vcr.use_cassette(
+        "tests/integrational/fixtures/native_sync/objects_v2/memberships/manage_memberships.yaml",
+        filter_query_parameters=["uuid", "pnsdk"],
+    )
     def test_manage_memberships_happy_path(self):
         pn = _pubnub()
 
         some_channel = "somechannel"
         some_channel_with_custom = "somechannel_with_custom"
 
-        manage_memberships_result = pn.manage_memberships() \
-            .uuid(TestObjectsV2Memberships._some_uuid) \
-            .set([PNChannelMembership.channel(some_channel)]) \
-            .remove([PNChannelMembership.channel(some_channel_with_custom)]) \
-            .include_custom(True) \
-            .include_channel(ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM) \
+        manage_memberships_result = (
+            pn.manage_memberships()
+            .uuid(TestObjectsV2Memberships._some_uuid)
+            .set([PNChannelMembership.channel(some_channel)])
+            .remove([PNChannelMembership.channel(some_channel_with_custom)])
+            .include_custom(True)
+            .include_channel(ChannelIncludeEndpoint.CHANNEL_WITH_CUSTOM)
             .sync()
+        )
 
         assert isinstance(manage_memberships_result, Envelope)
         assert isinstance(manage_memberships_result.result, PNManageMembershipsResult)
@@ -209,5 +231,8 @@ class TestObjectsV2Memberships:
         data = manage_memberships_result.result.data
         assert isinstance(data, list)
 
-        assert len([e for e in data if e['channel']['id'] == some_channel]) == 1
-        assert len([e for e in data if e['channel']['id'] == some_channel_with_custom]) == 0
+        assert len([e for e in data if e["channel"]["id"] == some_channel]) == 1
+        assert (
+            len([e for e in data if e["channel"]["id"] == some_channel_with_custom])
+            == 0
+        )

@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 
 from pubnub.models.consumer.objects_v2.page import PNPageable
 
@@ -24,11 +24,7 @@ class PNUUID:
 
 class JustUUID(PNUUID):
     def to_payload_dict(self):
-        return {
-            "uuid": {
-                "id": str(self._uuid)
-            }
-        }
+        return {"uuid": {"id": str(self._uuid)}}
 
 
 class UUIDWithCustom(PNUUID):
@@ -37,12 +33,7 @@ class UUIDWithCustom(PNUUID):
         self._custom = custom
 
     def to_payload_dict(self):
-        return {
-            "uuid": {
-                "id": str(self._uuid)
-            },
-            "custom": dict(self._custom)
-        }
+        return {"uuid": {"id": str(self._uuid)}, "custom": dict(self._custom)}
 
 
 class PNSetChannelMembersResult(PNPageable):

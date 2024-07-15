@@ -61,19 +61,19 @@ class Subscribe(Endpoint):
         params = {}
 
         if len(self._groups) > 0:
-            params['channel-group'] = utils.join_items_and_encode(self._groups)
+            params["channel-group"] = utils.join_items_and_encode(self._groups)
 
         if self._filter_expression is not None and len(self._filter_expression) > 0:
-            params['filter-expr'] = utils.url_encode(self._filter_expression)
+            params["filter-expr"] = utils.url_encode(self._filter_expression)
 
         if self._timetoken is not None:
-            params['tt'] = str(self._timetoken)
+            params["tt"] = str(self._timetoken)
 
         if self._region is not None:
-            params['tr'] = self._region
+            params["tr"] = self._region
 
         if not self.pubnub.config.heartbeat_default_values:
-            params['heartbeat'] = self.pubnub.config.presence_timeout
+            params["heartbeat"] = self.pubnub.config.presence_timeout
 
         return params
 

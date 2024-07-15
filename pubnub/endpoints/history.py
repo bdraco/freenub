@@ -56,31 +56,31 @@ class History(Endpoint):
         params = {}
 
         if self._start is not None:
-            params['start'] = str(self._start)
+            params["start"] = str(self._start)
 
         if self._end is not None:
-            params['end'] = str(self._end)
+            params["end"] = str(self._end)
 
         if self._count is not None and 0 < self._count <= History.MAX_COUNT:
-            params['count'] = str(self._count)
+            params["count"] = str(self._count)
         else:
-            params['count'] = '100'
+            params["count"] = "100"
 
         if self._reverse is not None:
-            params['reverse'] = "true" if self._reverse else "false"
+            params["reverse"] = "true" if self._reverse else "false"
 
         if self._include_timetoken is not None:
-            params['include_token'] = "true" if self._include_timetoken else "false"
+            params["include_token"] = "true" if self._include_timetoken else "false"
 
         if self._include_meta is not None:
-            params['include_meta'] = "true" if self._include_meta else "false"
+            params["include_meta"] = "true" if self._include_meta else "false"
 
         return params
 
     def build_path(self):
         return History.HISTORY_PATH % (
             self.pubnub.config.subscribe_key,
-            utils.url_encode(self._channel)
+            utils.url_encode(self._channel),
         )
 
     def http_method(self):
@@ -99,7 +99,8 @@ class History(Endpoint):
             crypto=self.pubnub.config.crypto,
             include_timetoken=self._include_timetoken,
             include_meta=self._include_meta,
-            cipher=self.pubnub.config.cipher_key)
+            cipher=self.pubnub.config.cipher_key,
+        )
 
     def request_timeout(self):
         return self.pubnub.config.non_subscribe_request_timeout

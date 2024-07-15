@@ -1,21 +1,31 @@
 import copy
 import logging
 import threading
-
+from queue import Empty, Queue
 from threading import Event
-from queue import Queue, Empty
+
 from . import utils
-from .request_handlers.base import BaseRequestHandler
-from .request_handlers.requests_handler import RequestsRequestHandler
-from .callbacks import SubscribeCallback, ReconnectionCallback
+from .callbacks import ReconnectionCallback, SubscribeCallback
 from .endpoints.presence.heartbeat import Heartbeat
 from .endpoints.presence.leave import Leave
 from .endpoints.pubsub.subscribe import Subscribe
-from .enums import PNStatusCategory, PNHeartbeatNotificationOptions, PNOperationType, PNReconnectionPolicy
-from .managers import SubscriptionManager, PublishSequenceManager, ReconnectionManager, TelemetryManager
+from .enums import (
+    PNHeartbeatNotificationOptions,
+    PNOperationType,
+    PNReconnectionPolicy,
+    PNStatusCategory,
+)
+from .managers import (
+    PublishSequenceManager,
+    ReconnectionManager,
+    SubscriptionManager,
+    TelemetryManager,
+)
 from .models.consumer.common import PNStatus
 from .pnconfiguration import PNConfiguration
 from .pubnub_core import PubNubCore
+from .request_handlers.base import BaseRequestHandler
+from .request_handlers.requests_handler import RequestsRequestHandler
 from .structures import PlatformOptions
 from .workers import SubscribeMessageWorker
 
@@ -52,9 +62,13 @@ class PubNub(PubNubCore):
         if self.config.log_verbosity:
             print(endpoint_call_options)
 
-        return self._request_handler.sync_request(platform_options, endpoint_call_options)
+        return self._request_handler.sync_request(
+            platform_options, endpoint_call_options
+        )
 
-    def request_async(self, endpoint_name, endpoint_call_options, callback, cancellation_event):
+    def request_async(
+        self, endpoint_name, endpoint_call_options, callback, cancellation_event
+    ):
         platform_options = PlatformOptions(self.headers, self.config)
 
         self.merge_in_params(endpoint_call_options)
@@ -67,15 +81,16 @@ class PubNub(PubNubCore):
             platform_options,
             endpoint_call_options,
             callback,
-            cancellation_event
+            cancellation_event,
         )
 
     def merge_in_params(self, options):
-
         params_to_merge_in = {}
 
         if options.operation_type == PNOperationType.PNPublishOperation:
-            params_to_merge_in['seqn'] = self._publish_sequence_manager.get_next_sequence()
+            params_to_merge_in["seqn"] = (
+                self._publish_sequence_manager.get_next_sequence()
+            )
 
         options.merge_params_in(params_to_merge_in)
 
@@ -113,7 +128,10 @@ class NativeReconnectionManager(ReconnectionManager):
             self._connection_errors = 1
             self.stop_heartbeat_timer()
             self._callback.on_reconnect()
-            logger.debug("reconnection manager stop due success time endpoint call: %s" % utils.datetime_now())
+            logger.debug(
+                "reconnection manager stop due success time endpoint call: %s"
+                % utils.datetime_now()
+            )
         elif self._pubnub.config.reconnect_policy == PNReconnectionPolicy.EXPONENTIAL:
             logger.debug("reconnect interval increment at: %s" % utils.datetime_now())
             self.stop_heartbeat_timer()
@@ -126,7 +144,9 @@ class NativeReconnectionManager(ReconnectionManager):
 
     def start_polling(self):
         if self._pubnub.config.reconnect_policy == PNReconnectionPolicy.NONE:
-            logger.warning("reconnection policy is disabled, please handle reconnection manually.")
+            logger.warning(
+                "reconnection policy is disabled, please handle reconnection manually."
+            )
             return
 
         logger.debug("reconnection manager start at: %s" % utils.datetime_now())
@@ -178,15 +198,17 @@ class NativeSubscriptionManager(SubscriptionManager):
                 subscription_manager._listener_manager.announce_status(pn_status)
 
         self._reconnection_listener = NativeReconnectionCallback()
-        self._reconnection_manager.set_reconnection_listener(self._reconnection_listener)
+        self._reconnection_manager.set_reconnection_listener(
+            self._reconnection_listener
+        )
 
     def _send_leave(self, unsubscribe_operation):
         def leave_callback(result, status):
             self._listener_manager.announce_status(status)
 
-        Leave(self._pubnub) \
-            .channels(unsubscribe_operation.channels) \
-            .channel_groups(unsubscribe_operation.channel_groups).pn_async(leave_callback)
+        Leave(self._pubnub).channels(unsubscribe_operation.channels).channel_groups(
+            unsubscribe_operation.channel_groups
+        ).pn_async(leave_callback)
 
     def _register_heartbeat_timer(self):
         super(NativeSubscriptionManager, self)._register_heartbeat_timer()
@@ -194,8 +216,8 @@ class NativeSubscriptionManager(SubscriptionManager):
         self._perform_heartbeat_loop()
 
         self._heartbeat_periodic_callback = NativePeriodicCallback(
-            self._perform_heartbeat_loop,
-            self._pubnub.config.heartbeat_interval)
+            self._perform_heartbeat_loop, self._pubnub.config.heartbeat_interval
+        )
 
         if not self._should_stop:
             self._heartbeat_periodic_callback.start()
@@ -215,18 +237,23 @@ class NativeSubscriptionManager(SubscriptionManager):
         def heartbeat_callback(raw_result, status):
             heartbeat_verbosity = self._pubnub.config.heartbeat_notification_options
             if status.is_error():
-                if heartbeat_verbosity in (PNHeartbeatNotificationOptions.ALL, PNHeartbeatNotificationOptions.FAILURES):
+                if heartbeat_verbosity in (
+                    PNHeartbeatNotificationOptions.ALL,
+                    PNHeartbeatNotificationOptions.FAILURES,
+                ):
                     self._listener_manager.announce_status(status)
             else:
                 if heartbeat_verbosity == PNHeartbeatNotificationOptions.ALL:
                     self._listener_manager.announce_status(status)
 
         try:
-            (Heartbeat(self._pubnub)
-             .channels(presence_channels)
-             .channel_groups(presence_groups)
-             .state(state_payload)
-             .pn_async(heartbeat_callback))
+            (
+                Heartbeat(self._pubnub)
+                .channels(presence_channels)
+                .channel_groups(presence_groups)
+                .state(state_payload)
+                .pn_async(heartbeat_callback)
+            )
         except Exception as e:
             logger.error("Heartbeat request failed: %s" % e)
 
@@ -259,11 +286,10 @@ class NativeSubscriptionManager(SubscriptionManager):
             self._pubnub,
             self._listener_manager,
             self._message_queue,
-            self._consumer_event
+            self._consumer_event,
         )
         self._consumer_thread = threading.Thread(
-            target=consumer.run,
-            name="SubscribeMessageWorker"
+            target=consumer.run, name="SubscribeMessageWorker"
         )
         self._consumer_thread.daemon = True
         self._consumer_thread.start()
@@ -278,18 +304,26 @@ class NativeSubscriptionManager(SubscriptionManager):
             return
 
         def callback(raw_result, status):
-            """ SubscribeEndpoint callback"""
+            """SubscribeEndpoint callback"""
             if status.is_error():
                 if status and status.category == PNStatusCategory.PNCancelledCategory:
                     return
 
-                if status.category is PNStatusCategory.PNTimeoutCategory and not self._should_stop:
+                if (
+                    status.category is PNStatusCategory.PNTimeoutCategory
+                    and not self._should_stop
+                ):
                     self._start_subscribe_loop()
                     return
 
-                logger.error("Exception in subscribe loop: %s" % str(status.error_data.exception))
+                logger.error(
+                    "Exception in subscribe loop: %s" % str(status.error_data.exception)
+                )
 
-                if status and status.category == PNStatusCategory.PNAccessDeniedCategory:
+                if (
+                    status
+                    and status.category == PNStatusCategory.PNAccessDeniedCategory
+                ):
                     status.operation = PNOperationType.PNUnsubscribeOperation
                     self._listener_manager.announce_status(status)
                     self.unsubscribe_all()
@@ -304,11 +338,15 @@ class NativeSubscriptionManager(SubscriptionManager):
                 self._start_subscribe_loop()
 
         try:
-            self._subscribe_call = Subscribe(self._pubnub) \
-                .channels(combined_channels).channel_groups(combined_groups) \
-                .timetoken(self._timetoken).region(self._region) \
-                .filter_expression(self._pubnub.config.filter_expression) \
+            self._subscribe_call = (
+                Subscribe(self._pubnub)
+                .channels(combined_channels)
+                .channel_groups(combined_groups)
+                .timetoken(self._timetoken)
+                .region(self._region)
+                .filter_expression(self._pubnub.config.filter_expression)
                 .pn_async(callback)
+            )
         except Exception as e:
             logger.error("Subscribe request failed: %s" % e)
 
@@ -386,7 +424,9 @@ class SubscribeListener(SubscribeCallback):
     def status(self, pubnub, status):
         if utils.is_subscribed_event(status) and not self.connected_event.is_set():
             self.connected_event.set()
-        elif utils.is_unsubscribed_event(status) and not self.disconnected_event.is_set():
+        elif (
+            utils.is_unsubscribed_event(status) and not self.disconnected_event.is_set()
+        ):
             self.disconnected_event.set()
 
     def message(self, pubnub, message):
@@ -449,7 +489,7 @@ class NonSubscribeListener:
         self.done_event.set()
 
     def pn_await(self, timeout=5):
-        """ Returns False if a timeout happened, otherwise True"""
+        """Returns False if a timeout happened, otherwise True"""
         return self.done_event.wait(timeout)
 
     def await_result(self, timeout=5):

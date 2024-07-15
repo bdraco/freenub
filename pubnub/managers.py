@@ -1,21 +1,21 @@
+import base64
+import copy
 import logging
-from abc import abstractmethod, ABCMeta
-
 import math
 import time
-import copy
-import base64
+from abc import ABCMeta, abstractmethod
+
 from cbor2 import loads
 
 from . import utils
-from .enums import PNStatusCategory, PNReconnectionPolicy, PNOperationType
-from .models.consumer.common import PNStatus
-from .models.server.subscribe import SubscribeEnvelope
+from .callbacks import ReconnectionCallback, SubscribeCallback
 from .dtos import SubscribeOperation, UnsubscribeOperation
-from .callbacks import SubscribeCallback, ReconnectionCallback
-from .models.subscription_item import SubscriptionItem
+from .enums import PNOperationType, PNReconnectionPolicy, PNStatusCategory
 from .errors import PNERR_INVALID_ACCESS_TOKEN
 from .exceptions import PubNubException
+from .models.consumer.common import PNStatus
+from .models.server.subscribe import SubscribeEnvelope
+from .models.subscription_item import SubscriptionItem
 
 logger = logging.getLogger("pubnub")
 
@@ -34,7 +34,7 @@ class PublishSequenceManager:
         return self.next_sequence
 
 
-class BasePathManager(object):
+class BasePathManager:
     MAX_SUBDOMAIN = 20
     DEFAULT_SUBDOMAIN = "pubsub"
     DEFAULT_BASE_PATH = "pubnub.com"
@@ -47,7 +47,10 @@ class BasePathManager(object):
         if self.config.origin:
             return self.config.origin
         else:
-            return "%s.%s" % (BasePathManager.DEFAULT_SUBDOMAIN, BasePathManager.DEFAULT_BASE_PATH)
+            return "%s.%s" % (
+                BasePathManager.DEFAULT_SUBDOMAIN,
+                BasePathManager.DEFAULT_BASE_PATH,
+            )
 
 
 class ReconnectionManager:
@@ -72,10 +75,16 @@ class ReconnectionManager:
             if self._timer_interval > self.MAXEXPONENTIALBACKOFF:
                 self._timer_interval = self.MINEXPONENTIALBACKOFF
                 self._connection_errors = 1
-                logger.debug("timerInterval > MAXEXPONENTIALBACKOFF at: %s" % utils.datetime_now())
+                logger.debug(
+                    "timerInterval > MAXEXPONENTIALBACKOFF at: %s"
+                    % utils.datetime_now()
+                )
             elif self._timer_interval < 1:
                 self._timer_interval = self.MINEXPONENTIALBACKOFF
-            logger.debug("timerInterval = %d at: %s" % (self._timer_interval, utils.datetime_now()))
+            logger.debug(
+                "timerInterval = %d at: %s"
+                % (self._timer_interval, utils.datetime_now())
+            )
         else:
             self._timer_interval = self.INTERVAL
 
@@ -97,20 +106,30 @@ class StateManager:
         self._presence_groups = {}
 
     def is_empty(self):
-        return len(self._channels) == 0 and len(self._groups) == 0 and\
-            len(self._presence_channels) == 0 and len(self._presence_groups) == 0
+        return (
+            len(self._channels) == 0
+            and len(self._groups) == 0
+            and len(self._presence_channels) == 0
+            and len(self._presence_groups) == 0
+        )
 
     def subscribed_to_the_only_channel(self):
-        return len(self._channels) == 1 and len(self._groups) == 0 and\
-            len(self._presence_channels) == 0 and len(self._presence_groups) == 0
+        return (
+            len(self._channels) == 1
+            and len(self._groups) == 0
+            and len(self._presence_channels) == 0
+            and len(self._presence_groups) == 0
+        )
 
     def prepare_channel_list(self, include_presence):
         return StateManager._prepare_membership_list(
-            self._channels, self._presence_channels, include_presence)
+            self._channels, self._presence_channels, include_presence
+        )
 
     def prepare_channel_group_list(self, include_presence):
         return StateManager._prepare_membership_list(
-            self._groups, self._presence_groups, include_presence)
+            self._groups, self._presence_groups, include_presence
+        )
 
     def adapt_subscribe_builder(self, subscribe_operation):
         for channel in subscribe_operation.channels:
@@ -290,10 +309,14 @@ class SubscriptionManager:
         return self._subscription_state.prepare_channel_group_list(False)
 
     def unsubscribe_all(self):
-        self.adapt_unsubscribe_builder(UnsubscribeOperation(
-            channels=self._subscription_state.prepare_channel_list(False),
-            channel_groups=self._subscription_state.prepare_channel_group_list(False)
-        ))
+        self.adapt_unsubscribe_builder(
+            UnsubscribeOperation(
+                channels=self._subscription_state.prepare_channel_list(False),
+                channel_groups=self._subscription_state.prepare_channel_group_list(
+                    False
+                ),
+            )
+        )
 
     def adapt_subscribe_builder(self, subscribe_operation):
         assert isinstance(subscribe_operation, SubscribeOperation)
@@ -387,9 +410,11 @@ class TelemetryManager:
         operation_latencies = {}
 
         for endpoint_name, endpoint_latencies in self.latencies.items():
-            latency_key = 'l_' + endpoint_name
+            latency_key = "l_" + endpoint_name
 
-            endpoint_average_latency = self.average_latency_from_data(endpoint_latencies)
+            endpoint_average_latency = self.average_latency_from_data(
+                endpoint_latencies
+            )
 
             if endpoint_average_latency > 0:
                 operation_latencies[latency_key] = endpoint_average_latency
@@ -402,7 +427,10 @@ class TelemetryManager:
 
         for endpoint_name, endpoint_latencies in copy_latencies.items():
             for latency_information in endpoint_latencies:
-                if current_timestamp - latency_information["timestamp"] > self.MAXIMUM_LATENCY_DATA_AGE:
+                if (
+                    current_timestamp - latency_information["timestamp"]
+                    > self.MAXIMUM_LATENCY_DATA_AGE
+                ):
                     self.latencies[endpoint_name].remove(latency_information)
 
             if len(self.latencies[endpoint_name]) == 0:
@@ -429,79 +457,65 @@ class TelemetryManager:
         total_latency = 0
 
         for latency_data in endpoint_latencies:
-            total_latency += latency_data['latency']
+            total_latency += latency_data["latency"]
 
         return total_latency / len(endpoint_latencies)
 
     @staticmethod
     def endpoint_name_for_operation(operation_type):
         endpoint = {
-            PNOperationType.PNPublishOperation: 'pub',
-            PNOperationType.PNFireOperation: 'pub',
-
-            PNOperationType.PNHistoryOperation: 'hist',
-            PNOperationType.PNHistoryDeleteOperation: 'hist',
-            PNOperationType.PNMessageCountOperation: 'mc',
-
-            PNOperationType.PNUnsubscribeOperation: 'pres',
-            PNOperationType.PNWhereNowOperation: 'pres',
-            PNOperationType.PNHereNowOperation: 'pres',
-            PNOperationType.PNGetState: 'pres',
-            PNOperationType.PNSetStateOperation: 'pres',
-            PNOperationType.PNHeartbeatOperation: 'pres',
-
-            PNOperationType.PNAddChannelsToGroupOperation: 'cg',
-            PNOperationType.PNRemoveChannelsFromGroupOperation: 'cg',
-            PNOperationType.PNChannelGroupsOperation: 'cg',
-            PNOperationType.PNChannelsForGroupOperation: 'cg',
-            PNOperationType.PNRemoveGroupOperation: 'cg',
-
-            PNOperationType.PNAddPushNotificationsOnChannelsOperation: 'push',
-            PNOperationType.PNPushNotificationEnabledChannelsOperation: 'push',
-            PNOperationType.PNRemoveAllPushNotificationsOperation: 'push',
-            PNOperationType.PNRemovePushNotificationsFromChannelsOperation: 'push',
-
-            PNOperationType.PNAccessManagerAudit: 'pam',
-            PNOperationType.PNAccessManagerGrant: 'pam',
-            PNOperationType.PNAccessManagerRevoke: 'pam',
-            PNOperationType.PNTimeOperation: 'pam',
-
-            PNOperationType.PNAccessManagerGrantToken: 'pamv3',
-            PNOperationType.PNAccessManagerRevokeToken: 'pamv3',
-
-            PNOperationType.PNSignalOperation: 'sig',
-
-            PNOperationType.PNSetUuidMetadataOperation: 'obj',
-            PNOperationType.PNGetUuidMetadataOperation: 'obj',
-            PNOperationType.PNRemoveUuidMetadataOperation: 'obj',
-            PNOperationType.PNGetAllUuidMetadataOperation: 'obj',
-
-            PNOperationType.PNSetChannelMetadataOperation: 'obj',
-            PNOperationType.PNGetChannelMetadataOperation: 'obj',
-            PNOperationType.PNRemoveChannelMetadataOperation: 'obj',
-            PNOperationType.PNGetAllChannelMetadataOperation: 'obj',
-
-            PNOperationType.PNSetChannelMembersOperation: 'obj',
-            PNOperationType.PNGetChannelMembersOperation: 'obj',
-            PNOperationType.PNRemoveChannelMembersOperation: 'obj',
-            PNOperationType.PNManageChannelMembersOperation: 'obj',
-
-            PNOperationType.PNSetMembershipsOperation: 'obj',
-            PNOperationType.PNGetMembershipsOperation: 'obj',
-            PNOperationType.PNRemoveMembershipsOperation: 'obj',
-            PNOperationType.PNManageMembershipsOperation: 'obj',
-
-            PNOperationType.PNAddMessageAction: 'msga',
-            PNOperationType.PNGetMessageActions: 'msga',
-            PNOperationType.PNDeleteMessageAction: 'msga',
-
-            PNOperationType.PNGetFilesAction: 'file',
-            PNOperationType.PNDeleteFileOperation: 'file',
-            PNOperationType.PNGetFileDownloadURLAction: 'file',
-            PNOperationType.PNFetchFileUploadS3DataAction: 'file',
-            PNOperationType.PNDownloadFileAction: 'file',
-            PNOperationType.PNSendFileAction: 'file',
-
+            PNOperationType.PNPublishOperation: "pub",
+            PNOperationType.PNFireOperation: "pub",
+            PNOperationType.PNHistoryOperation: "hist",
+            PNOperationType.PNHistoryDeleteOperation: "hist",
+            PNOperationType.PNMessageCountOperation: "mc",
+            PNOperationType.PNUnsubscribeOperation: "pres",
+            PNOperationType.PNWhereNowOperation: "pres",
+            PNOperationType.PNHereNowOperation: "pres",
+            PNOperationType.PNGetState: "pres",
+            PNOperationType.PNSetStateOperation: "pres",
+            PNOperationType.PNHeartbeatOperation: "pres",
+            PNOperationType.PNAddChannelsToGroupOperation: "cg",
+            PNOperationType.PNRemoveChannelsFromGroupOperation: "cg",
+            PNOperationType.PNChannelGroupsOperation: "cg",
+            PNOperationType.PNChannelsForGroupOperation: "cg",
+            PNOperationType.PNRemoveGroupOperation: "cg",
+            PNOperationType.PNAddPushNotificationsOnChannelsOperation: "push",
+            PNOperationType.PNPushNotificationEnabledChannelsOperation: "push",
+            PNOperationType.PNRemoveAllPushNotificationsOperation: "push",
+            PNOperationType.PNRemovePushNotificationsFromChannelsOperation: "push",
+            PNOperationType.PNAccessManagerAudit: "pam",
+            PNOperationType.PNAccessManagerGrant: "pam",
+            PNOperationType.PNAccessManagerRevoke: "pam",
+            PNOperationType.PNTimeOperation: "pam",
+            PNOperationType.PNAccessManagerGrantToken: "pamv3",
+            PNOperationType.PNAccessManagerRevokeToken: "pamv3",
+            PNOperationType.PNSignalOperation: "sig",
+            PNOperationType.PNSetUuidMetadataOperation: "obj",
+            PNOperationType.PNGetUuidMetadataOperation: "obj",
+            PNOperationType.PNRemoveUuidMetadataOperation: "obj",
+            PNOperationType.PNGetAllUuidMetadataOperation: "obj",
+            PNOperationType.PNSetChannelMetadataOperation: "obj",
+            PNOperationType.PNGetChannelMetadataOperation: "obj",
+            PNOperationType.PNRemoveChannelMetadataOperation: "obj",
+            PNOperationType.PNGetAllChannelMetadataOperation: "obj",
+            PNOperationType.PNSetChannelMembersOperation: "obj",
+            PNOperationType.PNGetChannelMembersOperation: "obj",
+            PNOperationType.PNRemoveChannelMembersOperation: "obj",
+            PNOperationType.PNManageChannelMembersOperation: "obj",
+            PNOperationType.PNSetMembershipsOperation: "obj",
+            PNOperationType.PNGetMembershipsOperation: "obj",
+            PNOperationType.PNRemoveMembershipsOperation: "obj",
+            PNOperationType.PNManageMembershipsOperation: "obj",
+            PNOperationType.PNAddMessageAction: "msga",
+            PNOperationType.PNGetMessageActions: "msga",
+            PNOperationType.PNDeleteMessageAction: "msga",
+            PNOperationType.PNGetFilesAction: "file",
+            PNOperationType.PNDeleteFileOperation: "file",
+            PNOperationType.PNGetFileDownloadURLAction: "file",
+            PNOperationType.PNFetchFileUploadS3DataAction: "file",
+            PNOperationType.PNDownloadFileAction: "file",
+            PNOperationType.PNSendFileAction: "file",
         }[operation_type]
 
         return endpoint
@@ -528,27 +542,24 @@ class TokenManager:
             "authorized_uuid": token.get("uuid"),
             "resources": {},
             "patterns": {},
-            "meta": token["meta"]
+            "meta": token["meta"],
         }
 
-        perm_type_name_mapping = {
-            "res": "resources",
-            "pat": "patterns"
-        }
+        perm_type_name_mapping = {"res": "resources", "pat": "patterns"}
 
         for resource_type in perm_type_name_mapping:
             for resource in token[resource_type]:
                 if resource == "uuid":
-                    parsed_token[perm_type_name_mapping[resource_type]]["uuids"] = utils.parse_pam_permissions(
-                        token[resource_type][resource]
+                    parsed_token[perm_type_name_mapping[resource_type]]["uuids"] = (
+                        utils.parse_pam_permissions(token[resource_type][resource])
                     )
                 elif resource == "grp":
-                    parsed_token[perm_type_name_mapping[resource_type]]["groups"] = utils.parse_pam_permissions(
-                        token[resource_type][resource]
+                    parsed_token[perm_type_name_mapping[resource_type]]["groups"] = (
+                        utils.parse_pam_permissions(token[resource_type][resource])
                     )
                 elif resource == "chan":
-                    parsed_token[perm_type_name_mapping[resource_type]]["channels"] = utils.parse_pam_permissions(
-                        token[resource_type][resource]
+                    parsed_token[perm_type_name_mapping[resource_type]]["channels"] = (
+                        utils.parse_pam_permissions(token[resource_type][resource])
                     )
 
         return parsed_token

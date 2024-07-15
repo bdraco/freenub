@@ -1,8 +1,8 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.errors import PNERR_CHANNEL_OR_GROUP_MISSING
 from pubnub.exceptions import PubNubException
-from pubnub.enums import HttpMethod, PNOperationType
 
 
 class Leave(Endpoint):
@@ -34,12 +34,15 @@ class Leave(Endpoint):
         params = {}
 
         if len(self._groups) > 0:
-            params['channel-group'] = utils.join_items(self._groups)
+            params["channel-group"] = utils.join_items(self._groups)
 
         return params
 
     def build_path(self):
-        return Leave.LEAVE_PATH % (self.pubnub.config.subscribe_key, utils.join_channels(self._channels))
+        return Leave.LEAVE_PATH % (
+            self.pubnub.config.subscribe_key,
+            utils.join_channels(self._channels),
+        )
 
     def http_method(self):
         return HttpMethod.GET

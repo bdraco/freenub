@@ -1,12 +1,11 @@
-from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
-
 from pubnub.crypto import PubNubFileCrypto
+from pubnub.endpoints.file_operations.fetch_upload_details import FetchFileUploadS3Data
+from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
+from pubnub.endpoints.file_operations.publish_file_message import PublishFileMessage
+from pubnub.endpoints.mixins import TimeTokenOverrideMixin
 from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.file import PNSendFileResult
-from pubnub.endpoints.file_operations.publish_file_message import PublishFileMessage
-from pubnub.endpoints.file_operations.fetch_upload_details import FetchFileUploadS3Data
 from pubnub.request_handlers.requests_handler import RequestsRequestHandler
-from pubnub.endpoints.mixins import TimeTokenOverrideMixin
 
 
 class SendFileNative(FileOperationEndpoint, TimeTokenOverrideMixin):
@@ -42,8 +41,7 @@ class SendFileNative(FileOperationEndpoint, TimeTokenOverrideMixin):
                 payload = self._file_object
 
             return PubNubFileCrypto(self._pubnub.config).encrypt(
-                self._cipher_key or self._pubnub.config.cipher_key,
-                payload
+                self._cipher_key or self._pubnub.config.cipher_key, payload
             )
         else:
             return self._file_object
@@ -123,26 +121,34 @@ class SendFileNative(FileOperationEndpoint, TimeTokenOverrideMixin):
         return "Send file to S3"
 
     def sync(self):
-        self._file_upload_envelope = FetchFileUploadS3Data(self._pubnub).\
-            channel(self._channel).\
-            file_name(self._file_name).sync()
+        self._file_upload_envelope = (
+            FetchFileUploadS3Data(self._pubnub)
+            .channel(self._channel)
+            .file_name(self._file_name)
+            .sync()
+        )
 
         response_envelope = super(SendFileNative, self).sync()
 
-        publish_file_response = PublishFileMessage(self._pubnub).\
-            channel(self._channel).\
-            meta(self._meta).\
-            message(self._message).\
-            file_id(response_envelope.result.file_id).\
-            file_name(response_envelope.result.name).\
-            should_store(self._should_store).\
-            ttl(self._ttl).\
-            replicate(self._replicate).\
-            ptto(self._ptto).\
-            cipher_key(self._cipher_key).sync()
+        publish_file_response = (
+            PublishFileMessage(self._pubnub)
+            .channel(self._channel)
+            .meta(self._meta)
+            .message(self._message)
+            .file_id(response_envelope.result.file_id)
+            .file_name(response_envelope.result.name)
+            .should_store(self._should_store)
+            .ttl(self._ttl)
+            .replicate(self._replicate)
+            .ptto(self._ptto)
+            .cipher_key(self._cipher_key)
+            .sync()
+        )
 
         response_envelope.result.timestamp = publish_file_response.result.timestamp
         return response_envelope
 
     def pn_async(self, callback):
-        return RequestsRequestHandler(self._pubnub).async_file_based_operation(self.sync, callback, "File Download")
+        return RequestsRequestHandler(self._pubnub).async_file_based_operation(
+            self.sync, callback, "File Download"
+        )

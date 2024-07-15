@@ -16,7 +16,9 @@ def _pubnub():
 
 
 class TestObjectsV2Callbacks:
-    @unittest.skip("Needs real subscribe key and real traffic. Hard to implement using vcr")
+    @unittest.skip(
+        "Needs real subscribe key and real traffic. Hard to implement using vcr"
+    )
     def test_callbacks(self):
         pn = _pubnub()
         subscribe_listener = SubscribeListener()
@@ -24,27 +26,25 @@ class TestObjectsV2Callbacks:
 
         test_channel = "test_ch1_%s" % utils.uuid()
 
-        pn.subscribe() \
-            .channels([test_channel]) \
-            .execute()
+        pn.subscribe().channels([test_channel]).execute()
 
         subscribe_listener.wait_for_connect()
 
-        pn.set_channel_metadata() \
-            .channel(test_channel) \
-            .set_name("The channel %s" + utils.uuid()) \
-            .sync()
+        pn.set_channel_metadata().channel(test_channel).set_name(
+            "The channel %s" + utils.uuid()
+        ).sync()
 
-        pn.set_memberships() \
-            .channel_memberships([PNChannelMembership.channel(test_channel)]) \
-            .sync()
+        pn.set_memberships().channel_memberships(
+            [PNChannelMembership.channel(test_channel)]
+        ).sync()
 
-        pn.set_uuid_metadata() \
-            .set_name("Some Name %s" + utils.uuid()) \
-            .email("test@example.com") \
-            .sync()
+        pn.set_uuid_metadata().set_name("Some Name %s" + utils.uuid()).email(
+            "test@example.com"
+        ).sync()
 
-        membership_result = subscribe_listener.membership_queue.get(block=True, timeout=10)
+        membership_result = subscribe_listener.membership_queue.get(
+            block=True, timeout=10
+        )
         channel_result = subscribe_listener.channel_queue.get(block=True, timeout=10)
         uuid_result = subscribe_listener.uuid_queue.get(block=True, timeout=10)
 

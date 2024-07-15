@@ -1,5 +1,5 @@
-from pubnub.event_engine.models import effects
 from pubnub.event_engine import manage_effects
+from pubnub.event_engine.models import effects
 
 
 class Dispatcher:
@@ -17,7 +17,9 @@ class Dispatcher:
 
     def dispatch_effect(self, effect: effects.PNEffect):
         if not self._managed_effects_factory:
-            self._managed_effects_factory = manage_effects.ManagedEffectFactory(self._pubnub, self._event_engine)
+            self._managed_effects_factory = manage_effects.ManagedEffectFactory(
+                self._pubnub, self._event_engine
+            )
 
         if isinstance(effect, effects.PNEmittableEffect):
             self.emit_effect(effect)

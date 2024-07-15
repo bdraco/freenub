@@ -3,7 +3,10 @@ import logging
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
 from pubnub.enums import HttpMethod, PNOperationType
-from pubnub.errors import PNERR_CHANNEL_MISSING, PNERR_HISTORY_MESSAGE_ACTIONS_MULTIPLE_CHANNELS
+from pubnub.errors import (
+    PNERR_CHANNEL_MISSING,
+    PNERR_HISTORY_MESSAGE_ACTIONS_MULTIPLE_CHANNELS,
+)
 from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.history import PNFetchMessagesResult
 
@@ -77,22 +80,24 @@ class FetchMessages(Endpoint):
         return self
 
     def custom_params(self):
-        params = {'max': int(self._count)}
+        params = {"max": int(self._count)}
 
         if self._start is not None:
-            params['start'] = str(self._start)
+            params["start"] = str(self._start)
 
         if self._end is not None:
-            params['end'] = str(self._end)
+            params["end"] = str(self._end)
 
         if self._include_meta is not None:
-            params['include_meta'] = "true" if self._include_meta else "false"
+            params["include_meta"] = "true" if self._include_meta else "false"
 
         if self._include_message_type is not None:
-            params['include_message_type'] = "true" if self._include_message_type else "false"
+            params["include_message_type"] = (
+                "true" if self._include_message_type else "false"
+            )
 
         if self.include_message_actions and self._include_uuid is not None:
-            params['include_uuid'] = "true" if self._include_uuid else "false"
+            params["include_uuid"] = "true" if self._include_uuid else "false"
 
         return params
 
@@ -100,12 +105,12 @@ class FetchMessages(Endpoint):
         if self._include_message_actions is False:
             return FetchMessages.FETCH_MESSAGES_PATH % (
                 self.pubnub.config.subscribe_key,
-                utils.join_channels(self._channels)
+                utils.join_channels(self._channels),
             )
         else:
             return FetchMessages.FETCH_MESSAGES_WITH_ACTIONS_PATH % (
                 self.pubnub.config.subscribe_key,
-                utils.url_encode(self._channels[0])
+                utils.url_encode(self._channels[0]),
             )
 
     def http_method(self):
@@ -143,10 +148,15 @@ class FetchMessages(Endpoint):
                     logger.info("count param defaulting to %d", self._count)
         else:
             if len(self._channels) > 1:
-                raise PubNubException(pn_error=PNERR_HISTORY_MESSAGE_ACTIONS_MULTIPLE_CHANNELS)
+                raise PubNubException(
+                    pn_error=PNERR_HISTORY_MESSAGE_ACTIONS_MULTIPLE_CHANNELS
+                )
 
-            if self._count is None or self._count < 1 or\
-                    self._count > FetchMessages.MAX_MESSAGES_ACTIONS:
+            if (
+                self._count is None
+                or self._count < 1
+                or self._count > FetchMessages.MAX_MESSAGES_ACTIONS
+            ):
                 self._count = FetchMessages.DEFAULT_MESSAGES_ACTIONS
                 logger.info("count param defaulting to %d", self._count)
 
@@ -155,7 +165,8 @@ class FetchMessages(Endpoint):
             json_input=envelope,
             include_message_actions=self._include_message_actions,
             start_timetoken=self._start,
-            end_timetoken=self._end)
+            end_timetoken=self._end,
+        )
 
     def request_timeout(self):
         return self.pubnub.config.non_subscribe_request_timeout

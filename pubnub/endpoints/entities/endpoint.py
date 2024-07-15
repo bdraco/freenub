@@ -51,14 +51,20 @@ class EntitiesEndpoint(Endpoint):
             if self._uuid_details_level:
                 if self._uuid_details_level == UserIDIncludeEndpoint.USER_ID:
                     inclusions.append("user_id")
-                elif self._uuid_details_level == UserIDIncludeEndpoint.USER_ID_WITH_CUSTOM:
+                elif (
+                    self._uuid_details_level
+                    == UserIDIncludeEndpoint.USER_ID_WITH_CUSTOM
+                ):
                     inclusions.append("user_id.custom")
 
         if isinstance(self, SpaceIDIncludeEndpoint):
             if self._space_details_level:
                 if self._space_details_level == SpaceIDIncludeEndpoint.CHANNEL:
                     inclusions.append("space")
-                elif self._space_details_level == SpaceIDIncludeEndpoint.CHANNEL_WITH_CUSTOM:
+                elif (
+                    self._space_details_level
+                    == SpaceIDIncludeEndpoint.CHANNEL_WITH_CUSTOM
+                ):
                     inclusions.append("space.custom")
 
         if isinstance(self, ListEndpoint):
@@ -74,7 +80,9 @@ class EntitiesEndpoint(Endpoint):
             if self._sort_keys:
                 joined_sort_params_array = []
                 for sort_key in self._sort_keys:
-                    joined_sort_params_array.append("%s:%s" % (sort_key.key_str(), sort_key.dir_str()))
+                    joined_sort_params_array.append(
+                        "%s:%s" % (sort_key.key_str(), sort_key.dir_str())
+                    )
 
                 params["sort"] = ",".join(joined_sort_params_array)
 

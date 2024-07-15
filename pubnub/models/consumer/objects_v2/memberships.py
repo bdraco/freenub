@@ -1,4 +1,4 @@
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 
 from pubnub.models.consumer.objects_v2.page import PNPageable
 
@@ -27,11 +27,7 @@ class JustChannel(PNChannelMembership):
         PNChannelMembership.__init__(self, channel)
 
     def to_payload_dict(self):
-        return {
-            "channel": {
-                "id": str(self._channel)
-            }
-        }
+        return {"channel": {"id": str(self._channel)}}
 
 
 class ChannelWithCustom(PNChannelMembership):
@@ -40,12 +36,7 @@ class ChannelWithCustom(PNChannelMembership):
         self._custom = custom
 
     def to_payload_dict(self):
-        return {
-            "channel": {
-                "id": str(self._channel)
-            },
-            "custom": dict(self._custom)
-        }
+        return {"channel": {"id": str(self._channel)}, "custom": dict(self._custom)}
 
 
 class PNSetMembershipsResult(PNPageable):
@@ -88,7 +79,7 @@ class PNManageMembershipsResult(PNPageable):
         return "Manage Channel Members metatdata: %s" % self.data
 
 
-class PNMembershipResult(object):
+class PNMembershipResult:
     def __init__(self, event, data):
         self.data = data
         self.event = event

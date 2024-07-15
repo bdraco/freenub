@@ -1,14 +1,13 @@
 import os
-import threading
-import string
 import random
+import string
+import threading
 import urllib
-
 from copy import copy, deepcopy
+
 from pubnub import utils
 from pubnub.crypto import PubNubCryptodome
 from pubnub.pnconfiguration import PNConfiguration
-
 
 PAM_TOKEN_WITH_ALL_PERMS_GRANTED = (
     "qEF2AkF0GmEI03xDdHRsGDxDcmVzpURjaGFuoWljaGFubmVsLTEY70NncnChb2NoYW5uZWxfZ3JvdXAtMQVDdXNyoENzcGOgRHV1aWShZ"
@@ -100,16 +99,16 @@ pnconf_ssl.ssl = True
 pnconf_ssl.uuid = uuid_mock
 
 message_count_config = PNConfiguration()
-message_count_config.publish_key = 'demo-36'
+message_count_config.publish_key = "demo-36"
 message_count_config.subscribe_request_timeout = 10
-message_count_config.subscribe_key = 'demo-36'
-message_count_config.origin = 'balancer1g.bronze.aws-pdx-1.ps.pn'
+message_count_config.subscribe_key = "demo-36"
+message_count_config.origin = "balancer1g.bronze.aws-pdx-1.ps.pn"
 message_count_config.uuid = uuid_mock
 
 pnconf_demo = PNConfiguration()
-pnconf_demo.publish_key = 'demo'
+pnconf_demo.publish_key = "demo"
 pnconf_demo.subscribe_request_timeout = 10
-pnconf_demo.subscribe_key = 'demo'
+pnconf_demo.subscribe_key = "demo"
 pnconf_demo.uuid = uuid_mock
 
 file_upload_config = PNConfiguration()
@@ -130,27 +129,27 @@ hardcoded_iv_config.subscribe_request_timeout = 10
 
 # configuration with keys from PN_KEY_* (enabled all except PAM, PUSH and FUNCTIONS)
 pnconf_env = PNConfiguration()
-pnconf_env.publish_key = os.environ.get('PN_KEY_PUBLISH')
+pnconf_env.publish_key = os.environ.get("PN_KEY_PUBLISH")
 pnconf_env.subscribe_request_timeout = 10
-pnconf_env.subscribe_key = os.environ.get('PN_KEY_SUBSCRIBE')
+pnconf_env.subscribe_key = os.environ.get("PN_KEY_SUBSCRIBE")
 pnconf_env.enable_subscribe = False
 pnconf_env.uuid = uuid_mock
 
 # configuration with keys from PN_KEY_* (enabled all except PAM, PUSH and FUNCTIONS) and encryption enabled
 pnconf_enc_env = PNConfiguration()
-pnconf_enc_env.publish_key = os.environ.get('PN_KEY_PUBLISH')
+pnconf_enc_env.publish_key = os.environ.get("PN_KEY_PUBLISH")
 pnconf_enc_env.subscribe_request_timeout = 10
-pnconf_enc_env.subscribe_key = os.environ.get('PN_KEY_SUBSCRIBE')
+pnconf_enc_env.subscribe_key = os.environ.get("PN_KEY_SUBSCRIBE")
 pnconf_enc_env.cipher_key = "testKey"
 pnconf_enc_env.enable_subscribe = False
 pnconf_enc_env.uuid = uuid_mock
 
 # configuration with keys from PN_KEY_PAM_* (enabled with all including PAM except PUSH and FUNCTIONS)
 pnconf_pam_env = PNConfiguration()
-pnconf_pam_env.publish_key = os.environ.get('PN_KEY_PAM_PUBLISH')
+pnconf_pam_env.publish_key = os.environ.get("PN_KEY_PAM_PUBLISH")
 pnconf_pam_env.subscribe_request_timeout = 10
-pnconf_pam_env.subscribe_key = os.environ.get('PN_KEY_PAM_SUBSCRIBE')
-pnconf_pam_env.secret_key = os.environ.get('PN_KEY_PAM_SECRET')
+pnconf_pam_env.subscribe_key = os.environ.get("PN_KEY_PAM_SUBSCRIBE")
+pnconf_pam_env.secret_key = os.environ.get("PN_KEY_PAM_SECRET")
 pnconf_pam_env.enable_subscribe = False
 pnconf_pam_env.uuid = uuid_mock
 
@@ -246,10 +245,12 @@ def gen_channel(prefix):
 
 
 def gen_string(length):
-    return ''.join(random.choice(string.ascii_uppercase + string.digits) for _ in range(length))
+    return "".join(
+        random.choice(string.ascii_uppercase + string.digits) for _ in range(length)
+    )
 
 
-class CountDownLatch(object):
+class CountDownLatch:
     def __init__(self, count=1):
         self.count = count
         self.lock = threading.Condition()

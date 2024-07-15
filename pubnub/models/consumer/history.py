@@ -1,14 +1,24 @@
-class PNHistoryResult(object):
+class PNHistoryResult:
     def __init__(self, messages, start_timetoken, end_timetoken):
         self.messages = messages
         self.start_timetoken = start_timetoken
         self.end_timetoken = end_timetoken
 
     def __str__(self):
-        return "History result for range %d..%d" % (self.start_timetoken, self.end_timetoken)
+        return "History result for range %d..%d" % (
+            self.start_timetoken,
+            self.end_timetoken,
+        )
 
     @classmethod
-    def from_json(cls, json_input, crypto, include_timetoken=False, include_meta=False, cipher=None):
+    def from_json(
+        cls,
+        json_input,
+        crypto,
+        include_timetoken=False,
+        include_meta=False,
+        cipher=None,
+    ):
         start_timetoken = json_input[1]
         end_timetoken = json_input[2]
 
@@ -16,12 +26,16 @@ class PNHistoryResult(object):
         messages = []
 
         for item in raw_items:
-            if (include_timetoken or include_meta) and isinstance(item, dict) and 'message' in item:
-                message = PNHistoryItemResult(item['message'], crypto)
-                if include_timetoken and 'timetoken' in item:
-                    message.timetoken = item['timetoken']
-                if include_meta and 'meta' in item:
-                    message.meta = item['meta']
+            if (
+                (include_timetoken or include_meta)
+                and isinstance(item, dict)
+                and "message" in item
+            ):
+                message = PNHistoryItemResult(item["message"], crypto)
+                if include_timetoken and "timetoken" in item:
+                    message.timetoken = item["timetoken"]
+                if include_meta and "meta" in item:
+                    message.meta = item["meta"]
 
             else:
                 message = PNHistoryItemResult(item, crypto)
@@ -34,11 +48,11 @@ class PNHistoryResult(object):
         return PNHistoryResult(
             messages=messages,
             start_timetoken=start_timetoken,
-            end_timetoken=end_timetoken
+            end_timetoken=end_timetoken,
         )
 
 
-class PNHistoryItemResult(object):
+class PNHistoryItemResult:
     def __init__(self, entry, crypto, timetoken=None, meta=None):
         self.timetoken = timetoken
         self.meta = meta
@@ -52,35 +66,43 @@ class PNHistoryItemResult(object):
         self.entry = self.crypto.decrypt(cipher_key, self.entry)
 
 
-class PNFetchMessagesResult(object):
-
+class PNFetchMessagesResult:
     def __init__(self, channels, start_timetoken, end_timetoken):
         self.channels = channels
         self.start_timetoken = start_timetoken
         self.end_timetoken = end_timetoken
 
     def __str__(self):
-        return "Fetch messages result for range %d..%d" % (self.start_timetoken, self.end_timetoken)
+        return "Fetch messages result for range %d..%d" % (
+            self.start_timetoken,
+            self.end_timetoken,
+        )
 
     @classmethod
-    def from_json(cls, json_input, include_message_actions=False, start_timetoken=None, end_timetoken=None):
+    def from_json(
+        cls,
+        json_input,
+        include_message_actions=False,
+        start_timetoken=None,
+        end_timetoken=None,
+    ):
         channels = {}
 
-        for key, entry in json_input['channels'].items():
+        for key, entry in json_input["channels"].items():
             channels[key] = []
             for item in entry:
-                message = PNFetchMessageItem(item['message'], item['timetoken'])
-                if 'uuid' in item:
-                    message.uuid = item['uuid']
-                if 'message_type' in item:
-                    message.message_type = item['message_type']
+                message = PNFetchMessageItem(item["message"], item["timetoken"])
+                if "uuid" in item:
+                    message.uuid = item["uuid"]
+                if "message_type" in item:
+                    message.message_type = item["message_type"]
 
-                if 'meta' in item:
-                    message.meta = item['meta']
+                if "meta" in item:
+                    message.meta = item["meta"]
 
                 if include_message_actions:
-                    if 'actions' in item:
-                        message.actions = item['actions']
+                    if "actions" in item:
+                        message.actions = item["actions"]
                     else:
                         message.actions = {}
 
@@ -89,11 +111,11 @@ class PNFetchMessagesResult(object):
         return PNFetchMessagesResult(
             channels=channels,
             start_timetoken=start_timetoken,
-            end_timetoken=end_timetoken
+            end_timetoken=end_timetoken,
         )
 
 
-class PNFetchMessageItem(object):
+class PNFetchMessageItem:
     def __init__(self, message, timetoken, meta=None, actions=None):
         self.message = message
         self.meta = meta
@@ -101,4 +123,7 @@ class PNFetchMessageItem(object):
         self.actions = actions
 
     def __str__(self):
-        return "Fetch message item with tt: %s and content: %s" % (self.timetoken, self.message)
+        return "Fetch message item with tt: %s and content: %s" % (
+            self.timetoken,
+            self.message,
+        )

@@ -1,8 +1,8 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.errors import PNERR_GROUP_MISSING
 from pubnub.exceptions import PubNubException
-from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.channel_group import PNChannelGroupsListResult
 
 
@@ -24,7 +24,9 @@ class ListChannelsInChannelGroup(Endpoint):
 
     def build_path(self):
         return ListChannelsInChannelGroup.LIST_PATH % (
-            self.pubnub.config.subscribe_key, utils.url_encode(self._channel_group))
+            self.pubnub.config.subscribe_key,
+            utils.url_encode(self._channel_group),
+        )
 
     def http_method(self):
         return HttpMethod.GET
@@ -36,8 +38,8 @@ class ListChannelsInChannelGroup(Endpoint):
             raise PubNubException(pn_error=PNERR_GROUP_MISSING)
 
     def create_response(self, envelope):
-        if 'payload' in envelope and 'channels' in envelope['payload']:
-            return PNChannelGroupsListResult(envelope['payload']['channels'])
+        if "payload" in envelope and "channels" in envelope["payload"]:
+            return PNChannelGroupsListResult(envelope["payload"]["channels"])
         else:
             return PNChannelGroupsListResult([])
 

@@ -1,27 +1,23 @@
 import copy
 import unittest
-
-
 from unittest.mock import MagicMock
 
 from pubnub.endpoints.pubsub.publish import Publish
+from pubnub.managers import TelemetryManager
 from pubnub.pubnub import PubNub
 from tests.helper import pnconf, sdk_name, url_encode
-from pubnub.managers import TelemetryManager
 
 
 class TestPublish(unittest.TestCase):
     def setUp(self):
-        self.sm = MagicMock(
-            get_next_sequence=MagicMock(return_value=2)
-        )
+        self.sm = MagicMock(get_next_sequence=MagicMock(return_value=2))
 
         self.pubnub = MagicMock(
             spec=PubNub,
             config=pnconf,
             sdk_name=sdk_name,
             _publish_sequence_manager=self.sm,
-            _get_token=lambda: None
+            _get_token=lambda: None,
         )
 
         self.pubnub.uuid = "UUID_PublishUnitTest"
@@ -34,13 +30,19 @@ class TestPublish(unittest.TestCase):
 
         self.pub.channel("ch1").message(message)
 
-        self.assertEqual(self.pub.build_path(), "/publish/%s/%s/0/ch1/0/%s"
-                         % (pnconf.publish_key, pnconf.subscribe_key, encoded_message))
+        self.assertEqual(
+            self.pub.build_path(),
+            "/publish/%s/%s/0/ch1/0/%s"
+            % (pnconf.publish_key, pnconf.subscribe_key, encoded_message),
+        )
 
-        self.assertEqual(self.pub.build_params_callback()({}), {
-            'pnsdk': sdk_name,
-            'uuid': self.pubnub.uuid,
-        })
+        self.assertEqual(
+            self.pub.build_params_callback()({}),
+            {
+                "pnsdk": sdk_name,
+                "uuid": self.pubnub.uuid,
+            },
+        )
 
     def test_pub_list_message(self):
         self.pubnub.uuid = "UUID_PublishUnitTest"
@@ -50,31 +52,43 @@ class TestPublish(unittest.TestCase):
 
         self.pub.channel("ch1").message(message)
 
-        self.assertEqual(self.pub.build_path(), "/publish/%s/%s/0/ch1/0/%s"
-                         % (pnconf.publish_key, pnconf.subscribe_key, encoded_message))
+        self.assertEqual(
+            self.pub.build_path(),
+            "/publish/%s/%s/0/ch1/0/%s"
+            % (pnconf.publish_key, pnconf.subscribe_key, encoded_message),
+        )
 
-        self.assertEqual(self.pub.build_params_callback()({}), {
-            'pnsdk': sdk_name,
-            'uuid': self.pubnub.uuid,
-        })
+        self.assertEqual(
+            self.pub.build_params_callback()({}),
+            {
+                "pnsdk": sdk_name,
+                "uuid": self.pubnub.uuid,
+            },
+        )
 
     def test_pub_with_meta(self):
         self.pubnub.uuid = "UUID_PublishUnitTest"
 
         message = ["hi", "hi2", "hi3"]
         encoded_message = url_encode(message)
-        meta = ['m1', 'm2']
+        meta = ["m1", "m2"]
 
         self.pub.channel("ch1").message(message).meta(meta)
 
-        self.assertEqual(self.pub.build_path(), "/publish/%s/%s/0/ch1/0/%s"
-                         % (pnconf.publish_key, pnconf.subscribe_key, encoded_message))
+        self.assertEqual(
+            self.pub.build_path(),
+            "/publish/%s/%s/0/ch1/0/%s"
+            % (pnconf.publish_key, pnconf.subscribe_key, encoded_message),
+        )
 
-        self.assertEqual(self.pub.build_params_callback()({}), {
-            'pnsdk': sdk_name,
-            'uuid': self.pubnub.uuid,
-            'meta': '%5B%22m1%22%2C%20%22m2%22%5D',
-        })
+        self.assertEqual(
+            self.pub.build_params_callback()({}),
+            {
+                "pnsdk": sdk_name,
+                "uuid": self.pubnub.uuid,
+                "meta": "%5B%22m1%22%2C%20%22m2%22%5D",
+            },
+        )
 
     def test_pub_store(self):
         self.pubnub.uuid = "UUID_PublishUnitTest"
@@ -84,14 +98,20 @@ class TestPublish(unittest.TestCase):
 
         self.pub.channel("ch1").message(message).should_store(True)
 
-        self.assertEqual(self.pub.build_path(), "/publish/%s/%s/0/ch1/0/%s"
-                         % (pnconf.publish_key, pnconf.subscribe_key, encoded_message))
+        self.assertEqual(
+            self.pub.build_path(),
+            "/publish/%s/%s/0/ch1/0/%s"
+            % (pnconf.publish_key, pnconf.subscribe_key, encoded_message),
+        )
 
-        self.assertEqual(self.pub.build_params_callback()({}), {
-            'pnsdk': sdk_name,
-            'uuid': self.pubnub.uuid,
-            'store': '1',
-        })
+        self.assertEqual(
+            self.pub.build_params_callback()({}),
+            {
+                "pnsdk": sdk_name,
+                "uuid": self.pubnub.uuid,
+                "store": "1",
+            },
+        )
 
     def test_pub_do_not_store(self):
         self.pubnub.uuid = "UUID_PublishUnitTest"
@@ -101,14 +121,20 @@ class TestPublish(unittest.TestCase):
 
         self.pub.channel("ch1").message(message).should_store(False)
 
-        self.assertEqual(self.pub.build_path(), "/publish/%s/%s/0/ch1/0/%s"
-                         % (pnconf.publish_key, pnconf.subscribe_key, encoded_message))
+        self.assertEqual(
+            self.pub.build_path(),
+            "/publish/%s/%s/0/ch1/0/%s"
+            % (pnconf.publish_key, pnconf.subscribe_key, encoded_message),
+        )
 
-        self.assertEqual(self.pub.build_params_callback()({}), {
-            'pnsdk': sdk_name,
-            'uuid': self.pubnub.uuid,
-            'store': '0',
-        })
+        self.assertEqual(
+            self.pub.build_params_callback()({}),
+            {
+                "pnsdk": sdk_name,
+                "uuid": self.pubnub.uuid,
+                "store": "0",
+            },
+        )
 
     def test_pub_with_auth(self):
         conf = copy.copy(pnconf)
@@ -120,7 +146,7 @@ class TestPublish(unittest.TestCase):
             sdk_name=sdk_name,
             uuid="UUID_PublishUnitTest",
             _publish_sequence_manager=self.sm,
-            _get_token=lambda: None
+            _get_token=lambda: None,
         )
         pubnub._telemetry_manager = TelemetryManager()
         pub = Publish(pubnub)
@@ -128,14 +154,20 @@ class TestPublish(unittest.TestCase):
         encoded_message = url_encode(message)
         pub.channel("ch1").message(message)
 
-        self.assertEqual(pub.build_path(), "/publish/%s/%s/0/ch1/0/%s"
-                         % (pnconf.publish_key, pnconf.subscribe_key, encoded_message))
+        self.assertEqual(
+            pub.build_path(),
+            "/publish/%s/%s/0/ch1/0/%s"
+            % (pnconf.publish_key, pnconf.subscribe_key, encoded_message),
+        )
 
-        self.assertEqual(pub.build_params_callback()({}), {
-            'pnsdk': sdk_name,
-            'uuid': pubnub.uuid,
-            'auth': conf.auth_key,
-        })
+        self.assertEqual(
+            pub.build_params_callback()({}),
+            {
+                "pnsdk": sdk_name,
+                "uuid": pubnub.uuid,
+                "auth": conf.auth_key,
+            },
+        )
 
     def test_pub_encrypted_list_message(self):
         conf = copy.copy(pnconf)
@@ -148,7 +180,7 @@ class TestPublish(unittest.TestCase):
             sdk_name=sdk_name,
             uuid="UUID_PublishUnitTest",
             _publish_sequence_manager=self.sm,
-            _get_token=lambda: None
+            _get_token=lambda: None,
         )
         pubnub._telemetry_manager = TelemetryManager()
         pub = Publish(pubnub)
@@ -158,10 +190,16 @@ class TestPublish(unittest.TestCase):
 
         pub.channel("ch1").message(message)
 
-        self.assertEqual(pub.build_path(), "/publish/%s/%s/0/ch1/0/%s"
-                         % (pnconf.publish_key, pnconf.subscribe_key, encoded_message))
+        self.assertEqual(
+            pub.build_path(),
+            "/publish/%s/%s/0/ch1/0/%s"
+            % (pnconf.publish_key, pnconf.subscribe_key, encoded_message),
+        )
 
-        self.assertEqual(pub.build_params_callback()({}), {
-            'pnsdk': sdk_name,
-            'uuid': pubnub.uuid,
-        })
+        self.assertEqual(
+            pub.build_params_callback()({}),
+            {
+                "pnsdk": sdk_name,
+                "uuid": pubnub.uuid,
+            },
+        )

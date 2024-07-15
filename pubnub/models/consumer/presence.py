@@ -8,94 +8,107 @@ class PNHereNowResult:
         self.channels = channels
 
     def __str__(self):
-        return "HereNow Result total occupancy: %d, total channels: %d" % (self.total_occupancy, self.total_channels)
+        return "HereNow Result total occupancy: %d, total channels: %d" % (
+            self.total_occupancy,
+            self.total_channels,
+        )
 
     @classmethod
     def from_json(cls, envelope, channel_names):
         # multiple
-        if 'payload' in envelope and isinstance(envelope['payload'], dict):
-            json_input = envelope['payload']
+        if "payload" in envelope and isinstance(envelope["payload"], dict):
+            json_input = envelope["payload"]
 
             channels = []
-            if len(json_input['channels']) > 0:
-                for channel_name, raw_data in json_input['channels'].items():
-                    channels.append(PNHereNowChannelData.from_json(channel_name, raw_data))
+            if len(json_input["channels"]) > 0:
+                for channel_name, raw_data in json_input["channels"].items():
+                    channels.append(
+                        PNHereNowChannelData.from_json(channel_name, raw_data)
+                    )
                 return PNHereNowResult(
-                    total_channels=int(json_input['total_channels']),
-                    total_occupancy=int(json_input['total_occupancy']),
-                    channels=channels)
+                    total_channels=int(json_input["total_channels"]),
+                    total_occupancy=int(json_input["total_occupancy"]),
+                    channels=channels,
+                )
             elif len(channel_names) == 1:
                 return PNHereNowResult(
-                    total_channels=int(1),
-                    total_occupancy=int(json_input['total_occupancy']),
-                    channels=[PNHereNowChannelData(channel_names[0], 0, [])]
+                    total_channels=1,
+                    total_occupancy=int(json_input["total_occupancy"]),
+                    channels=[PNHereNowChannelData(channel_names[0], 0, [])],
                 )
             else:
                 return PNHereNowResult(
-                    total_channels=int(json_input['total_channels']),
-                    total_occupancy=int(json_input['total_occupancy']),
-                    channels={}
+                    total_channels=int(json_input["total_channels"]),
+                    total_occupancy=int(json_input["total_occupancy"]),
+                    channels={},
                 )
         # empty
-        elif 'occupancy' in envelope and int(envelope['occupancy']) == 0:
+        elif "occupancy" in envelope and int(envelope["occupancy"]) == 0:
             return PNHereNowResult(
-                total_channels=int(1),
-                total_occupancy=int(envelope['occupancy']),
-                channels=[PNHereNowChannelData(channel_names[0], 0, [])]
+                total_channels=1,
+                total_occupancy=int(envelope["occupancy"]),
+                channels=[PNHereNowChannelData(channel_names[0], 0, [])],
             )
         # single
-        elif 'uuids' in envelope and isinstance(envelope['uuids'], list):
+        elif "uuids" in envelope and isinstance(envelope["uuids"], list):
             occupants = []
-            for user in envelope['uuids']:
+            for user in envelope["uuids"]:
                 if isinstance(user, str):
                     occupants.append(PNHereNowOccupantsData(user, None))
                 else:
-                    state = user['state'] if 'state' in user else None
-                    occupants.append(PNHereNowOccupantsData(user['uuid'], state))
+                    state = user["state"] if "state" in user else None
+                    occupants.append(PNHereNowOccupantsData(user["uuid"], state))
 
             return PNHereNowResult(
                 total_channels=1,
-                total_occupancy=int(envelope['occupancy']),
+                total_occupancy=int(envelope["occupancy"]),
                 channels=[
                     PNHereNowChannelData(
                         channel_name=channel_names[0],
-                        occupancy=envelope['occupancy'],
-                        occupants=occupants
+                        occupancy=envelope["occupancy"],
+                        occupants=occupants,
                     )
-                ])
+                ],
+            )
         else:
             return PNHereNowResult(
                 total_channels=1,
-                total_occupancy=int(envelope['occupancy']),
+                total_occupancy=int(envelope["occupancy"]),
                 channels=[
                     PNHereNowChannelData(
                         channel_name=channel_names[0],
-                        occupancy=envelope['occupancy'],
-                        occupants=[]
+                        occupancy=envelope["occupancy"],
+                        occupants=[],
                     )
-                ])
+                ],
+            )
 
 
-class PNHereNowChannelData(object):
+class PNHereNowChannelData:
     def __init__(self, channel_name, occupancy, occupants):
         self.channel_name = channel_name
         self.occupancy = occupancy
         self.occupants = occupants
 
     def __str__(self):
-        return "HereNow Channel Data for channel '%s': occupancy: %d, occupants: %d" \
-               % (self.channel_name, self.occupancy, self.occupants)
+        return "HereNow Channel Data for channel '%s': occupancy: %d, occupants: %d" % (
+            self.channel_name,
+            self.occupancy,
+            self.occupants,
+        )
 
     @classmethod
     def from_json(cls, name, json_input):
-        if 'uuids' in json_input:
+        if "uuids" in json_input:
             occupants = []
-            for user in json_input['uuids']:
+            for user in json_input["uuids"]:
                 if isinstance(user, dict) and len(user) > 0:
-                    if 'state' in user:
-                        occupants.append(PNHereNowOccupantsData(user['uuid'], user['state']))
+                    if "state" in user:
+                        occupants.append(
+                            PNHereNowOccupantsData(user["uuid"], user["state"])
+                        )
                     else:
-                        occupants.append(PNHereNowOccupantsData(user['uuid'], None))
+                        occupants.append(PNHereNowOccupantsData(user["uuid"], None))
                 else:
                     occupants.append(PNHereNowOccupantsData(user, None))
         else:
@@ -103,12 +116,12 @@ class PNHereNowChannelData(object):
 
         return PNHereNowChannelData(
             channel_name=name,
-            occupancy=int(json_input['occupancy']),
-            occupants=occupants
+            occupancy=int(json_input["occupancy"]),
+            occupants=occupants,
         )
 
 
-class PNHereNowOccupantsData(object):
+class PNHereNowOccupantsData:
     def __init__(self, uuid, state):
         self.uuid = uuid
         self.state = state
@@ -117,7 +130,7 @@ class PNHereNowOccupantsData(object):
         return "HereNow Occupants Data for '%s': %s" % (self.uuid, self.state)
 
 
-class PNWhereNowResult(object):
+class PNWhereNowResult:
     def __init__(self, channels):
         assert isinstance(channels, (list, tuple))
         self.channels = channels
@@ -127,10 +140,10 @@ class PNWhereNowResult(object):
 
     @classmethod
     def from_json(cls, json_input):
-        return PNWhereNowResult(json_input['payload']['channels'])
+        return PNWhereNowResult(json_input["payload"]["channels"])
 
 
-class PNSetStateResult(object):
+class PNSetStateResult:
     def __init__(self, state):
         assert isinstance(state, dict)
         self.state = state
@@ -139,7 +152,7 @@ class PNSetStateResult(object):
         return "New state %s successfully set" % self.state
 
 
-class PNGetStateResult(object):
+class PNGetStateResult:
     def __init__(self, channels):
         assert isinstance(channels, dict)
         self.channels = channels

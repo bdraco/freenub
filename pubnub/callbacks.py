@@ -1,13 +1,13 @@
 from abc import ABCMeta, abstractmethod
 
 
-class PNCallback(object):
+class PNCallback:
     @abstractmethod
     def on_response(self, x, status):
         pass
 
 
-class SubscribeCallback(object):
+class SubscribeCallback:
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -41,7 +41,7 @@ class SubscribeCallback(object):
         pass
 
 
-class ReconnectionCallback(object):
+class ReconnectionCallback:
     @abstractmethod
     def on_reconnect(self):
         pass

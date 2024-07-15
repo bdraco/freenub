@@ -22,11 +22,11 @@ class Previous(PNPage):
         PNPage.__init__(self, hash)
 
 
-class PNPageable(object):
+class PNPageable:
     __metaclass__ = ABCMeta
 
     def __init__(self, result):
-        self.total_count = result.get('totalCount', None)
+        self.total_count = result.get("totalCount", None)
         if result.get("next", None):
             self.next = Next(result["next"])
         else:

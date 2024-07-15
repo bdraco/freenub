@@ -1,9 +1,9 @@
-from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
-from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.crypto import PubNubFileCrypto
+from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
+from pubnub.endpoints.file_operations.get_file_url import GetFileDownloadUrl
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.file import PNDownloadFileResult
 from pubnub.request_handlers.requests_handler import RequestsRequestHandler
-from pubnub.endpoints.file_operations.get_file_url import GetFileDownloadUrl
 
 
 class DownloadFileNative(FileOperationEndpoint):
@@ -41,8 +41,7 @@ class DownloadFileNative(FileOperationEndpoint):
 
     def decrypt_payload(self, data):
         return PubNubFileCrypto(self._pubnub.config).decrypt(
-            self._cipher_key or self._pubnub.config.cipher_key,
-            data
+            self._cipher_key or self._pubnub.config.cipher_key, data
         )
 
     def validate_params(self):
@@ -73,13 +72,17 @@ class DownloadFileNative(FileOperationEndpoint):
         return "Downloading file"
 
     def sync(self):
-        self._download_data = GetFileDownloadUrl(self._pubnub)\
-            .channel(self._channel)\
-            .file_name(self._file_name)\
-            .file_id(self._file_id)\
+        self._download_data = (
+            GetFileDownloadUrl(self._pubnub)
+            .channel(self._channel)
+            .file_name(self._file_name)
+            .file_id(self._file_id)
             .sync()
+        )
 
         return super(DownloadFileNative, self).sync()
 
     def pn_async(self, callback):
-        return RequestsRequestHandler(self._pubnub).async_file_based_operation(self.sync, callback, "File Download")
+        return RequestsRequestHandler(self._pubnub).async_file_based_operation(
+            self.sync, callback, "File Download"
+        )

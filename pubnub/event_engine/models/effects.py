@@ -1,6 +1,7 @@
 from typing import List, Union
-from pubnub.exceptions import PubNubException
+
 from pubnub.enums import PNStatusCategory
+from pubnub.exceptions import PubNubException
 
 
 class PNEffect:
@@ -16,7 +17,11 @@ class PNCancelEffect(PNEffect):
 
 
 class HandshakeEffect(PNManageableEffect):
-    def __init__(self, channels: Union[None, List[str]] = None, groups: Union[None, List[str]] = None) -> None:
+    def __init__(
+        self,
+        channels: Union[None, List[str]] = None,
+        groups: Union[None, List[str]] = None,
+    ) -> None:
         super().__init__()
         self.channels = channels
         self.groups = groups
@@ -27,12 +32,13 @@ class CancelHandshakeEffect(PNCancelEffect):
 
 
 class ReceiveMessagesEffect(PNManageableEffect):
-    def __init__(self,
-                 channels: Union[None, List[str]] = None,
-                 groups: Union[None, List[str]] = None,
-                 timetoken: Union[None, str] = None,
-                 region: Union[None, int] = None
-                 ) -> None:
+    def __init__(
+        self,
+        channels: Union[None, List[str]] = None,
+        groups: Union[None, List[str]] = None,
+        timetoken: Union[None, str] = None,
+        region: Union[None, int] = None,
+    ) -> None:
         super().__init__()
         self.channels = channels
         self.groups = groups
@@ -45,14 +51,15 @@ class CancelReceiveMessagesEffect(PNCancelEffect):
 
 
 class ReconnectEffect(PNManageableEffect):
-    def __init__(self,
-                 channels: Union[None, List[str]] = None,
-                 groups: Union[None, List[str]] = None,
-                 timetoken: Union[None, str] = None,
-                 region: Union[None, int] = None,
-                 attempts: Union[None, int] = None,
-                 reason: Union[None, PubNubException] = None
-                 ) -> None:
+    def __init__(
+        self,
+        channels: Union[None, List[str]] = None,
+        groups: Union[None, List[str]] = None,
+        timetoken: Union[None, str] = None,
+        region: Union[None, int] = None,
+        attempts: Union[None, int] = None,
+        reason: Union[None, PubNubException] = None,
+    ) -> None:
         self.channels = channels
         self.groups = groups
         self.attempts = attempts

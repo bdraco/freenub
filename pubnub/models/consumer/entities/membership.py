@@ -9,21 +9,23 @@ class PNMembershipsResult(PNEntityPageableResult):
         self.status = result["status"]
 
     def rename_channel(result):
-        result['space'] = result.pop('channel')
+        result["space"] = result.pop("channel")
         return result
 
     def rename_uuid(result):
-        result['user'] = result.pop('uuid')
+        result["user"] = result.pop("uuid")
         return result
 
 
 class PNUserMembershipsResult(PNMembershipsResult):
     def __init__(self, result):
         super().__init__(result)
-        self.data = [PNMembershipsResult.rename_channel(space) for space in result['data']]
+        self.data = [
+            PNMembershipsResult.rename_channel(space) for space in result["data"]
+        ]
 
 
 class PNSpaceMembershipsResult(PNMembershipsResult):
     def __init__(self, result):
         super().__init__(result)
-        self.data = [PNMembershipsResult.rename_uuid(user) for user in result['data']]
+        self.data = [PNMembershipsResult.rename_uuid(user) for user in result["data"]]

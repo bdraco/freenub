@@ -1,6 +1,5 @@
 from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, SpaceEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.entities.space import PNRemoveSpaceResult
 
 
@@ -12,7 +11,10 @@ class RemoveSpace(EntitiesEndpoint, SpaceEndpoint):
         SpaceEndpoint.__init__(self)
 
     def build_path(self):
-        return RemoveSpace.REMOVE_SPACE_PATH % (self.pubnub.config.subscribe_key, self._space_id)
+        return RemoveSpace.REMOVE_SPACE_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._space_id,
+        )
 
     def validate_specific_params(self):
         self._validate_space_id()

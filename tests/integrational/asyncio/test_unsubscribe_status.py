@@ -1,18 +1,16 @@
-import logging
 import asyncio
+import logging
 
 import pytest
-from pubnub.enums import PNOperationType, PNStatusCategory
-
-from pubnub.callbacks import SubscribeCallback
 
 import pubnub as pn
-
+from pubnub.callbacks import SubscribeCallback
+from pubnub.enums import PNOperationType, PNStatusCategory
 from pubnub.pubnub_asyncio import PubNubAsyncio
 from tests.helper import pnconf_pam_copy
 from tests.integrational.vcr_helper import pn_vcr
 
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 
 
 class AccessDeniedListener(SubscribeCallback):
@@ -48,9 +46,16 @@ class ReconnectedListener(SubscribeCallback):
 
 
 @pn_vcr.use_cassette(
-    'tests/integrational/fixtures/asyncio/subscription/access_denied_unsubscribe_operation.yaml',
-    filter_query_parameters=['pnsdk', 'l_cg', 'l_pres'],
-    match_on=['method', 'scheme', 'host', 'port', 'string_list_in_path', 'string_list_in_query'],
+    "tests/integrational/fixtures/asyncio/subscription/access_denied_unsubscribe_operation.yaml",
+    filter_query_parameters=["pnsdk", "l_cg", "l_pres"],
+    match_on=[
+        "method",
+        "scheme",
+        "host",
+        "port",
+        "string_list_in_path",
+        "string_list_in_query",
+    ],
 )
 @pytest.mark.asyncio
 async def test_access_denied_unsubscribe_operation(event_loop):

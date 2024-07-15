@@ -1,10 +1,14 @@
-from pubnub.endpoints.endpoint import Endpoint
-from pubnub.errors import PNERR_CHANNEL_MISSING, PNERR_PUSH_DEVICE_MISSING, PNERROR_PUSH_TYPE_MISSING, \
-    PNERR_PUSH_TOPIC_MISSING
-from pubnub.exceptions import PubNubException
-from pubnub.enums import HttpMethod, PNOperationType, PNPushType, PNPushEnvironment
-from pubnub.models.consumer.push import PNPushAddChannelResult
 from pubnub import utils
+from pubnub.endpoints.endpoint import Endpoint
+from pubnub.enums import HttpMethod, PNOperationType, PNPushEnvironment, PNPushType
+from pubnub.errors import (
+    PNERR_CHANNEL_MISSING,
+    PNERR_PUSH_DEVICE_MISSING,
+    PNERR_PUSH_TOPIC_MISSING,
+    PNERROR_PUSH_TYPE_MISSING,
+)
+from pubnub.exceptions import PubNubException
+from pubnub.models.consumer.push import PNPushAddChannelResult
 
 
 class AddChannelsToPush(Endpoint):
@@ -44,26 +48,30 @@ class AddChannelsToPush(Endpoint):
     def custom_params(self):
         params = {}
 
-        params['add'] = utils.join_items(self._channels)
+        params["add"] = utils.join_items(self._channels)
 
         if self._push_type != PNPushType.APNS2:
-            params['type'] = utils.push_type_to_string(self._push_type)
+            params["type"] = utils.push_type_to_string(self._push_type)
         else:
             if self._environment is None:
                 self._environment = PNPushEnvironment.DEVELOPMENT
 
-            params['environment'] = self._environment
-            params['topic'] = self._topic
+            params["environment"] = self._environment
+            params["topic"] = self._topic
 
         return params
 
     def build_path(self):
         if self._push_type != PNPushType.APNS2:
             return AddChannelsToPush.ADD_PATH % (
-                self.pubnub.config.subscribe_key, self._device_id)
+                self.pubnub.config.subscribe_key,
+                self._device_id,
+            )
         else:
             return AddChannelsToPush.ADD_PATH_APNS2 % (
-                self.pubnub.config.subscribe_key, self._device_id)
+                self.pubnub.config.subscribe_key,
+                self._device_id,
+            )
 
     def http_method(self):
         return HttpMethod.GET

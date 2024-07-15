@@ -6,7 +6,7 @@ from pubnub.models.consumer.message_count import PNMessageCountResult
 
 
 class MessageCount(Endpoint):
-    MESSAGE_COUNT_PATH = '/v3/history/sub-key/%s/message-counts/%s'
+    MESSAGE_COUNT_PATH = "/v3/history/sub-key/%s/message-counts/%s"
 
     def __init__(self, pubnub):
         Endpoint.__init__(self, pubnub)
@@ -26,15 +26,15 @@ class MessageCount(Endpoint):
         params = {}
         if len(self._channels_timetoken) > 0:
             if len(self._channels_timetoken) > 1:
-                params['channelsTimetoken'] = utils.join_items(self._channels_timetoken)
+                params["channelsTimetoken"] = utils.join_items(self._channels_timetoken)
             else:
-                params['timetoken'] = self._channels_timetoken[0]
+                params["timetoken"] = self._channels_timetoken[0]
         return params
 
     def build_path(self):
         return MessageCount.MESSAGE_COUNT_PATH % (
             self.pubnub.config.subscribe_key,
-            utils.join_channels(self._channel)
+            utils.join_channels(self._channel),
         )
 
     def http_method(self):
@@ -48,7 +48,9 @@ class MessageCount(Endpoint):
         self.validate_channel()
 
         if len(self._channels_timetoken) != len(self._channel):
-            raise PubNubException('The number of channels and the number of timetokens do not match.')
+            raise PubNubException(
+                "The number of channels and the number of timetokens do not match."
+            )
 
     def create_response(self, result):  # pylint: disable=W0221
         return PNMessageCountResult(result)

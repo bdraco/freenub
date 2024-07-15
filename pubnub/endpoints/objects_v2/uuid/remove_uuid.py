@@ -1,6 +1,5 @@
 from pubnub.endpoints.objects_v2.objects_endpoint import ObjectsEndpoint, UuidEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.objects_v2.uuid import PNRemoveUUIDMetadataResult
 
 
@@ -12,7 +11,10 @@ class RemoveUuid(ObjectsEndpoint, UuidEndpoint):
         UuidEndpoint.__init__(self)
 
     def build_path(self):
-        return RemoveUuid.REMOVE_UID_PATH % (self.pubnub.config.subscribe_key, self._effective_uuid())
+        return RemoveUuid.REMOVE_UID_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._effective_uuid(),
+        )
 
     def validate_specific_params(self):
         self._validate_uuid()

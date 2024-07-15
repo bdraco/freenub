@@ -1,6 +1,6 @@
+from pubnub import utils
 from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
 from pubnub.enums import HttpMethod, PNOperationType
-from pubnub import utils
 from pubnub.models.consumer.file import PNFetchFileUploadS3DataResult
 
 
@@ -14,13 +14,11 @@ class FetchFileUploadS3Data(FileOperationEndpoint):
     def build_path(self):
         return FetchFileUploadS3Data.GENERATE_FILE_UPLOAD_DATA % (
             self.pubnub.config.subscribe_key,
-            utils.url_encode(self._channel)
+            utils.url_encode(self._channel),
         )
 
     def build_data(self):
-        params = {
-            "name": self._file_name
-        }
+        params = {"name": self._file_name}
 
         return utils.write_value_as_string(params)
 

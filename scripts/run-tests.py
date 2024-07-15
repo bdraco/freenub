@@ -11,8 +11,8 @@ _dname = os.path.dirname
 REPO_ROOT = _dname(_dname(os.path.abspath(__file__)))
 os.chdir(os.path.join(REPO_ROOT))
 
-tcmn = 'py.test tests --cov=pubnub --ignore=tests/manual/'
-fcmn = 'flake8 --exclude=scripts/,src/,.cache,.git,.idea,.tox,._trial_temp/,venv/ --ignore F811,E402'
+tcmn = "py.test tests --cov=pubnub --ignore=tests/manual/"
+fcmn = "flake8 --exclude=scripts/,src/,.cache,.git,.idea,.tox,._trial_temp/,venv/ --ignore F811,E402"
 
 
 def run(command):

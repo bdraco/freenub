@@ -1,7 +1,7 @@
-from abc import abstractmethod, ABCMeta
+from abc import ABCMeta, abstractmethod
 
 
-class BaseRequestHandler(object):
+class BaseRequestHandler:
     __metaclass__ = ABCMeta
 
     @abstractmethod
@@ -9,5 +9,12 @@ class BaseRequestHandler(object):
         pass
 
     @abstractmethod
-    def async_request(self, endpoint_name, platform_options, endpoint_call_options, callback, cancellation_event):
+    def async_request(
+        self,
+        endpoint_name,
+        platform_options,
+        endpoint_call_options,
+        callback,
+        cancellation_event,
+    ):
         pass

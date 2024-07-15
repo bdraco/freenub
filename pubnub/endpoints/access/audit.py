@@ -35,13 +35,13 @@ class Audit(Endpoint):
         params = {}
 
         if len(self._auth_keys) > 0:
-            params['auth'] = utils.join_items_and_encode(self._auth_keys)
+            params["auth"] = utils.join_items_and_encode(self._auth_keys)
 
         if len(self._channels) > 0:
-            params['channel'] = utils.join_items_and_encode(self._channels)
+            params["channel"] = utils.join_items_and_encode(self._channels)
 
         if len(self._groups) > 0:
-            params['channel-group'] = utils.join_items_and_encode(self._groups)
+            params["channel-group"] = utils.join_items_and_encode(self._groups)
 
         return params
 
@@ -56,7 +56,7 @@ class Audit(Endpoint):
         self.validate_secret_key()
 
     def create_response(self, envelope):
-        return PNAccessManagerAuditResult.from_json(envelope['payload'])
+        return PNAccessManagerAuditResult.from_json(envelope["payload"])
 
     def is_auth_required(self):
         return False

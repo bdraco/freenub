@@ -1,5 +1,9 @@
 from typing import Optional
-from pubnub.models.consumer.entities.result import PNEntityPageableResult, PNEntityResult
+
+from pubnub.models.consumer.entities.result import (
+    PNEntityPageableResult,
+    PNEntityResult,
+)
 
 
 class PNCreateSpaceResult(PNEntityResult):
@@ -33,15 +37,11 @@ class Space:
 
     def __init__(self, space_id=None, **kwargs):
         self.space_id = space_id
-        if 'custom' in kwargs.keys():
-            self.custom = kwargs['custom']
+        if "custom" in kwargs.keys():
+            self.custom = kwargs["custom"]
 
     def to_payload_dict(self):
-        result = {
-            "channel": {
-                "id": str(self.space_id)
-            }
-        }
-        if 'custom' in self.__dict__.keys():
-            result['custom'] = self.custom
+        result = {"channel": {"id": str(self.space_id)}}
+        if "custom" in self.__dict__.keys():
+            result["custom"] = self.custom
         return result

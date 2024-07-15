@@ -5,7 +5,7 @@ import pytest
 def file_upload_test_data():
     return {
         "UPLOADED_FILENAME": "king_arthur.txt",
-        "FILE_CONTENT": "Knights who say Ni!"
+        "FILE_CONTENT": "Knights who say Ni!",
     }
 
 
@@ -19,5 +19,5 @@ def file_for_upload(tmpdir, file_upload_test_data):
 @pytest.fixture
 def file_for_upload_10mb_size(tmpdir):
     temp_file = tmpdir.mkdir("fixutre").join("file_5mb")
-    temp_file.write('0' * 10 * 1024 * 1024)
+    temp_file.write("0" * 10 * 1024 * 1024)
     return temp_file

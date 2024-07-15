@@ -1,13 +1,22 @@
 from pubnub import utils
-from pubnub.endpoints.objects_v2.objects_endpoint import ObjectsEndpoint, IncludeCustomEndpoint, \
-    ListEndpoint, ChannelIncludeEndpoint, UuidEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.objects_v2.objects_endpoint import (
+    ChannelIncludeEndpoint,
+    IncludeCustomEndpoint,
+    ListEndpoint,
+    ObjectsEndpoint,
+    UuidEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.objects_v2.memberships import PNSetMembershipsResult
 
 
-class SetMemberships(ObjectsEndpoint, ListEndpoint, IncludeCustomEndpoint,
-                     ChannelIncludeEndpoint, UuidEndpoint):
+class SetMemberships(
+    ObjectsEndpoint,
+    ListEndpoint,
+    IncludeCustomEndpoint,
+    ChannelIncludeEndpoint,
+    UuidEndpoint,
+):
     SET_MEMBERSHIP_PATH = "/v2/objects/%s/uuids/%s/channels"
 
     def __init__(self, pubnub):
@@ -27,7 +36,10 @@ class SetMemberships(ObjectsEndpoint, ListEndpoint, IncludeCustomEndpoint,
         self._validate_uuid()
 
     def build_path(self):
-        return SetMemberships.SET_MEMBERSHIP_PATH % (self.pubnub.config.subscribe_key, self._effective_uuid())
+        return SetMemberships.SET_MEMBERSHIP_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._effective_uuid(),
+        )
 
     def build_data(self):
         channel_memberships_to_set = []
@@ -35,10 +47,7 @@ class SetMemberships(ObjectsEndpoint, ListEndpoint, IncludeCustomEndpoint,
         for channel_membership in self._channel_memberships:
             channel_memberships_to_set.append(channel_membership.to_payload_dict())
 
-        payload = {
-            "set": channel_memberships_to_set,
-            "delete": []
-        }
+        payload = {"set": channel_memberships_to_set, "delete": []}
         return utils.write_value_as_string(payload)
 
     def create_response(self, envelope):

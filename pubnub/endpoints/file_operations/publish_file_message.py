@@ -1,8 +1,8 @@
-from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
-from pubnub.enums import HttpMethod, PNOperationType
 from pubnub import utils
-from pubnub.models.consumer.file import PNPublishFileMessageResult
+from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
 from pubnub.endpoints.mixins import TimeTokenOverrideMixin
+from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.models.consumer.file import PNPublishFileMessageResult
 
 
 class PublishFileMessage(FileOperationEndpoint, TimeTokenOverrideMixin):
@@ -53,7 +53,7 @@ class PublishFileMessage(FileOperationEndpoint, TimeTokenOverrideMixin):
         if self._cipher_key or self._pubnub.config.cipher_key:
             return self._pubnub.config.crypto.encrypt(
                 self._cipher_key or self._pubnub.config.cipher_key,
-                utils.write_value_as_string(message)
+                utils.write_value_as_string(message),
             )
         else:
             return message
@@ -61,10 +61,7 @@ class PublishFileMessage(FileOperationEndpoint, TimeTokenOverrideMixin):
     def _build_message(self):
         message = {
             "message": self._message,
-            "file": {
-                "id": self._file_id,
-                "name": self._file_name
-            }
+            "file": {"id": self._file_id, "name": self._file_name},
         }
         return self._encrypt_message(message)
 
@@ -74,7 +71,7 @@ class PublishFileMessage(FileOperationEndpoint, TimeTokenOverrideMixin):
             self.pubnub.config.publish_key,
             self.pubnub.config.subscribe_key,
             utils.url_encode(self._channel),
-            utils.url_write(message)
+            utils.url_write(message),
         )
 
     def http_method(self):
@@ -82,11 +79,13 @@ class PublishFileMessage(FileOperationEndpoint, TimeTokenOverrideMixin):
 
     def custom_params(self):
         params = TimeTokenOverrideMixin.custom_params(self)
-        params.update({
-            "meta": utils.url_write(self._meta),
-            "ttl": self._ttl,
-            "store": 1 if self._should_store else 0
-        })
+        params.update(
+            {
+                "meta": utils.url_write(self._meta),
+                "ttl": self._ttl,
+                "store": 1 if self._should_store else 0,
+            }
+        )
         return params
 
     def is_auth_required(self):

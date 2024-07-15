@@ -1,4 +1,4 @@
-class PNSignalResult(object):
+class PNSignalResult:
     def __init__(self, result):
         """
         Representation of signal server response

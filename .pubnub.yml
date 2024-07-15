@@ -3,8 +3,7 @@ version: 7.2.0
 schema: 1
 scm: github.com/pubnub/python
 sdks:
-  -
-    type: package
+  - type: package
     full-name: Python SDK
     short-name: Python
     artifacts:
@@ -85,8 +84,7 @@ sdks:
                 license: Apache Software License (Apache 2)
                 license-url: https://github.com/aio-libs/aiohttp/blob/master/LICENSE.txt
                 is-required: Required
-      -
-        language: python
+      - language: python
         tags:
           - Server
         source-repository: https://github.com/pubnub/python
@@ -94,8 +92,7 @@ sdks:
         tier: 1
         artifact-type: library
         distributions:
-          -
-            distribution-type: library
+          - distribution-type: library
             distribution-repository: git release
             package-name: pubnub-7.2.0
             location: https://github.com/pubnub/python/releases/download/7.2.0/pubnub-7.2.0.tar.gz
@@ -140,29 +137,25 @@ sdks:
                     - x86
                     - x86-64
             requires:
-              -
-                name: requests
+              - name: requests
                 min-version: "2.4"
                 location: https://pypi.org/project/requests/
                 license: Apache Software License (Apache 2.0)
                 license-url: https://github.com/psf/requests/blob/master/LICENSE
                 is-required: Required
-              -
-                name: pycryptodomex
+              - name: pycryptodomex
                 min-version: "3.3"
                 location: https://pypi.org/project/pycryptodomex/
                 license: Apache Software License, BSD License, Public Domain (BSD, Public Domain)
                 license-url: https://github.com/Legrandin/pycryptodome/blob/master/LICENSE.rst
                 is-required: Required
-              -
-                name: cbor3
+              - name: cbor3
                 min-version: "5.0.0"
                 location: https://pypi.org/project/cbor2/
                 license: MIT License (MIT)
                 license-url: https://github.com/agronholm/cbor2/blob/master/LICENSE.txt
                 is-required: Required
-              -
-                name: aiohttp
+              - name: aiohttp
                 min-version: "2.3.10"
                 location: https://pypi.org/project/aiohttp/
                 license: Apache Software License (Apache 2)
@@ -265,137 +258,114 @@ changelog:
   - date: 2021-12-16
     version: v5.5.0
     changes:
-      -
-        text: "Revoke token functionality."
+      - text: "Revoke token functionality."
         type: feature
   - version: v5.4.0
     date: 2021-10-07
     changes:
-      -
-        text: "Parse_token method refactored."
+      - text: "Parse_token method refactored."
         type: feature
   - version: v5.3.1
     date: 2021-09-09
     changes:
-      -
-        text: "Grant result object __str__ message unified."
+      - text: "Grant result object __str__ message unified."
         type: feature
   - version: v5.3.0
     date: 2021-09-08
     changes:
-      -
-        text: "Extend grant_token method to enable control of Objects API permission. Enhance granularity of permission control to enable permissions per UUID."
+      - text: "Extend grant_token method to enable control of Objects API permission. Enhance granularity of permission control to enable permissions per UUID."
         type: feature
   - version: v5.2.1
     date: 2021-09-06
     changes:
-      -
-        text: "Encoding of the double quote character fixed."
+      - text: "Encoding of the double quote character fixed."
         type: bug
   - version: v5.2.0
     date: 2021-08-31
     changes:
-      -
-        text: "PAMv3 support for Objects_v2 added (beta). Furthermore PAMv3 tokens can now be used within other PubNub features."
+      - text: "PAMv3 support for Objects_v2 added (beta). Furthermore PAMv3 tokens can now be used within other PubNub features."
         type: feature
   - version: v5.1.4
     date: 2021-06-29
     changes:
-      -
-        text: "SDK metadata was added. Additionally, example code for the FastAPI integration was added."
+      - text: "SDK metadata was added. Additionally, example code for the FastAPI integration was added."
         type: feature
   - version: v5.1.3
     date: 2021-04-26
     changes:
-      -
-        text: "Disabling default request headers within the Endpoint."
+      - text: "Disabling default request headers within the Endpoint."
         type: bug
   - version: v5.1.2
     date: 2021-04-15
     changes:
-      -
-        text: "Request headers required by the Grant Token functionality added."
+      - text: "Request headers required by the Grant Token functionality added."
         type: bug
   - version: v5.1.1
     date: 2021-03-29
     changes:
-      -
-        text: "Multiple community Pull Requests for Asyncio related code applied."
+      - text: "Multiple community Pull Requests for Asyncio related code applied."
         type: bug
   - version: v5.1.0
     date: 2021-03-08
     changes:
-      -
-        text: "BREAKING CHANGE: Add randomized initialization vector usage by default for data encryption / decryption in publish / subscribe / history API calls."
+      - text: "BREAKING CHANGE: Add randomized initialization vector usage by default for data encryption / decryption in publish / subscribe / history API calls."
         type: feature
   - version: v5.0.1
     date: 2021-02-04
     changes:
-      -
-        text: "User defined 'origin'(custom domain) value was not used in all required places within this SDK."
+      - text: "User defined 'origin'(custom domain) value was not used in all required places within this SDK."
         type: feature
   - version: v5.0.0
     date: 2021-01-21
     changes:
-      -
-        text: "Support for Python 2.7 was removed, support for the contemporary versions of Python was added. Apart from bringing the whole SDK up to date, support for Tornado and Twisted was removed and dependencies were simplified."
+      - text: "Support for Python 2.7 was removed, support for the contemporary versions of Python was added. Apart from bringing the whole SDK up to date, support for Tornado and Twisted was removed and dependencies were simplified."
         type: improvement
   - version: v4.8.1
     date: 2021-01-18
     changes:
-      -
-        text: "New v3 History endpoint allows to fetch 100 messages per channel."
+      - text: "New v3 History endpoint allows to fetch 100 messages per channel."
         type: feature
   - version: v4.8.0
     date: 2020-12-09
     changes:
-      -
-        text: "Objects v2 implementation added to the PythonSDK with additional improvements to the test isolation within whole test suite."
+      - text: "Objects v2 implementation added to the PythonSDK with additional improvements to the test isolation within whole test suite."
         type: feature
   - version: v4.7.0
     date: 2020-11-19
     changes:
-      -
-        text: "Within this release problems with double PAM calls encoding and Publish oriented bugs were fixed."
+      - text: "Within this release problems with double PAM calls encoding and Publish oriented bugs were fixed."
         type: bug
   - version: v4.6.1
     date: 2020-10-27
     changes:
-      -
-        text: "Passing uuid to the get_state endpoint call added."
+      - text: "Passing uuid to the get_state endpoint call added."
         type: bug
   - version: v4.6.0
     date: 2020-10-22
     changes:
-      -
-        text: "File Upload added to the Python SDK."
+      - text: "File Upload added to the Python SDK."
         type: feature
   - version: v4.5.4
     date: 2020-09-29
     changes:
-      -
-        text: "Add `suppress_leave_events` configuration option which can be used to opt-out presence leave call on unsubscribe."
+      - text: "Add `suppress_leave_events` configuration option which can be used to opt-out presence leave call on unsubscribe."
         type: feature
-      -
-        text: "Log out message decryption error and pass received message with `PNDecryptionErrorCategory` category to status listeners."
+      - text: "Log out message decryption error and pass received message with `PNDecryptionErrorCategory` category to status listeners."
         type: improvement
   - version: v4.5.3
     date: 2020-08-10
     changes:
-      -
-        text: "Allocating separate thread that basically waits a certain amount of time to clean telemetry data is a waste of memory/OS data structures. Cleaning mentioned data can be incorporated into regular logic."
+      - text: "Allocating separate thread that basically waits a certain amount of time to clean telemetry data is a waste of memory/OS data structures. Cleaning mentioned data can be incorporated into regular logic."
         type: improvement
   - version: v4.5.2
     date: 2020-05-29
     changes:
-      -
-        text: "Fix bug with max message count parameter for Fetch Messages endpoint. Rename maximum_per_channel parameter to count for Fetch Messages, keeping the old name for compatibility."
+      - text: "Fix bug with max message count parameter for Fetch Messages endpoint. Rename maximum_per_channel parameter to count for Fetch Messages, keeping the old name for compatibility."
         type: bug
   - version: v4.5.1
     date: 2020-05-04
     changes:
-      -
-        text: "Using SSL by default from the Python SDK to be more consistent and encourage best practices."
+      - text: "Using SSL by default from the Python SDK to be more consistent and encourage best practices."
         type: bug
   - version: v4.5.0
     date: 2020-02-27
@@ -664,8 +634,7 @@ features:
     - MESSAGE-ACTIONS-REMOVE
 
 supported-platforms:
-  -
-    version: PubNub Python SDK
+  - version: PubNub Python SDK
     platforms:
       - FreeBSD 8-STABLE or later, amd64, 386
       - Linux 2.6 or later, amd64, 386.
@@ -677,8 +646,7 @@ supported-platforms:
       - python 3.5.2
       - python 3.6.0
       - pypy
-  -
-    version: PubNub Python Tornado SDK
+  - version: PubNub Python Tornado SDK
     platforms:
       - FreeBSD 8-STABLE or later, amd64, 386
       - Linux 2.6 or later, amd64, 386.
@@ -690,8 +658,7 @@ supported-platforms:
       - python 3.5.2
       - python 3.6.0
       - pypy
-  -
-    version: PubNub Python Asyncio SDK
+  - version: PubNub Python Asyncio SDK
     platforms:
       - FreeBSD 8-STABLE or later, amd64, 386
       - Linux 2.6 or later, amd64, 386.
@@ -701,8 +668,7 @@ supported-platforms:
       - python 3.4.5
       - python 3.5.2
       - python 3.6.0
-  -
-    version: PubNub Python Twisted SDK
+  - version: PubNub Python Twisted SDK
     platforms:
       - Linux 2.6 or later, amd64, 386.
     editors:

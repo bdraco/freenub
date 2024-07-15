@@ -1,9 +1,10 @@
 import logging
+
 from fastapi import BackgroundTasks, FastAPI
+
+import pubnub as pn
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub_asyncio import PubNubAsyncio
-import pubnub as pn
-
 
 app = FastAPI()
 
@@ -15,7 +16,7 @@ CHANNEL = "the_guide"
 
 
 pubnub = PubNubAsyncio(pnconfig)
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 
 
 async def write_notification(email: str, message=""):

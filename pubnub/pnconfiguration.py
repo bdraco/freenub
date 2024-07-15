@@ -1,9 +1,10 @@
 from Cryptodome.Cipher import AES
+
 from pubnub.enums import PNHeartbeatNotificationOptions, PNReconnectionPolicy
 from pubnub.exceptions import PubNubException
 
 
-class PNConfiguration(object):
+class PNConfiguration:
     DEFAULT_PRESENCE_TIMEOUT = 300
     DEFAULT_HEARTBEAT_INTERVAL = 280
     ALLOWED_AES_MODES = [AES.MODE_CBC, AES.MODE_GCM]
@@ -48,7 +49,9 @@ class PNConfiguration(object):
         PNConfiguration.validate_not_empty_string(self.uuid)
 
     def validate_not_empty_string(value: str):
-        assert value and isinstance(value, str) and value.strip() != "", "UUID missing or invalid type"
+        assert (
+            value and isinstance(value, str) and value.strip() != ""
+        ), "UUID missing or invalid type"
 
     def scheme(self):
         if self.ssl:
@@ -77,7 +80,7 @@ class PNConfiguration(object):
     @cipher_mode.setter
     def cipher_mode(self, cipher_mode):
         if cipher_mode not in self.ALLOWED_AES_MODES:
-            raise PubNubException('Cipher mode not supported')
+            raise PubNubException("Cipher mode not supported")
         if cipher_mode is not self._cipher_mode:
             self._cipher_mode = cipher_mode
             self.crypto_instance = None
@@ -89,7 +92,7 @@ class PNConfiguration(object):
     @fallback_cipher_mode.setter
     def fallback_cipher_mode(self, fallback_cipher_mode):
         if fallback_cipher_mode not in self.ALLOWED_AES_MODES:
-            raise PubNubException('Cipher mode not supported')
+            raise PubNubException("Cipher mode not supported")
         if fallback_cipher_mode is not self._fallback_cipher_mode:
             self._fallback_cipher_mode = fallback_cipher_mode
             self.crypto_instance = None
@@ -103,10 +106,12 @@ class PNConfiguration(object):
 
     def _init_cryptodome(self):
         from .crypto import PubNubCryptodome
+
         self.crypto_instance = PubNubCryptodome(self)
 
     def _init_file_crypto(self):
         from .crypto import PubNubFileCrypto
+
         self.file_crypto_instance = PubNubFileCrypto(self)
 
     @property

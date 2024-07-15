@@ -1,27 +1,66 @@
 import logging
 import time
-from pubnub.endpoints.entities.membership.add_memberships import AddSpaceMembers, AddUserSpaces
-from pubnub.endpoints.entities.membership.update_memberships import UpdateSpaceMembers, UpdateUserSpaces
-from pubnub.endpoints.entities.membership.fetch_memberships import FetchSpaceMemberships, FetchUserMemberships
-from pubnub.endpoints.entities.membership.remove_memberships import RemoveSpaceMembers, RemoveUserSpaces
+from abc import ABCMeta, abstractmethod
 
+from pubnub.endpoints.entities.membership.add_memberships import (
+    AddSpaceMembers,
+    AddUserSpaces,
+)
+from pubnub.endpoints.entities.membership.fetch_memberships import (
+    FetchSpaceMemberships,
+    FetchUserMemberships,
+)
+from pubnub.endpoints.entities.membership.remove_memberships import (
+    RemoveSpaceMembers,
+    RemoveUserSpaces,
+)
+from pubnub.endpoints.entities.membership.update_memberships import (
+    UpdateSpaceMembers,
+    UpdateUserSpaces,
+)
+from pubnub.endpoints.entities.space.create_space import CreateSpace
+from pubnub.endpoints.entities.space.fetch_space import FetchSpace
+from pubnub.endpoints.entities.space.fetch_spaces import FetchSpaces
+from pubnub.endpoints.entities.space.remove_space import RemoveSpace
 from pubnub.endpoints.entities.space.update_space import UpdateSpace
 from pubnub.endpoints.entities.user.create_user import CreateUser
-from pubnub.endpoints.entities.space.remove_space import RemoveSpace
-from pubnub.endpoints.entities.space.fetch_spaces import FetchSpaces
-from pubnub.endpoints.entities.space.fetch_space import FetchSpace
-from pubnub.endpoints.entities.space.create_space import CreateSpace
-from pubnub.endpoints.entities.user.remove_user import RemoveUser
-from pubnub.endpoints.entities.user.update_user import UpdateUser
 from pubnub.endpoints.entities.user.fetch_user import FetchUser
 from pubnub.endpoints.entities.user.fetch_users import FetchUsers
+from pubnub.endpoints.entities.user.remove_user import RemoveUser
+from pubnub.endpoints.entities.user.update_user import UpdateUser
 from pubnub.errors import PNERR_MISUSE_OF_USER_AND_SPACE, PNERR_USER_SPACE_PAIRS_MISSING
 from pubnub.exceptions import PubNubException
 from pubnub.features import feature_flag
 
-from abc import ABCMeta, abstractmethod
-
-from .endpoints.objects_v2.uuid.set_uuid import SetUuid
+from .builders import SubscribeBuilder, UnsubscribeBuilder
+from .endpoints.access.audit import Audit
+from .endpoints.access.grant import Grant
+from .endpoints.access.grant_token import GrantToken
+from .endpoints.access.revoke_token import RevokeToken
+from .endpoints.channel_groups.add_channel_to_channel_group import (
+    AddChannelToChannelGroup,
+)
+from .endpoints.channel_groups.list_channels_in_channel_group import (
+    ListChannelsInChannelGroup,
+)
+from .endpoints.channel_groups.remove_channel_from_channel_group import (
+    RemoveChannelFromChannelGroup,
+)
+from .endpoints.channel_groups.remove_channel_group import RemoveChannelGroup
+from .endpoints.fetch_messages import FetchMessages
+from .endpoints.file_operations.delete_file import DeleteFile
+from .endpoints.file_operations.download_file import DownloadFileNative
+from .endpoints.file_operations.fetch_upload_details import FetchFileUploadS3Data
+from .endpoints.file_operations.get_file_url import GetFileDownloadUrl
+from .endpoints.file_operations.list_files import ListFiles
+from .endpoints.file_operations.publish_file_message import PublishFileMessage
+from .endpoints.file_operations.send_file import SendFileNative
+from .endpoints.history import History
+from .endpoints.history_delete import HistoryDelete
+from .endpoints.message_actions.add_message_action import AddMessageAction
+from .endpoints.message_actions.get_message_actions import GetMessageActions
+from .endpoints.message_actions.remove_message_action import RemoveMessageAction
+from .endpoints.message_count import MessageCount
 from .endpoints.objects_v2.channel.get_all_channels import GetAllChannels
 from .endpoints.objects_v2.channel.get_channel import GetChannel
 from .endpoints.objects_v2.channel.remove_channel import RemoveChannel
@@ -37,52 +76,28 @@ from .endpoints.objects_v2.memberships.set_memberships import SetMemberships
 from .endpoints.objects_v2.uuid.get_all_uuid import GetAllUuid
 from .endpoints.objects_v2.uuid.get_uuid import GetUuid
 from .endpoints.objects_v2.uuid.remove_uuid import RemoveUuid
-from .managers import BasePathManager, TokenManager
-from .builders import SubscribeBuilder
-from .builders import UnsubscribeBuilder
-from .endpoints.time import Time
-from .endpoints.history import History
-from .endpoints.access.audit import Audit
-from .endpoints.access.grant import Grant
-from .endpoints.access.grant_token import GrantToken
-from .endpoints.access.revoke_token import RevokeToken
-from .endpoints.channel_groups.add_channel_to_channel_group import AddChannelToChannelGroup
-from .endpoints.channel_groups.list_channels_in_channel_group import ListChannelsInChannelGroup
-from .endpoints.channel_groups.remove_channel_from_channel_group import RemoveChannelFromChannelGroup
-from .endpoints.channel_groups.remove_channel_group import RemoveChannelGroup
+from .endpoints.objects_v2.uuid.set_uuid import SetUuid
 from .endpoints.presence.get_state import GetState
 from .endpoints.presence.heartbeat import Heartbeat
-from .endpoints.presence.set_state import SetState
-from .endpoints.pubsub.publish import Publish
-from .endpoints.pubsub.fire import Fire
 from .endpoints.presence.here_now import HereNow
+from .endpoints.presence.set_state import SetState
 from .endpoints.presence.where_now import WhereNow
-from .endpoints.history_delete import HistoryDelete
-from .endpoints.message_count import MessageCount
-from .endpoints.signal import Signal
-from .endpoints.fetch_messages import FetchMessages
-from .endpoints.message_actions.add_message_action import AddMessageAction
-from .endpoints.message_actions.get_message_actions import GetMessageActions
-from .endpoints.message_actions.remove_message_action import RemoveMessageAction
-from .endpoints.file_operations.list_files import ListFiles
-from .endpoints.file_operations.delete_file import DeleteFile
-from .endpoints.file_operations.get_file_url import GetFileDownloadUrl
-from .endpoints.file_operations.fetch_upload_details import FetchFileUploadS3Data
-from .endpoints.file_operations.send_file import SendFileNative
-from .endpoints.file_operations.download_file import DownloadFileNative
-from .endpoints.file_operations.publish_file_message import PublishFileMessage
-
+from .endpoints.pubsub.fire import Fire
+from .endpoints.pubsub.publish import Publish
 from .endpoints.push.add_channels_to_push import AddChannelsToPush
+from .endpoints.push.list_push_provisions import ListPushProvisions
 from .endpoints.push.remove_channels_from_push import RemoveChannelsFromPush
 from .endpoints.push.remove_device import RemoveDeviceFromPush
-from .endpoints.push.list_push_provisions import ListPushProvisions
-from .managers import TelemetryManager
+from .endpoints.signal import Signal
+from .endpoints.time import Time
+from .managers import BasePathManager, TelemetryManager, TokenManager
 
 logger = logging.getLogger("pubnub")
 
 
 class PubNubCore:
     """A base class for PubNub Python API implementations"""
+
     SDK_VERSION = "7.2.0"
     SDK_NAME = "PubNub-Python"
 
@@ -95,9 +110,7 @@ class PubNubCore:
     def __init__(self, config):
         self.config = config
         self.config.validate()
-        self.headers = {
-            'User-Agent': self.sdk_name
-        }
+        self.headers = {"User-Agent": self.sdk_name}
 
         self._subscription_manager = None
         self._publish_sequence_manager = None
@@ -111,7 +124,11 @@ class PubNubCore:
 
     @property
     def sdk_name(self):
-        return "%s%s/%s" % (PubNubCore.SDK_NAME, self.sdk_platform(), PubNubCore.SDK_VERSION)
+        return "%s%s/%s" % (
+            PubNubCore.SDK_NAME,
+            self.sdk_platform(),
+            PubNubCore.SDK_VERSION,
+        )
 
     @abstractmethod
     def sdk_platform(self):
@@ -297,6 +314,7 @@ class PubNubCore:
             return SendFileNative(self)
         elif "Asyncio" in self.sdk_platform():
             from .endpoints.file_operations.send_file_asyncio import AsyncioSendFile
+
             return AsyncioSendFile(self)
         else:
             raise NotImplementedError
@@ -305,7 +323,10 @@ class PubNubCore:
         if not self.sdk_platform():
             return DownloadFileNative(self)
         elif "Asyncio" in self.sdk_platform():
-            from .endpoints.file_operations.download_file_asyncio import DownloadFileAsyncio
+            from .endpoints.file_operations.download_file_asyncio import (
+                DownloadFileAsyncio,
+            )
+
             return DownloadFileAsyncio(self)
         else:
             raise NotImplementedError
@@ -340,9 +361,17 @@ class PubNubCore:
             raise Exception("Subscription manager is not enabled for this instance")
 
     """ Entities code -- all of methods bellow should be decorated with pubnub.features.feature_flag """
-    @feature_flag('PN_ENABLE_ENTITIES')
+
+    @feature_flag("PN_ENABLE_ENTITIES")
     def create_space(
-        self, space_id, name=None, description=None, custom=None, space_type=None, space_status=None, sync=None
+        self,
+        space_id,
+        name=None,
+        description=None,
+        custom=None,
+        space_type=None,
+        space_status=None,
+        sync=None,
     ):
         space = CreateSpace(self).space_id(space_id)
 
@@ -366,9 +395,16 @@ class PubNubCore:
 
         return space
 
-    @feature_flag('PN_ENABLE_ENTITIES')
+    @feature_flag("PN_ENABLE_ENTITIES")
     def update_space(
-        self, space_id, name=None, description=None, custom=None, space_type=None, space_status=None, sync=None
+        self,
+        space_id,
+        name=None,
+        description=None,
+        custom=None,
+        space_type=None,
+        space_status=None,
+        sync=None,
     ):
         space = UpdateSpace(self).space_id(space_id)
 
@@ -392,7 +428,7 @@ class PubNubCore:
 
         return space
 
-    @feature_flag('PN_ENABLE_ENTITIES')
+    @feature_flag("PN_ENABLE_ENTITIES")
     def remove_space(self, space_id, sync=None):
         remove_space = RemoveSpace(self).space_id(space_id)
 
@@ -401,7 +437,7 @@ class PubNubCore:
 
         return remove_space
 
-    @feature_flag('PN_ENABLE_ENTITIES')
+    @feature_flag("PN_ENABLE_ENTITIES")
     def fetch_space(self, space_id, include_custom=None, sync=None):
         space = FetchSpace(self).space_id(space_id)
 
@@ -412,10 +448,17 @@ class PubNubCore:
             return space.sync()
         return space
 
-    @feature_flag('PN_ENABLE_ENTITIES')
-    def fetch_spaces(self, limit=None, page=None, filter=None, sort=None, include_total_count=None, include_custom=None,
-                     sync=None):
-
+    @feature_flag("PN_ENABLE_ENTITIES")
+    def fetch_spaces(
+        self,
+        limit=None,
+        page=None,
+        filter=None,
+        sort=None,
+        include_total_count=None,
+        include_custom=None,
+        sync=None,
+    ):
         spaces = FetchSpaces(self)
 
         if limit is not None:
@@ -440,8 +483,17 @@ class PubNubCore:
             return spaces.sync()
         return spaces
 
-    @feature_flag('PN_ENABLE_ENTITIES')
-    def create_user(self, user_id, name=None, email=None, custom=None, user_type=None, user_status=None, sync=None):
+    @feature_flag("PN_ENABLE_ENTITIES")
+    def create_user(
+        self,
+        user_id,
+        name=None,
+        email=None,
+        custom=None,
+        user_type=None,
+        user_status=None,
+        sync=None,
+    ):
         user = CreateUser(self).user_id(user_id)
 
         if name is not None:
@@ -463,8 +515,17 @@ class PubNubCore:
             return user.sync()
         return user
 
-    @feature_flag('PN_ENABLE_ENTITIES')
-    def update_user(self, user_id, name=None, email=None, custom=None, user_type=None, user_status=None, sync=None):
+    @feature_flag("PN_ENABLE_ENTITIES")
+    def update_user(
+        self,
+        user_id,
+        name=None,
+        email=None,
+        custom=None,
+        user_type=None,
+        user_status=None,
+        sync=None,
+    ):
         user = UpdateUser(self).user_id(user_id)
 
         if name is not None:
@@ -486,7 +547,7 @@ class PubNubCore:
             return user.sync()
         return user
 
-    @feature_flag('PN_ENABLE_ENTITIES')
+    @feature_flag("PN_ENABLE_ENTITIES")
     def remove_user(self, user_id, sync=None):
         user = RemoveUser(self).user_id(user_id)
 
@@ -494,7 +555,7 @@ class PubNubCore:
             return user.sync()
         return user
 
-    @feature_flag('PN_ENABLE_ENTITIES')
+    @feature_flag("PN_ENABLE_ENTITIES")
     def fetch_user(self, user_id, include_custom=None, sync=None):
         user = FetchUser(self).user_id(user_id)
 
@@ -505,9 +566,17 @@ class PubNubCore:
             return user.sync()
         return user
 
-    @feature_flag('PN_ENABLE_ENTITIES')
-    def fetch_users(self, limit=None, page=None, filter=None, sort=None, include_total_count=None, include_custom=None,
-                    sync=None):
+    @feature_flag("PN_ENABLE_ENTITIES")
+    def fetch_users(
+        self,
+        limit=None,
+        page=None,
+        filter=None,
+        sort=None,
+        include_total_count=None,
+        include_custom=None,
+        sync=None,
+    ):
         users = FetchUsers(self)
 
         if limit is not None:
@@ -532,14 +601,14 @@ class PubNubCore:
             return users.sync()
         return users
 
-    @feature_flag('PN_ENABLE_ENTITIES')
+    @feature_flag("PN_ENABLE_ENTITIES")
     def add_memberships(
         self,
         user_id: str = None,
         users: list = None,
         space_id: str = None,
         spaces: list = None,
-        sync=None
+        sync=None,
     ):
         if user_id and space_id:
             raise (PubNubException(pn_error=PNERR_MISUSE_OF_USER_AND_SPACE))
@@ -554,14 +623,14 @@ class PubNubCore:
             return membership.sync()
         return membership
 
-    @feature_flag('PN_ENABLE_ENTITIES')
+    @feature_flag("PN_ENABLE_ENTITIES")
     def update_memberships(
         self,
         user_id: str = None,
         users: list = None,
         space_id: str = None,
         spaces: list = None,
-        sync=None
+        sync=None,
     ):
         if user_id and space_id:
             raise (PubNubException(pn_error=PNERR_MISUSE_OF_USER_AND_SPACE))
@@ -580,23 +649,41 @@ class PubNubCore:
         if len(kwargs) == 0:
             return RemoveMemberships(self)
 
-        if 'user_id' in kwargs.keys() and 'space_id' in kwargs.keys():
+        if "user_id" in kwargs.keys() and "space_id" in kwargs.keys():
             raise (PubNubException(pn_error=PNERR_MISUSE_OF_USER_AND_SPACE))
 
-        if kwargs['user_id'] and kwargs['spaces']:
-            membership = RemoveUserSpaces(self).user_id(kwargs['user_id']).spaces(kwargs['spaces'])
-        elif kwargs['space_id'] and kwargs['users']:
-            membership = RemoveSpaceMembers(self).space_id(kwargs['space_id']).users(kwargs['users'])
+        if kwargs["user_id"] and kwargs["spaces"]:
+            membership = (
+                RemoveUserSpaces(self)
+                .user_id(kwargs["user_id"])
+                .spaces(kwargs["spaces"])
+            )
+        elif kwargs["space_id"] and kwargs["users"]:
+            membership = (
+                RemoveSpaceMembers(self)
+                .space_id(kwargs["space_id"])
+                .users(kwargs["users"])
+            )
         else:
             raise (PubNubException(pn_error=PNERR_USER_SPACE_PAIRS_MISSING))
 
-        if kwargs['sync']:
+        if kwargs["sync"]:
             return membership.sync()
         return membership
 
-    @feature_flag('PN_ENABLE_ENTITIES')
-    def fetch_memberships(self, user_id: str = None, space_id: str = None, limit=None, page=None, filter=None,
-                          sort=None, include_total_count=None, include_custom=None, sync=None):
+    @feature_flag("PN_ENABLE_ENTITIES")
+    def fetch_memberships(
+        self,
+        user_id: str = None,
+        space_id: str = None,
+        limit=None,
+        page=None,
+        filter=None,
+        sort=None,
+        include_total_count=None,
+        include_custom=None,
+        sync=None,
+    ):
         if user_id and space_id:
             raise (PubNubException(pn_error=PNERR_MISUSE_OF_USER_AND_SPACE))
 

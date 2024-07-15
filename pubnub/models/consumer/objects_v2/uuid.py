@@ -1,7 +1,7 @@
 from pubnub.models.consumer.objects_v2.page import PNPageable
 
 
-class PNSetUUIDMetadataResult(object):
+class PNSetUUIDMetadataResult:
     def __init__(self, result):
         self.data = result["data"]
         self.status = result["status"]
@@ -10,7 +10,7 @@ class PNSetUUIDMetadataResult(object):
         return "Set UUID metatdata: %s" % self.data
 
 
-class PNGetUUIDMetadataResult(object):
+class PNGetUUIDMetadataResult:
     def __init__(self, result):
         self.data = result["data"]
         self.status = result["status"]
@@ -19,7 +19,7 @@ class PNGetUUIDMetadataResult(object):
         return "Get UUID metatdata: %s" % self.data
 
 
-class PNRemoveUUIDMetadataResult(object):
+class PNRemoveUUIDMetadataResult:
     def __init__(self, result):
         self.data = result["data"]
         self.status = result["status"]
@@ -38,7 +38,7 @@ class PNGetAllUUIDMetadataResult(PNPageable):
         return "Get all UUID metatdata: %s" % self.data
 
 
-class PNUUIDMetadataResult(object):
+class PNUUIDMetadataResult:
     def __init__(self, event, data):
         self.data = data
         self.event = event

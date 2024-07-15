@@ -9,14 +9,12 @@ PUBNUB_ROOT = d(d(d(os.path.dirname(os.path.abspath(__file__)))))
 sys.path.append(PUBNUB_ROOT)
 
 import pubnub as pn
-
 from pubnub.callbacks import SubscribeCallback
 from pubnub.enums import PNReconnectionPolicy, PNStatusCategory
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
 
-
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 logger = logging.getLogger("myapp")
 
 
@@ -45,6 +43,6 @@ time_until_open_again = 8
 
 my_listener = MySubscribeCallback()
 pubnub.add_listener(my_listener)
-pubnub.subscribe().channels('my_channel').execute()
+pubnub.subscribe().channels("my_channel").execute()
 
 # atexit.register(pubnub.stop)

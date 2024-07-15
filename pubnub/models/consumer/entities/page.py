@@ -28,10 +28,10 @@ class Previous(PNPage):
         super().__init__(hash)
 
 
-class PNPageable(object):
+class PNPageable:
     __metaclass__ = ABCMeta
 
     def __init__(self, result):
-        self.total_count = result.get('totalCount', None)
+        self.total_count = result.get("totalCount", None)
         self.next = Next.builder(result.get("next", None))
         self.prev = Previous.builder(result.get("prev", None))

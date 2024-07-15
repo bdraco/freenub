@@ -1,10 +1,11 @@
 import logging
 import time
 import unittest
-import pubnub
+from unittest.mock import patch
+
 import pytest
 
-from unittest.mock import patch
+import pubnub
 from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.history import PNHistoryResult
 from pubnub.models.consumer.pubsub import PNPublishResult
@@ -12,14 +13,16 @@ from pubnub.pubnub import PubNub
 from tests.helper import pnconf_copy, pnconf_enc_copy, pnconf_pam_copy
 from tests.integrational.vcr_helper import use_cassette_and_stub_time_sleep_native
 
-pubnub.set_stream_logger('pubnub', logging.DEBUG)
+pubnub.set_stream_logger("pubnub", logging.DEBUG)
 
 COUNT = 5
 
 
 class TestPubNubHistory(unittest.TestCase):
-    @use_cassette_and_stub_time_sleep_native('tests/integrational/fixtures/native_sync/history/basic.yaml',
-                                             filter_query_parameters=['uuid', 'pnsdk', 'l_pub'])
+    @use_cassette_and_stub_time_sleep_native(
+        "tests/integrational/fixtures/native_sync/history/basic.yaml",
+        filter_query_parameters=["uuid", "pnsdk", "l_pub"],
+    )
     def test_basic(self):
         ch = "history-native-sync-ch"
         pubnub = PubNub(pnconf_copy())
@@ -39,16 +42,19 @@ class TestPubNubHistory(unittest.TestCase):
         assert envelope.result.end_timetoken > 0
         assert len(envelope.result.messages) == 5
 
-        assert envelope.result.messages[0].entry == 'hey-0'
-        assert envelope.result.messages[1].entry == 'hey-1'
-        assert envelope.result.messages[2].entry == 'hey-2'
-        assert envelope.result.messages[3].entry == 'hey-3'
-        assert envelope.result.messages[4].entry == 'hey-4'
+        assert envelope.result.messages[0].entry == "hey-0"
+        assert envelope.result.messages[1].entry == "hey-1"
+        assert envelope.result.messages[2].entry == "hey-2"
+        assert envelope.result.messages[3].entry == "hey-3"
+        assert envelope.result.messages[4].entry == "hey-4"
 
-    @patch("pubnub.crypto.PubNubCryptodome.get_initialization_vector", return_value="knightsofni12345")
+    @patch(
+        "pubnub.crypto.PubNubCryptodome.get_initialization_vector",
+        return_value="knightsofni12345",
+    )
     @use_cassette_and_stub_time_sleep_native(
-        'tests/integrational/fixtures/native_sync/history/encoded.yaml',
-        filter_query_parameters=['uuid', 'pnsdk', 'l_pub']
+        "tests/integrational/fixtures/native_sync/history/encoded.yaml",
+        filter_query_parameters=["uuid", "pnsdk", "l_pub"],
     )
     def test_encrypted(self, crypto_mock):
         ch = "history-native-sync-ch"
@@ -69,14 +75,16 @@ class TestPubNubHistory(unittest.TestCase):
         assert envelope.result.end_timetoken > 0
         assert len(envelope.result.messages) == 5
 
-        assert envelope.result.messages[0].entry == 'hey-0'
-        assert envelope.result.messages[1].entry == 'hey-1'
-        assert envelope.result.messages[2].entry == 'hey-2'
-        assert envelope.result.messages[3].entry == 'hey-3'
-        assert envelope.result.messages[4].entry == 'hey-4'
+        assert envelope.result.messages[0].entry == "hey-0"
+        assert envelope.result.messages[1].entry == "hey-1"
+        assert envelope.result.messages[2].entry == "hey-2"
+        assert envelope.result.messages[3].entry == "hey-3"
+        assert envelope.result.messages[4].entry == "hey-4"
 
-    @use_cassette_and_stub_time_sleep_native('tests/integrational/fixtures/native_sync/history/not_permitted.yaml',
-                                             filter_query_parameters=['uuid', 'pnsdk'])
+    @use_cassette_and_stub_time_sleep_native(
+        "tests/integrational/fixtures/native_sync/history/not_permitted.yaml",
+        filter_query_parameters=["uuid", "pnsdk"],
+    )
     def test_not_permitted(self):
         ch = "history-native-sync-ch"
         pubnub = PubNub(pnconf_pam_copy())
@@ -100,7 +108,16 @@ class TestPubNubHistory(unittest.TestCase):
         pubnub = PubNub(pnconf_pam_copy())
         pubnub.config.uuid = "history-native-sync-uuid"
 
-        envelope = pubnub.history().channel(ch).count(2).include_timetoken(True).reverse(True).start(1).end(2).sync()
+        envelope = (
+            pubnub.history()
+            .channel(ch)
+            .count(2)
+            .include_timetoken(True)
+            .reverse(True)
+            .start(1)
+            .end(2)
+            .sync()
+        )
         assert isinstance(envelope.result, PNHistoryResult)
 
         assert not envelope.status.is_error()

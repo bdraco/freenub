@@ -1,20 +1,23 @@
 interactions:
-- request:
-    body: null
-    headers:
-      USER-AGENT: [PubNub-Python-Asyncio/4.0.4]
-    method: GET
-    uri: https://ps.pndsn.com/publish/blah/blah/0/blah/0/%22hey%22
-  response:
-    body: {string: '{"message":"Invalid Subscribe Key","error":true,"service":"Access
-        Manager","status":400}
+  - request:
+      body: null
+      headers:
+        USER-AGENT: [PubNub-Python-Asyncio/4.0.4]
+      method: GET
+      uri: https://ps.pndsn.com/publish/blah/blah/0/blah/0/%22hey%22
+    response:
+      body:
+        {
+          string:
+            '{"message":"Invalid Subscribe Key","error":true,"service":"Access
+            Manager","status":400}
 
-'}
-    headers: {ACCESS-CONTROL-ALLOW-HEADERS: 'Origin, X-Requested-With, Content-Type,
-        Accept', ACCESS-CONTROL-ALLOW-METHODS: GET, ACCESS-CONTROL-ALLOW-ORIGIN: '*',
-      CACHE-CONTROL: 'no-cache, no-store, must-revalidate', CONNECTION: keep-alive,
-      CONTENT-TYPE: text/javascript; charset=UTF-8, DATE: 'Fri, 16 Dec 2016 13:52:10
-        GMT', SERVER: nginx, TRANSFER-ENCODING: chunked}
-    status: {code: 400, message: Bad Request}
-    url: https://ps.pndsn.com/publish/blah/blah/0/blah/0/%22hey%22?pnsdk=PubNub-Python-Asyncio%2F4.0.4&uuid=c06c6b93-2c6f-49de-9d5f-12b210366651&seqn=1
+            ',
+        }
+      headers:
+        { ACCESS-CONTROL-ALLOW-HEADERS: "Origin, X-Requested-With, Content-Type,
+            Accept", ACCESS-CONTROL-ALLOW-METHODS: GET, ACCESS-CONTROL-ALLOW-ORIGIN: "*", CACHE-CONTROL: "no-cache, no-store, must-revalidate", CONNECTION: keep-alive, CONTENT-TYPE: text/javascript; charset=UTF-8, DATE: "Fri, 16 Dec 2016 13:52:10
+            GMT", SERVER: nginx, TRANSFER-ENCODING: chunked }
+      status: { code: 400, message: Bad Request }
+      url: https://ps.pndsn.com/publish/blah/blah/0/blah/0/%22hey%22?pnsdk=PubNub-Python-Asyncio%2F4.0.4&uuid=c06c6b93-2c6f-49de-9d5f-12b210366651&seqn=1
 version: 1

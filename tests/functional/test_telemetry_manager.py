@@ -1,8 +1,8 @@
 import time
 
+from pubnub.enums import PNOperationType
 from pubnub.managers import TelemetryManager
 from pubnub.pubnub import NativeTelemetryManager
-from pubnub.enums import PNOperationType
 
 
 def test_cleaning_up_latency_data():

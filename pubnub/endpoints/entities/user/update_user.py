@@ -1,12 +1,17 @@
-from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, UserEndpoint, \
-    IncludeCustomEndpoint, CustomAwareEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.entities.endpoint import (
+    CustomAwareEndpoint,
+    EntitiesEndpoint,
+    IncludeCustomEndpoint,
+    UserEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.entities.user import PNUpdateUserResult
 from pubnub.utils import write_value_as_string
 
 
-class UpdateUser(EntitiesEndpoint, UserEndpoint, IncludeCustomEndpoint, CustomAwareEndpoint):
+class UpdateUser(
+    EntitiesEndpoint, UserEndpoint, IncludeCustomEndpoint, CustomAwareEndpoint
+):
     UPDATE_USER_PATH = "/v2/objects/%s/uuids/%s"
 
     def __init__(self, pubnub):
@@ -47,7 +52,10 @@ class UpdateUser(EntitiesEndpoint, UserEndpoint, IncludeCustomEndpoint, CustomAw
         return self
 
     def build_path(self):
-        return UpdateUser.UPDATE_USER_PATH % (self.pubnub.config.subscribe_key, self._effective_user_id())
+        return UpdateUser.UPDATE_USER_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._effective_user_id(),
+        )
 
     def build_data(self):
         payload = {
@@ -55,7 +63,7 @@ class UpdateUser(EntitiesEndpoint, UserEndpoint, IncludeCustomEndpoint, CustomAw
             "email": self._email,
             "externalId": self._external_id,
             "profileUrl": self._profile_url,
-            "custom": self._custom
+            "custom": self._custom,
         }
         return write_value_as_string(payload)
 

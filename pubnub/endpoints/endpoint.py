@@ -1,14 +1,18 @@
-from abc import ABCMeta, abstractmethod
-
 import logging
 import zlib
+from abc import ABCMeta, abstractmethod
 
 from pubnub import utils
-from pubnub.enums import PNStatusCategory, HttpMethod
+from pubnub.enums import HttpMethod, PNStatusCategory
 from pubnub.errors import (
-    PNERR_SUBSCRIBE_KEY_MISSING, PNERR_PUBLISH_KEY_MISSING, PNERR_CHANNEL_OR_GROUP_MISSING,
-    PNERR_SECRET_KEY_MISSING, PNERR_CHANNEL_MISSING, PNERR_FILE_OBJECT_MISSING,
-    PNERR_FILE_ID_MISSING, PNERR_FILE_NAME_MISSING
+    PNERR_CHANNEL_MISSING,
+    PNERR_CHANNEL_OR_GROUP_MISSING,
+    PNERR_FILE_ID_MISSING,
+    PNERR_FILE_NAME_MISSING,
+    PNERR_FILE_OBJECT_MISSING,
+    PNERR_PUBLISH_KEY_MISSING,
+    PNERR_SECRET_KEY_MISSING,
+    PNERR_SUBSCRIBE_KEY_MISSING,
 )
 from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.common import PNStatus
@@ -18,7 +22,7 @@ from pubnub.structures import RequestOptions, ResponseInfo
 logger = logging.getLogger("pubnub")
 
 
-class Endpoint(object):
+class Endpoint:
     SERVER_RESPONSE_SUCCESS = 200
     SERVER_RESPONSE_FORBIDDEN = 403
     SERVER_RESPONSE_BAD_REQUEST = 400
@@ -119,7 +123,7 @@ class Endpoint(object):
     def options(self):
         data = self.build_data()
         if data and self.__compress_request():
-            data = zlib.compress(data.encode('utf-8'), level=2)
+            data = zlib.compress(data.encode("utf-8"), level=2)
         return RequestOptions(
             path=self.get_path(),
             params_callback=self.build_params_callback(),
@@ -136,7 +140,7 @@ class Endpoint(object):
             allow_redirects=self.allow_redirects(),
             use_base_path=self.use_base_path(),
             request_headers=self.request_headers(),
-            non_json_response=self.non_json_response()
+            non_json_response=self.non_json_response(),
         )
 
     def sync(self):
@@ -156,51 +160,64 @@ class Endpoint(object):
             self.validate_params()
             options = self.options()
         except PubNubException as e:
-            callback(None, self.create_status(PNStatusCategory.PNBadRequestCategory, None, None, e))
+            callback(
+                None,
+                self.create_status(
+                    PNStatusCategory.PNBadRequestCategory, None, None, e
+                ),
+            )
             return
 
         def callback_wrapper(envelope):
             callback(envelope.result, envelope.status)
 
-        return self.pubnub.request_async(endpoint_name=self.name(),
-                                         endpoint_call_options=options,
-                                         callback=callback_wrapper,
-                                         # REVIEW: include self._cancellation_event into options?
-                                         cancellation_event=self._cancellation_event)
+        return self.pubnub.request_async(
+            endpoint_name=self.name(),
+            endpoint_call_options=options,
+            callback=callback_wrapper,
+            # REVIEW: include self._cancellation_event into options?
+            cancellation_event=self._cancellation_event,
+        )
 
     def result(self):
         def handler():
             self.validate_params()
             return self.options()
 
-        return self.pubnub.request_result(options_func=handler,
-                                          cancellation_event=self._cancellation_event)
+        return self.pubnub.request_result(
+            options_func=handler, cancellation_event=self._cancellation_event
+        )
 
     def future(self):
         def handler():
             self.validate_params()
             return self.options()
 
-        return self.pubnub.request_future(options_func=handler,
-                                          cancellation_event=self._cancellation_event)
+        return self.pubnub.request_future(
+            options_func=handler, cancellation_event=self._cancellation_event
+        )
 
     def deferred(self):
         def handler():
             self.validate_params()
             return self.options()
 
-        return self.pubnub.request_deferred(options_func=handler,
-                                            cancellation_event=self._cancellation_event)
+        return self.pubnub.request_deferred(
+            options_func=handler, cancellation_event=self._cancellation_event
+        )
 
     def build_params_callback(self):
         def callback(params_to_merge):
             custom_params = self.custom_params()
             custom_params.update(params_to_merge)
 
-            custom_params['pnsdk'] = self.pubnub.sdk_name
-            custom_params['uuid'] = self.pubnub.uuid
+            custom_params["pnsdk"] = self.pubnub.sdk_name
+            custom_params["uuid"] = self.pubnub.uuid
 
-            for query_key, query_value in self.pubnub._telemetry_manager.operation_latencies().items():
+            for (
+                query_key,
+                query_value,
+            ) in self.pubnub._telemetry_manager.operation_latencies().items():
                 custom_params[query_key] = query_value
 
             if self.is_auth_required():
@@ -210,23 +227,35 @@ class Endpoint(object):
                     custom_params["auth"] = self.pubnub.config.auth_key
 
             if self.pubnub.config.secret_key:
-                utils.sign_request(self, self.pubnub, custom_params, self.http_method(), self.build_data())
+                utils.sign_request(
+                    self,
+                    self.pubnub,
+                    custom_params,
+                    self.http_method(),
+                    self.build_data(),
+                )
 
             custom_params.update(self.encoded_params())
 
             # reassign since pnsdk should be signed unencoded
-            custom_params['pnsdk'] = utils.url_encode(self.pubnub.sdk_name)
+            custom_params["pnsdk"] = utils.url_encode(self.pubnub.sdk_name)
 
             return custom_params
 
         return callback
 
     def validate_subscribe_key(self):
-        if self.pubnub.config.subscribe_key is None or len(self.pubnub.config.subscribe_key) == 0:
+        if (
+            self.pubnub.config.subscribe_key is None
+            or len(self.pubnub.config.subscribe_key) == 0
+        ):
             raise PubNubException(pn_error=PNERR_SUBSCRIBE_KEY_MISSING)
 
     def validate_secret_key(self):
-        if self.pubnub.config.secret_key is None or len(self.pubnub.config.secret_key) == 0:
+        if (
+            self.pubnub.config.secret_key is None
+            or len(self.pubnub.config.secret_key) == 0
+        ):
             raise PubNubException(pn_error=PNERR_SECRET_KEY_MISSING)
 
     def validate_channel(self):
@@ -238,7 +267,10 @@ class Endpoint(object):
             raise PubNubException(pn_error=PNERR_CHANNEL_OR_GROUP_MISSING)
 
     def validate_publish_key(self):
-        if self.pubnub.config.publish_key is None or len(self.pubnub.config.publish_key) == 0:
+        if (
+            self.pubnub.config.publish_key is None
+            or len(self.pubnub.config.publish_key) == 0
+        ):
             raise PubNubException(pn_error=PNERR_PUBLISH_KEY_MISSING)
 
     def validate_file_object(self):
@@ -299,4 +331,4 @@ class Endpoint(object):
         return exception
 
     def __compress_request(self):
-        return (self.is_compressable() and self._use_compression)
+        return self.is_compressable() and self._use_compression

@@ -5,10 +5,10 @@ from pubnub.pubnub import PubNub
 
 pnconfig = PNConfiguration()
 
-pnconfig.subscribe_key = 'sub-c-a41be4e8-b620-11e5-a916-0619f8945a4f'
-pnconfig.publish_key = 'pub-c-b525a8c0-3301-432e-a37b-d8fec5583788'
-pnconfig.subscribe_key = 'demo'
-pnconfig.publish_key = 'demo'
+pnconfig.subscribe_key = "sub-c-a41be4e8-b620-11e5-a916-0619f8945a4f"
+pnconfig.publish_key = "pub-c-b525a8c0-3301-432e-a37b-d8fec5583788"
+pnconfig.subscribe_key = "demo"
+pnconfig.publish_key = "demo"
 
 pubnub = PubNub(pnconfig)
 
@@ -38,7 +38,9 @@ class MySubscribeCallback(SubscribeCallback):
             # Connect event. You can do stuff like publish, and know you'll get it.
             # Or just use the connected event to confirm you are subscribed for
             # UI / internal notifications, etc
-            pubnub.publish().channel("someChannel").message("Hi...").pn_async(my_publish_callback)
+            pubnub.publish().channel("someChannel").message("Hi...").pn_async(
+                my_publish_callback
+            )
         elif status.category == PNStatusCategory.PNReconnectedCategory:
             pass
         # Happens as part of our regular operation. This event happens when
@@ -56,4 +58,4 @@ class MySubscribeCallback(SubscribeCallback):
 
 
 pubnub.add_listener(MySubscribeCallback())
-pubnub.subscribe().channels('someChannel').execute()
+pubnub.subscribe().channels("someChannel").execute()

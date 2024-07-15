@@ -1,6 +1,9 @@
-from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, ListEndpoint, IncludeCustomEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.entities.endpoint import (
+    EntitiesEndpoint,
+    IncludeCustomEndpoint,
+    ListEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.entities.user import PNFetchUsersResult
 
 

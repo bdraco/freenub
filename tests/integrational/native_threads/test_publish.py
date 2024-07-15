@@ -1,14 +1,14 @@
 import logging
 import threading
 import unittest
+
 import pubnub
 from pubnub.enums import PNStatusCategory
-
 from pubnub.models.consumer.pubsub import PNPublishResult
 from pubnub.pubnub import PubNub
-from tests.helper import pnconf, pnconf_enc, pnconf_pam_copy, pnconf_copy
+from tests.helper import pnconf, pnconf_copy, pnconf_enc, pnconf_pam_copy
 
-pubnub.set_stream_logger('pubnub', logging.DEBUG)
+pubnub.set_stream_logger("pubnub", logging.DEBUG)
 
 
 class TestPubNubSuccessPublish(unittest.TestCase):
@@ -31,19 +31,14 @@ class TestPubNubSuccessPublish(unittest.TestCase):
         self.status = None
 
     def assert_success_publish_get(self, msg):
-        PubNub(pnconf).publish() \
-            .channel("ch1") \
-            .message(msg) \
-            .pn_async(self.callback)
+        PubNub(pnconf).publish().channel("ch1").message(msg).pn_async(self.callback)
 
         self.assert_success()
 
     def assert_success_publish_post(self, msg):
-        PubNub(pnconf).publish() \
-            .channel("ch1") \
-            .message(msg) \
-            .use_post(True) \
-            .pn_async(self.callback)
+        PubNub(pnconf).publish().channel("ch1").message(msg).use_post(True).pn_async(
+            self.callback
+        )
 
         self.assert_success()
 
@@ -64,56 +59,46 @@ class TestPubNubSuccessPublish(unittest.TestCase):
     def test_publish_encrypted_list_get(self):
         pubnub = PubNub(pnconf_enc)
 
-        pubnub.publish() \
-            .channel("ch1") \
-            .message(["encrypted", "list"]) \
-            .pn_async(self.callback)
+        pubnub.publish().channel("ch1").message(["encrypted", "list"]).pn_async(
+            self.callback
+        )
 
         self.assert_success()
 
     def test_publish_encrypted_string_get(self):
-        PubNub(pnconf_enc).publish() \
-            .channel("ch1") \
-            .message("encrypted string") \
-            .pn_async(self.callback)
+        PubNub(pnconf_enc).publish().channel("ch1").message(
+            "encrypted string"
+        ).pn_async(self.callback)
 
         self.assert_success()
 
     def test_publish_encrypted_list_post(self):
-        PubNub(pnconf_enc).publish() \
-            .channel("ch1") \
-            .message(["encrypted", "list"]) \
-            .use_post(True) \
-            .pn_async(self.callback)
+        PubNub(pnconf_enc).publish().channel("ch1").message(
+            ["encrypted", "list"]
+        ).use_post(True).pn_async(self.callback)
 
         self.assert_success()
 
     def test_publish_encrypted_string_post(self):
-        PubNub(pnconf_enc).publish() \
-            .channel("ch1") \
-            .message("encrypted string") \
-            .use_post(True) \
-            .pn_async(self.callback)
+        PubNub(pnconf_enc).publish().channel("ch1").message(
+            "encrypted string"
+        ).use_post(True).pn_async(self.callback)
 
         self.assert_success()
 
     def test_publish_with_meta(self):
-        meta = {'a': 2, 'b': 'qwer'}
+        meta = {"a": 2, "b": "qwer"}
 
-        PubNub(pnconf_enc).publish() \
-            .channel("ch1") \
-            .message("hey") \
-            .meta(meta) \
-            .pn_async(self.callback)
+        PubNub(pnconf_enc).publish().channel("ch1").message("hey").meta(meta).pn_async(
+            self.callback
+        )
 
         self.assert_success()
 
     def test_publish_do_not_store(self):
-        PubNub(pnconf_enc).publish() \
-            .channel("ch1") \
-            .message("hey") \
-            .should_store(False) \
-            .pn_async(self.callback)
+        PubNub(pnconf_enc).publish().channel("ch1").message("hey").should_store(
+            False
+        ).pn_async(self.callback)
 
         self.assert_success()
 
@@ -132,25 +117,21 @@ class TestPubNubErrorPublish(unittest.TestCase):
         pn_fake_key_config = pnconf_copy()
         pn_fake_key_config.publish_key = "fake"
 
-        PubNub(pn_fake_key_config).publish() \
-            .channel("ch1") \
-            .message("hey") \
-            .pn_async(self.callback)
+        PubNub(pn_fake_key_config).publish().channel("ch1").message("hey").pn_async(
+            self.callback
+        )
 
         self.event.wait()
 
         assert self.status.is_error()
         assert self.status.category is PNStatusCategory.PNBadRequestCategory
         assert self.status.original_response[0] == 0
-        assert self.status.original_response[1] == 'Invalid Key'
+        assert self.status.original_response[1] == "Invalid Key"
         assert "HTTP Client Error (400):" in str(self.status.error_data.exception)
         assert "Invalid Key" in str(self.status.error_data.exception)
 
     def test_missing_message(self):
-        PubNub(pnconf).publish() \
-            .channel("ch1") \
-            .message(None) \
-            .pn_async(self.callback)
+        PubNub(pnconf).publish().channel("ch1").message(None).pn_async(self.callback)
 
         self.event.wait()
 
@@ -159,10 +140,7 @@ class TestPubNubErrorPublish(unittest.TestCase):
         assert "Message missing" in str(self.status.error_data.exception)
 
     def test_missing_chanel(self):
-        PubNub(pnconf).publish() \
-            .channel("") \
-            .message("hey") \
-            .pn_async(self.callback)
+        PubNub(pnconf).publish().channel("").message("hey").pn_async(self.callback)
 
         assert self.status.is_error()
         assert self.response is None
@@ -172,10 +150,7 @@ class TestPubNubErrorPublish(unittest.TestCase):
         def method():
             pass
 
-        PubNub(pnconf).publish() \
-            .channel("ch1") \
-            .message(method) \
-            .pn_async(self.callback)
+        PubNub(pnconf).publish().channel("ch1").message(method).pn_async(self.callback)
 
         self.event.wait()
 
@@ -187,10 +162,9 @@ class TestPubNubErrorPublish(unittest.TestCase):
         pnconf = pnconf_pam_copy()
         pnconf.secret_key = None
 
-        PubNub(pnconf).publish()\
-            .channel("not_permitted_channel")\
-            .message("correct message")\
-            .pn_async(self.callback)
+        PubNub(pnconf).publish().channel("not_permitted_channel").message(
+            "correct message"
+        ).pn_async(self.callback)
 
         self.event.wait()
 

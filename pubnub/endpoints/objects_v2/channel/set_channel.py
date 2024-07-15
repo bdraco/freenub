@@ -1,12 +1,17 @@
 from pubnub import utils
-from pubnub.endpoints.objects_v2.objects_endpoint import ObjectsEndpoint, IncludeCustomEndpoint, \
-    ChannelEndpoint, CustomAwareEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.objects_v2.objects_endpoint import (
+    ChannelEndpoint,
+    CustomAwareEndpoint,
+    IncludeCustomEndpoint,
+    ObjectsEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.objects_v2.channel import PNSetChannelMetadataResult
 
 
-class SetChannel(ObjectsEndpoint, ChannelEndpoint, IncludeCustomEndpoint, CustomAwareEndpoint):
+class SetChannel(
+    ObjectsEndpoint, ChannelEndpoint, IncludeCustomEndpoint, CustomAwareEndpoint
+):
     SET_CHANNEL_PATH = "/v2/objects/%s/channels/%s"
 
     def __init__(self, pubnub):
@@ -30,13 +35,16 @@ class SetChannel(ObjectsEndpoint, ChannelEndpoint, IncludeCustomEndpoint, Custom
         self._validate_channel()
 
     def build_path(self):
-        return SetChannel.SET_CHANNEL_PATH % (self.pubnub.config.subscribe_key, self._channel)
+        return SetChannel.SET_CHANNEL_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._channel,
+        )
 
     def build_data(self):
         payload = {
             "name": self._name,
             "description": self._description,
-            "custom": self._custom
+            "custom": self._custom,
         }
         return utils.write_value_as_string(payload)
 

@@ -1,5 +1,4 @@
-class PNResource(object):
-
+class PNResource:
     def __init__(self, resource_name=None, resource_pattern=None):
         self._resource_name = resource_name
         self._resource_pattern = resource_pattern

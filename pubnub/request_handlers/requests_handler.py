@@ -1,20 +1,26 @@
+import json  # noqa # pylint: disable=W0611
 import logging
 import threading
-import requests
-import json  # noqa # pylint: disable=W0611
 import urllib
 
+import requests
 from requests import Session
 from requests.adapters import HTTPAdapter
 
 from pubnub import utils
 from pubnub.enums import PNStatusCategory
-from pubnub.errors import PNERR_CLIENT_ERROR, PNERR_UNKNOWN_ERROR, PNERR_TOO_MANY_REDIRECTS_ERROR, \
-    PNERR_CLIENT_TIMEOUT, PNERR_HTTP_ERROR, PNERR_CONNECTION_ERROR
-from pubnub.errors import PNERR_SERVER_ERROR
+from pubnub.errors import (
+    PNERR_CLIENT_ERROR,
+    PNERR_CLIENT_TIMEOUT,
+    PNERR_CONNECTION_ERROR,
+    PNERR_HTTP_ERROR,
+    PNERR_SERVER_ERROR,
+    PNERR_TOO_MANY_REDIRECTS_ERROR,
+    PNERR_UNKNOWN_ERROR,
+)
 from pubnub.exceptions import PubNubException
 from pubnub.request_handlers.base import BaseRequestHandler
-from pubnub.structures import RequestOptions, PlatformOptions, ResponseInfo, Envelope
+from pubnub.structures import Envelope, PlatformOptions, RequestOptions, ResponseInfo
 
 try:
     from json.decoder import JSONDecodeError
@@ -26,23 +32,43 @@ logger = logging.getLogger("pubnub")
 
 
 class RequestsRequestHandler(BaseRequestHandler):
-    """ PubNub Python SDK Native requests handler based on `requests` HTTP library. """
+    """PubNub Python SDK Native requests handler based on `requests` HTTP library."""
+
     ENDPOINT_THREAD_COUNTER = 0
 
     def __init__(self, pubnub):
         self.session = Session()
 
-        self.session.mount('http://%s' % pubnub.config.origin, HTTPAdapter(max_retries=1, pool_maxsize=500))
-        self.session.mount('https://%s' % pubnub.config.origin, HTTPAdapter(max_retries=1, pool_maxsize=500))
-        self.session.mount('http://%s/v2/subscribe' % pubnub.config.origin, HTTPAdapter(pool_maxsize=500))
-        self.session.mount('https://%s/v2/subscribe' % pubnub.config.origin, HTTPAdapter(pool_maxsize=500))
+        self.session.mount(
+            "http://%s" % pubnub.config.origin,
+            HTTPAdapter(max_retries=1, pool_maxsize=500),
+        )
+        self.session.mount(
+            "https://%s" % pubnub.config.origin,
+            HTTPAdapter(max_retries=1, pool_maxsize=500),
+        )
+        self.session.mount(
+            "http://%s/v2/subscribe" % pubnub.config.origin,
+            HTTPAdapter(pool_maxsize=500),
+        )
+        self.session.mount(
+            "https://%s/v2/subscribe" % pubnub.config.origin,
+            HTTPAdapter(pool_maxsize=500),
+        )
 
         self.pubnub = pubnub
 
     def sync_request(self, platform_options, endpoint_call_options):
         return self._build_envelope(platform_options, endpoint_call_options)
 
-    def async_request(self, endpoint_name, platform_options, endpoint_call_options, callback, cancellation_event):
+    def async_request(
+        self,
+        endpoint_name,
+        platform_options,
+        endpoint_call_options,
+        callback,
+        cancellation_event,
+    ):
         call = Call()
 
         if cancellation_event is None:
@@ -59,22 +85,30 @@ class RequestsRequestHandler(BaseRequestHandler):
                 callback(envelope)
             except PubNubException as e:
                 logger.error("Async request PubNubException. %s" % str(e))
-                callback(Envelope(
-                    result=None,
-                    status=endpoint_call_options.create_status(
-                        category=PNStatusCategory.PNBadRequestCategory,
-                        response=None,
-                        response_info=None,
-                        exception=e)))
+                callback(
+                    Envelope(
+                        result=None,
+                        status=endpoint_call_options.create_status(
+                            category=PNStatusCategory.PNBadRequestCategory,
+                            response=None,
+                            response_info=None,
+                            exception=e,
+                        ),
+                    )
+                )
             except Exception as e:
                 logger.error("Async request Exception. %s" % str(e))
-                callback(Envelope(
-                    result=None,
-                    status=endpoint_call_options.create_status(
-                        category=PNStatusCategory.PNInternalExceptionCategory,
-                        response=None,
-                        response_info=None,
-                        exception=e)))
+                callback(
+                    Envelope(
+                        result=None,
+                        status=endpoint_call_options.create_status(
+                            category=PNStatusCategory.PNInternalExceptionCategory,
+                            response=None,
+                            response_info=None,
+                            exception=e,
+                        ),
+                    )
+                )
             finally:
                 call.executed_cb()
 
@@ -82,17 +116,22 @@ class RequestsRequestHandler(BaseRequestHandler):
             callback_to_invoke_in_separate_thread,
             endpoint_name,
             call,
-            cancellation_event
+            cancellation_event,
         )
 
     def execute_callback_in_separate_thread(
-            self, callback_to_invoke_in_another_thread, operation_name, call_obj, cancellation_event
+        self,
+        callback_to_invoke_in_another_thread,
+        operation_name,
+        call_obj,
+        cancellation_event,
     ):
         client = AsyncHTTPClient(callback_to_invoke_in_another_thread)
 
         thread = threading.Thread(
             target=client.run,
-            name="Thread-%s-%d" % (operation_name, ++RequestsRequestHandler.ENDPOINT_THREAD_COUNTER)
+            name="Thread-%s-%d"
+            % (operation_name, ++RequestsRequestHandler.ENDPOINT_THREAD_COUNTER),
         )
         thread.daemon = self.pubnub.config.daemon
         thread.start()
@@ -102,7 +141,9 @@ class RequestsRequestHandler(BaseRequestHandler):
 
         return call_obj
 
-    def async_file_based_operation(self, func, callback, operation_name, cancellation_event=None):
+    def async_file_based_operation(
+        self, func, callback, operation_name, cancellation_event=None
+    ):
         call = Call()
 
         if cancellation_event is None:
@@ -114,9 +155,7 @@ class RequestsRequestHandler(BaseRequestHandler):
                 callback(envelope.result, envelope.status)
             except Exception as e:
                 logger.error("Async file upload request Exception. %s" % str(e))
-                callback(
-                    Envelope(result=None, status=e)
-                )
+                callback(Envelope(result=None, status=e))
             finally:
                 call.executed_cb()
 
@@ -124,14 +163,13 @@ class RequestsRequestHandler(BaseRequestHandler):
             callback_to_invoke_in_separate_thread,
             operation_name,
             call,
-            cancellation_event
+            cancellation_event,
         )
 
         return call
 
     def _build_envelope(self, p_options, e_options):
-        """ A wrapper for _invoke_url to separate request logic """
-
+        """A wrapper for _invoke_url to separate request logic"""
         status_category = PNStatusCategory.PNUnknownCategory
         response_info = None
 
@@ -150,7 +188,9 @@ class RequestsRequestHandler(BaseRequestHandler):
                     category=status_category,
                     response=None,
                     response_info=response_info,
-                    exception=e))
+                    exception=e,
+                ),
+            )
 
         if res is not None:
             url = urllib.parse.urlparse(res.url)
@@ -158,19 +198,19 @@ class RequestsRequestHandler(BaseRequestHandler):
             uuid = None
             auth_key = None
 
-            if 'uuid' in query and len(query['uuid']) > 0:
-                uuid = query['uuid'][0]
+            if "uuid" in query and len(query["uuid"]) > 0:
+                uuid = query["uuid"][0]
 
-            if 'auth_key' in query and len(query['auth_key']) > 0:
-                auth_key = query['auth_key'][0]
+            if "auth_key" in query and len(query["auth_key"]) > 0:
+                auth_key = query["auth_key"][0]
 
             response_info = ResponseInfo(
                 status_code=res.status_code,
-                tls_enabled='https' == url.scheme,
+                tls_enabled="https" == url.scheme,
                 origin=url.hostname,
                 uuid=uuid,
                 auth_key=auth_key,
-                client_request=res.request
+                client_request=res.request,
             )
 
         if not res.ok:
@@ -200,10 +240,10 @@ class RequestsRequestHandler(BaseRequestHandler):
                     response=response,
                     response_info=response_info,
                     exception=PubNubException(
-                        pn_error=err,
-                        errormsg=text,
-                        status_code=res.status_code
-                    )))
+                        pn_error=err, errormsg=text, status_code=res.status_code
+                    ),
+                ),
+            )
         else:
             if e_options.non_json_response:
                 response = res
@@ -216,8 +256,8 @@ class RequestsRequestHandler(BaseRequestHandler):
                     category=PNStatusCategory.PNAcknowledgmentCategory,
                     response=response,
                     response_info=response_info,
-                    exception=None
-                )
+                    exception=None,
+                ),
             )
 
     def _invoke_request(self, p_options, e_options, base_origin):
@@ -240,56 +280,54 @@ class RequestsRequestHandler(BaseRequestHandler):
             "url": url,
             "params": e_options.query_string,
             "timeout": (e_options.connect_timeout, e_options.request_timeout),
-            "allow_redirects": e_options.allow_redirects
+            "allow_redirects": e_options.allow_redirects,
         }
 
         if e_options.is_post() or e_options.is_patch():
             args["data"] = e_options.data
             args["files"] = e_options.files
-            logger.debug("%s %s %s" % (
-                e_options.method_string,
-                utils.build_url(
-                    p_options.pn_config.scheme(),
-                    base_origin,
-                    e_options.path,
-                    e_options.query_string), e_options.data))
+            logger.debug(
+                "%s %s %s"
+                % (
+                    e_options.method_string,
+                    utils.build_url(
+                        p_options.pn_config.scheme(),
+                        base_origin,
+                        e_options.path,
+                        e_options.query_string,
+                    ),
+                    e_options.data,
+                )
+            )
         else:
-            logger.debug("%s %s" % (
-                e_options.method_string,
-                utils.build_url(
-                    p_options.pn_config.scheme(),
-                    base_origin,
-                    e_options.path,
-                    e_options.query_string)))
+            logger.debug(
+                "%s %s"
+                % (
+                    e_options.method_string,
+                    utils.build_url(
+                        p_options.pn_config.scheme(),
+                        base_origin,
+                        e_options.path,
+                        e_options.query_string,
+                    ),
+                )
+            )
 
         try:
             res = self.session.request(**args)
             logger.debug("GOT %s" % res.text)
         except requests.exceptions.ConnectionError as e:
-            raise PubNubException(
-                pn_error=PNERR_CONNECTION_ERROR,
-                errormsg=str(e)
-            )
+            raise PubNubException(pn_error=PNERR_CONNECTION_ERROR, errormsg=str(e))
         except requests.exceptions.HTTPError as e:
-            raise PubNubException(
-                pn_error=PNERR_HTTP_ERROR,
-                errormsg=str(e)
-            )
+            raise PubNubException(pn_error=PNERR_HTTP_ERROR, errormsg=str(e))
         except requests.exceptions.Timeout as e:
-            raise PubNubException(
-                pn_error=PNERR_CLIENT_TIMEOUT,
-                errormsg=str(e)
-            )
+            raise PubNubException(pn_error=PNERR_CLIENT_TIMEOUT, errormsg=str(e))
         except requests.exceptions.TooManyRedirects as e:
             raise PubNubException(
-                pn_error=PNERR_TOO_MANY_REDIRECTS_ERROR,
-                errormsg=str(e)
+                pn_error=PNERR_TOO_MANY_REDIRECTS_ERROR, errormsg=str(e)
             )
         except Exception as e:
-            raise PubNubException(
-                pn_error=PNERR_UNKNOWN_ERROR,
-                errormsg=str(e)
-            )
+            raise PubNubException(pn_error=PNERR_UNKNOWN_ERROR, errormsg=str(e))
 
         return res
 
@@ -304,7 +342,7 @@ class AsyncHTTPClient:
         self._callback_to_invoke()
 
 
-class Call(object):
+class Call:
     """
     A platform dependent representation of async PubNub method call
     """

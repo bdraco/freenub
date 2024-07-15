@@ -1,14 +1,22 @@
 from pubnub import utils
-from pubnub.endpoints.objects_v2.objects_endpoint import ObjectsEndpoint, ListEndpoint, \
-    IncludeCustomEndpoint, UuidEndpoint, ChannelIncludeEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
-
+from pubnub.endpoints.objects_v2.objects_endpoint import (
+    ChannelIncludeEndpoint,
+    IncludeCustomEndpoint,
+    ListEndpoint,
+    ObjectsEndpoint,
+    UuidEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.objects_v2.memberships import PNManageMembershipsResult
 
 
-class ManageMemberships(ObjectsEndpoint, UuidEndpoint, ListEndpoint, IncludeCustomEndpoint,
-                        ChannelIncludeEndpoint):
+class ManageMemberships(
+    ObjectsEndpoint,
+    UuidEndpoint,
+    ListEndpoint,
+    IncludeCustomEndpoint,
+    ChannelIncludeEndpoint,
+):
     MANAGE_MEMBERSHIPS_PATH = "/v2/objects/%s/uuids/%s/channels"
 
     def __init__(self, pubnub):
@@ -33,7 +41,10 @@ class ManageMemberships(ObjectsEndpoint, UuidEndpoint, ListEndpoint, IncludeCust
         self._validate_uuid()
 
     def build_path(self):
-        return ManageMemberships.MANAGE_MEMBERSHIPS_PATH % (self.pubnub.config.subscribe_key, self._effective_uuid())
+        return ManageMemberships.MANAGE_MEMBERSHIPS_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._effective_uuid(),
+        )
 
     def build_data(self):
         channel_memberships_to_set = []
@@ -47,7 +58,7 @@ class ManageMemberships(ObjectsEndpoint, UuidEndpoint, ListEndpoint, IncludeCust
 
         payload = {
             "set": channel_memberships_to_set,
-            "delete": channel_memberships_to_remove
+            "delete": channel_memberships_to_remove,
         }
         return utils.write_value_as_string(payload)
 

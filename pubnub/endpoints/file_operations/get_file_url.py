@@ -1,6 +1,6 @@
+from pubnub import utils
 from pubnub.endpoints.file_operations.file_based_endpoint import FileOperationEndpoint
 from pubnub.enums import HttpMethod, PNOperationType
-from pubnub import utils
 from pubnub.models.consumer.file import PNGetFileDownloadURLResult
 
 
@@ -17,15 +17,20 @@ class GetFileDownloadUrl(FileOperationEndpoint):
             self.pubnub.config.subscribe_key,
             utils.url_encode(self._channel),
             self._file_id,
-            self._file_name
+            self._file_name,
         )
 
     def get_complete_url(self):
         endpoint_options = self.options()
         endpoint_options.merge_params_in(self.custom_params())
-        query_params = '?' + endpoint_options.query_string
+        query_params = "?" + endpoint_options.query_string
 
-        return self.pubnub.config.scheme_extended() + self.pubnub.base_origin + self.build_path() + query_params
+        return (
+            self.pubnub.config.scheme_extended()
+            + self.pubnub.base_origin
+            + self.build_path()
+            + query_params
+        )
 
     def file_id(self, file_id):
         self._file_id = file_id

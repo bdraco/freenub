@@ -1,15 +1,14 @@
 import asyncio
 import json
-
-import sys
 import os
+import sys
 
 import aiohttp_cors as aiohttp_cors
 from aiohttp import web
 
 from pubnub import utils
 from pubnub.callbacks import SubscribeCallback
-from pubnub.enums import PNStatusCategory, PNOperationType
+from pubnub.enums import PNOperationType, PNStatusCategory
 from pubnub.pubnub_asyncio import PubNubAsyncio
 
 d = os.path.dirname
@@ -34,59 +33,41 @@ pubnub = PubNubAsyncio(pnconf)
 
 
 def publish_sync():
-    return _not_implemented_error({
-        "error": "Sync publish not implemented"
-    })
+    return _not_implemented_error({"error": "Sync publish not implemented"})
 
 
 def app_key_handler():
-    return _ok({
-        'app_key': APP_KEY
-    })
+    return _ok({"app_key": APP_KEY})
 
 
 def list_channels_handler():
-    return _ok({
-        "subscribed_channels": pubnub.get_subscribed_channels()
-    })
+    return _ok({"subscribed_channels": pubnub.get_subscribed_channels()})
 
 
 def add_channel_handler(request):
-    channel = request.GET['channel']
+    channel = request.GET["channel"]
 
     if channel is None:
-        return _internal_server_error({
-            "error": "Channel missing"
-        })
+        return _internal_server_error({"error": "Channel missing"})
 
     try:
         pubnub.subscribe().channels(channel).execute()
-        return _ok({
-            "subscribed_channels": pubnub.get_subscribed_channels()
-        })
+        return _ok({"subscribed_channels": pubnub.get_subscribed_channels()})
     except PubNubException as e:
-        return _internal_server_error({
-            "message": str(e)
-        })
+        return _internal_server_error({"message": str(e)})
 
 
 def remove_channel_handler(request):
-    channel = request.GET['channel']
+    channel = request.GET["channel"]
 
     if channel is None:
-        return _internal_server_error({
-            "error": "Channel missing"
-        })
+        return _internal_server_error({"error": "Channel missing"})
 
     try:
         pubnub.unsubscribe().channels(channel).execute()
-        return _ok({
-            "subscribed_channels": pubnub.get_subscribed_channels()
-        })
+        return _ok({"subscribed_channels": pubnub.get_subscribed_channels()})
     except PubNubException as e:
-        return _internal_server_error({
-            "message": str(e)
-        })
+        return _internal_server_error({"message": str(e)})
 
 
 def _ok(body):
@@ -94,15 +75,21 @@ def _ok(body):
 
 
 def _not_implemented_error(body):
-    return web.HTTPNotImplemented(body=json.dumps(body).encode('utf-8'), content_type='application/json')
+    return web.HTTPNotImplemented(
+        body=json.dumps(body).encode("utf-8"), content_type="application/json"
+    )
 
 
 def _internal_server_error(body):
-    return web.HTTPInternalServerError(body=json.dumps(body).encode('utf-8'), content_type='application/json')
+    return web.HTTPInternalServerError(
+        body=json.dumps(body).encode("utf-8"), content_type="application/json"
+    )
 
 
 def _prepare_response(body):
-    return web.Response(body=json.dumps(body).encode('utf-8'), content_type='application/json')
+    return web.Response(
+        body=json.dumps(body).encode("utf-8"), content_type="application/json"
+    )
 
 
 def init_events_transmitter():
@@ -110,20 +97,29 @@ def init_events_transmitter():
     Method transmits status events to the specific channel
     :return:
     """
+
     class StatusListener(SubscribeCallback):
         def status(self, pubnub, status):
             event = "unknown"
 
-            if status.operation == PNOperationType.PNSubscribeOperation \
-                    and status.category == PNStatusCategory.PNConnectedCategory:
+            if (
+                status.operation == PNOperationType.PNSubscribeOperation
+                and status.category == PNStatusCategory.PNConnectedCategory
+            ):
                 event = "Connect"
-            elif status.operation == PNOperationType.PNUnsubscribeOperation \
-                    and status.category == PNStatusCategory.PNAcknowledgmentCategory:
+            elif (
+                status.operation == PNOperationType.PNUnsubscribeOperation
+                and status.category == PNStatusCategory.PNAcknowledgmentCategory
+            ):
                 event = "Unsubscribe"
 
-            asyncio.ensure_future(pubnub.publish().channel('status-' + APP_KEY).message({
-                "event": event
-            }).future(), loop=loop)
+            asyncio.ensure_future(
+                pubnub.publish()
+                .channel("status-" + APP_KEY)
+                .message({"event": event})
+                .future(),
+                loop=loop,
+            )
 
         def presence(self, pubnub, presence):
             pass
@@ -139,26 +135,29 @@ async def make_app(loop):
     app = web.Application()
     # (r"/listen", ListenHandler),
 
-    cors = aiohttp_cors.setup(app, defaults={
-        "*": aiohttp_cors.ResourceOptions(
-            allow_credentials=True,
-            expose_headers="*",
-            allow_headers="*",
-        )
-    })
+    cors = aiohttp_cors.setup(
+        app,
+        defaults={
+            "*": aiohttp_cors.ResourceOptions(
+                allow_credentials=True,
+                expose_headers="*",
+                allow_headers="*",
+            )
+        },
+    )
 
-    app.router.add_route('GET', '/app_key', app_key_handler)
-    app.router.add_route('GET', '/subscription/add', add_channel_handler)
-    app.router.add_route('GET', '/subscription/remove', remove_channel_handler)
-    app.router.add_route('GET', '/subscription/list', list_channels_handler)
-    app.router.add_route('GET', '/publish/sync', publish_sync)
-    app.router.add_route('GET', '/publish/async', publish_sync)
-    app.router.add_route('GET', '/publish/async2', publish_sync)
+    app.router.add_route("GET", "/app_key", app_key_handler)
+    app.router.add_route("GET", "/subscription/add", add_channel_handler)
+    app.router.add_route("GET", "/subscription/remove", remove_channel_handler)
+    app.router.add_route("GET", "/subscription/list", list_channels_handler)
+    app.router.add_route("GET", "/publish/sync", publish_sync)
+    app.router.add_route("GET", "/publish/async", publish_sync)
+    app.router.add_route("GET", "/publish/async2", publish_sync)
 
     for route in list(app.router.routes()):
         cors.add(route)
 
-    srv = await loop.create_server(app.make_handler(), '0.0.0.0', 8080)
+    srv = await loop.create_server(app.make_handler(), "0.0.0.0", 8080)
     return srv
 
 

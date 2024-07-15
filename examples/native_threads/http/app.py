@@ -3,8 +3,7 @@ import os
 import sys
 import time
 
-from flask import Flask, jsonify
-from flask import request
+from flask import Flask, jsonify, request
 
 d = os.path.dirname
 PUBNUB_ROOT = d(d(d(os.path.dirname(os.path.abspath(__file__)))))
@@ -16,8 +15,7 @@ from pubnub.exceptions import PubNubException
 from pubnub.pnconfiguration import PNConfiguration
 from pubnub.pubnub import PubNub
 
-
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 logger = logging.getLogger("myapp")
 
 app = Flask(__name__)
@@ -37,89 +35,73 @@ logger.info("SDK Version: %s", pubnub.SDK_VERSION)
 
 @app.route("/app_key")
 def app_key():
-    return {
-        'app_key': APP_KEY
-    }
+    return {"app_key": APP_KEY}
 
 
 @app.route("/subscription/add")
 def subscription_add():
-    channel = request.args.get('channel')
+    channel = request.args.get("channel")
 
     if channel is None:
-        return jsonify({
-            "error": "Channel missing"
-        }), 500
+        return jsonify({"error": "Channel missing"}), 500
 
     pubnub.subscribe().channels(channel).execute()
-    return jsonify({
-        'subscribed_channels': pubnub.get_subscribed_channels()
-    })
+    return jsonify({"subscribed_channels": pubnub.get_subscribed_channels()})
 
 
 @app.route("/subscription/remove")
 def subscription_remove():
-    channel = request.args.get('channel')
+    channel = request.args.get("channel")
 
     if channel is None:
-        return jsonify({
-            "error": "Channel missing"
-        }), 500
+        return jsonify({"error": "Channel missing"}), 500
 
     pubnub.unsubscribe().channels(channel).execute()
 
-    return jsonify({
-        'subscribed_channels': pubnub.get_subscribed_channels()
-    })
+    return jsonify({"subscribed_channels": pubnub.get_subscribed_channels()})
 
 
 @app.route("/subscription/list")
 def subscription_list():
-    return jsonify({
-        'subscribed_channels': pubnub.get_subscribed_channels()
-    })
+    return jsonify({"subscribed_channels": pubnub.get_subscribed_channels()})
 
 
-@app.route('/publish/sync')
+@app.route("/publish/sync")
 def publish_sync():
-    channel = request.args.get('channel')
+    channel = request.args.get("channel")
 
     if channel is None:
-        return jsonify({
-            "error": "Channel missing"
-        }), 500
+        return jsonify({"error": "Channel missing"}), 500
 
     try:
-        envelope = pubnub.publish().channel(channel).message("hello from yield-based publish").sync()
-        return jsonify({
-            "original_response": str(envelope.status.original_response)
-        })
+        envelope = (
+            pubnub.publish()
+            .channel(channel)
+            .message("hello from yield-based publish")
+            .sync()
+        )
+        return jsonify({"original_response": str(envelope.status.original_response)})
     except PubNubException as e:
-        return jsonify({
-            "message": str(e)
-        }), 500
+        return jsonify({"message": str(e)}), 500
 
 
-@app.route('/publish/async')
+@app.route("/publish/async")
 def publish_async():
-    channel = request.args.get('channel')
+    channel = request.args.get("channel")
 
     if channel is None:
-        return jsonify({
-            "error": "Channel missing"
-        }), 500
+        return jsonify({"error": "Channel missing"}), 500
 
     def stub(res, state):
         pass
 
-    pubnub.publish().channel(channel).message("hello from yield-based publish")\
-        .pn_async(stub)
+    pubnub.publish().channel(channel).message(
+        "hello from yield-based publish"
+    ).pn_async(stub)
 
-    return jsonify({
-        "message": "Publish task scheduled"
-    })
+    return jsonify({"message": "Publish task scheduled"})
 
 
-if __name__ == '__main__':
-    app.run(host='0.0.0.0')
+if __name__ == "__main__":
+    app.run(host="0.0.0.0")
     time.sleep(100)

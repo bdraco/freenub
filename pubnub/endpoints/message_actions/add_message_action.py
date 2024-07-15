@@ -1,9 +1,13 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
-from pubnub.errors import PNERR_MESSAGE_ACTION_VALUE_MISSING, PNERR_MESSAGE_ACTION_TYPE_MISSING, \
-    PNERR_MESSAGE_TIMETOKEN_MISSING, PNERR_MESSAGE_ACTION_MISSING
-from pubnub.exceptions import PubNubException
 from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.errors import (
+    PNERR_MESSAGE_ACTION_MISSING,
+    PNERR_MESSAGE_ACTION_TYPE_MISSING,
+    PNERR_MESSAGE_ACTION_VALUE_MISSING,
+    PNERR_MESSAGE_TIMETOKEN_MISSING,
+)
+from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.message_actions import PNAddMessageActionResult
 
 
@@ -28,8 +32,8 @@ class AddMessageAction(Endpoint):
 
     def build_data(self):
         params = {
-            'type': self._message_action.type,
-            'value': self._message_action.value
+            "type": self._message_action.type,
+            "value": self._message_action.value,
         }
 
         return utils.write_value_as_string(params)
@@ -38,7 +42,7 @@ class AddMessageAction(Endpoint):
         return AddMessageAction.ADD_MESSAGE_ACTION_PATH % (
             self.pubnub.config.subscribe_key,
             utils.url_encode(self._channel),
-            self._message_action.message_timetoken
+            self._message_action.message_timetoken,
         )
 
     def http_method(self):
@@ -50,7 +54,7 @@ class AddMessageAction(Endpoint):
         self.validate_message_action()
 
     def create_response(self, envelope):  # pylint: disable=W0221
-        return PNAddMessageActionResult(envelope['data'])
+        return PNAddMessageActionResult(envelope["data"])
 
     def is_auth_required(self):
         return True

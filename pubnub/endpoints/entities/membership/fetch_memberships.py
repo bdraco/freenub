@@ -1,10 +1,20 @@
-from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, IncludeCustomEndpoint, ListEndpoint, SpaceEndpoint, \
-    UserEndpoint
-from pubnub.enums import PNOperationType, HttpMethod
-from pubnub.models.consumer.entities.membership import PNSpaceMembershipsResult, PNUserMembershipsResult
+from pubnub.endpoints.entities.endpoint import (
+    EntitiesEndpoint,
+    IncludeCustomEndpoint,
+    ListEndpoint,
+    SpaceEndpoint,
+    UserEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.models.consumer.entities.membership import (
+    PNSpaceMembershipsResult,
+    PNUserMembershipsResult,
+)
 
 
-class FetchUserMemberships(EntitiesEndpoint, IncludeCustomEndpoint, UserEndpoint, ListEndpoint):
+class FetchUserMemberships(
+    EntitiesEndpoint, IncludeCustomEndpoint, UserEndpoint, ListEndpoint
+):
     MEMBERSHIP_PATH = "/v2/objects/%s/uuids/%s/channels"
 
     def __init__(self, pubnub):
@@ -14,7 +24,10 @@ class FetchUserMemberships(EntitiesEndpoint, IncludeCustomEndpoint, UserEndpoint
         UserEndpoint.__init__(self)
 
     def build_path(self):
-        return FetchUserMemberships.MEMBERSHIP_PATH % (self.pubnub.config.subscribe_key, self._user_id)
+        return FetchUserMemberships.MEMBERSHIP_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._user_id,
+        )
 
     def validate_specific_params(self):
         self._validate_user_id()
@@ -42,7 +55,10 @@ class FetchSpaceMemberships(EntitiesEndpoint, IncludeCustomEndpoint, SpaceEndpoi
         UserEndpoint.__init__(self)
 
     def build_path(self):
-        return FetchSpaceMemberships.MEMBERSHIP_PATH % (self.pubnub.config.subscribe_key, self._space_id)
+        return FetchSpaceMemberships.MEMBERSHIP_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._space_id,
+        )
 
     def validate_specific_params(self):
         self._validate_space_id()

@@ -1,16 +1,16 @@
-import unittest
 import logging
+import threading
 import time
+import unittest
 
 import pytest
-import pubnub
-import threading
 
-from pubnub.pubnub import PubNub, SubscribeListener, NonSubscribeListener
+import pubnub
+from pubnub.pubnub import NonSubscribeListener, PubNub, SubscribeListener
 from tests import helper
 from tests.helper import pnconf_sub_copy
 
-pubnub.set_stream_logger('pubnub', logging.DEBUG)
+pubnub.set_stream_logger("pubnub", logging.DEBUG)
 
 
 class TestPubNubState(unittest.TestCase):
@@ -38,10 +38,9 @@ class TestPubNubState(unittest.TestCase):
 
         time.sleep(2)
 
-        pubnub.here_now() \
-            .channels(ch) \
-            .include_uuids(True) \
-            .pn_async(here_now_listener.callback)
+        pubnub.here_now().channels(ch).include_uuids(True).pn_async(
+            here_now_listener.callback
+        )
 
         if here_now_listener.pn_await() is False:
             self.fail("HereNow operation timeout")
@@ -74,9 +73,7 @@ class TestPubNubState(unittest.TestCase):
 
         time.sleep(5)
 
-        pubnub.here_now() \
-            .channels([ch1, ch2]) \
-            .pn_async(here_now_listener.callback)
+        pubnub.here_now().channels([ch1, ch2]).pn_async(here_now_listener.callback)
 
         if here_now_listener.pn_await() is False:
             self.fail("HereNow operation timeout")

@@ -1,5 +1,5 @@
-from pubnub.managers import TelemetryManager
 from pubnub.enums import PNOperationType
+from pubnub.managers import TelemetryManager
 
 
 def test_average_latency():
@@ -33,9 +33,9 @@ def test_valid_queries():
 
     queries = manager.operation_latencies()
 
-    if not queries['l_pub'] == 2:
+    if not queries["l_pub"] == 2:
         raise AssertionError()
-    if not queries['l_hist'] == 5:
+    if not queries["l_hist"] == 5:
         raise AssertionError()
-    if not queries['l_cg'] == 8:
+    if not queries["l_cg"] == 8:
         raise AssertionError()

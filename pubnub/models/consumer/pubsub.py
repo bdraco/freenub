@@ -1,9 +1,16 @@
 from pubnub.models.consumer.message_actions import PNMessageAction
 
 
-class PNMessageResult(object):
-    def __init__(self, message, subscription, channel, timetoken, user_metadata=None, publisher=None):
-
+class PNMessageResult:
+    def __init__(
+        self,
+        message,
+        subscription,
+        channel,
+        timetoken,
+        user_metadata=None,
+        publisher=None,
+    ):
         if subscription is not None:
             assert isinstance(subscription, str)
 
@@ -37,20 +44,40 @@ class PNSignalMessageResult(PNMessageResult):
 
 class PNFileMessageResult(PNMessageResult):
     def __init__(
-            self, message, subscription,
-            channel, timetoken, publisher,
-            file_url, file_id, file_name
+        self,
+        message,
+        subscription,
+        channel,
+        timetoken,
+        publisher,
+        file_url,
+        file_id,
+        file_name,
     ):
-        super(PNFileMessageResult, self).__init__(message, subscription, channel, timetoken, publisher=publisher)
+        super(PNFileMessageResult, self).__init__(
+            message, subscription, channel, timetoken, publisher=publisher
+        )
         self.file_url = file_url
         self.file_id = file_id
         self.file_name = file_name
 
 
-class PNPresenceEventResult(object):
-    def __init__(self, event, uuid, timestamp, occupancy, subscription, channel,
-                 timetoken, state, join, leave, timeout, user_metadata=None):
-
+class PNPresenceEventResult:
+    def __init__(
+        self,
+        event,
+        uuid,
+        timestamp,
+        occupancy,
+        subscription,
+        channel,
+        timetoken,
+        state,
+        join,
+        leave,
+        timeout,
+        user_metadata=None,
+    ):
         assert isinstance(event, str)
         assert isinstance(timestamp, int)
         assert isinstance(occupancy, int)
@@ -83,12 +110,11 @@ class PNPresenceEventResult(object):
 
 
 class PNMessageActionResult(PNMessageAction):
-
     def __init__(self, result):
         super(PNMessageActionResult, self).__init__(result)
 
 
-class PNPublishResult(object):
+class PNPublishResult:
     def __init__(self, envelope, timetoken):
         """
         Representation of publish server response
@@ -101,7 +127,7 @@ class PNPublishResult(object):
         return "Publish success with timetoken %s" % self.timetoken
 
 
-class PNFireResult(object):
+class PNFireResult:
     def __init__(self, envelope, timetoken):
         """
         Representation of fire server response

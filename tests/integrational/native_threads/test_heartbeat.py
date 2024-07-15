@@ -1,13 +1,13 @@
 import logging
-import unittest
 import time
-import pubnub as pn
+import unittest
 
+import pubnub as pn
 from pubnub.pubnub import PubNub, SubscribeListener
 from tests import helper
 from tests.helper import pnconf_sub_copy
 
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 
 
 # TODO: add a success heartbeat test
@@ -40,7 +40,7 @@ class TestPubNubHeartbeat(unittest.TestCase):
 
         presence_message = callback_presence.wait_for_presence_on(ch)
         assert ch == presence_message.channel
-        assert 'join' == presence_message.event
+        assert "join" == presence_message.event
         assert pubnub_listener.uuid == presence_message.uuid
 
         # - connect to :ch
@@ -50,7 +50,7 @@ class TestPubNubHeartbeat(unittest.TestCase):
 
         prs_envelope = callback_presence.wait_for_presence_on(ch)
         assert ch == prs_envelope.channel
-        assert 'join' == prs_envelope.event
+        assert "join" == prs_envelope.event
         assert pubnub.uuid == prs_envelope.uuid
 
         # wait for one heartbeat call
@@ -62,7 +62,7 @@ class TestPubNubHeartbeat(unittest.TestCase):
         # - assert for timeout
         presence_message = callback_presence.wait_for_presence_on(ch)
         assert ch == presence_message.channel
-        assert 'timeout' == presence_message.event
+        assert "timeout" == presence_message.event
         assert pubnub.uuid == presence_message.uuid
 
         pubnub.unsubscribe().channels(ch).execute()

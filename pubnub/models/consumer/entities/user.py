@@ -1,6 +1,9 @@
 from typing import Optional
 
-from pubnub.models.consumer.entities.result import PNEntityPageableResult, PNEntityResult
+from pubnub.models.consumer.entities.result import (
+    PNEntityPageableResult,
+    PNEntityResult,
+)
 
 
 class PNCreateUserResult(PNEntityResult):
@@ -34,15 +37,11 @@ class User:
 
     def __init__(self, user_id=None, **kwargs):
         self.user_id = user_id
-        if 'custom' in kwargs.keys():
-            self.custom = kwargs['custom']
+        if "custom" in kwargs.keys():
+            self.custom = kwargs["custom"]
 
     def to_payload_dict(self):
-        result = {
-            "uuid": {
-                "id": str(self.user_id)
-            }
-        }
-        if 'custom' in self.__dict__.keys():
-            result['custom'] = self.custom
+        result = {"uuid": {"id": str(self.user_id)}}
+        if "custom" in self.__dict__.keys():
+            result["custom"] = self.custom
         return result

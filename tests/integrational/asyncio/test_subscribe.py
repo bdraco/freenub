@@ -1,24 +1,33 @@
-import logging
 import asyncio
-import pytest
-import pubnub as pn
-
+import logging
 from unittest.mock import patch
+
+import pytest
+
+import pubnub as pn
 from pubnub.models.consumer.pubsub import PNMessageResult
-from pubnub.pubnub_asyncio import PubNubAsyncio, AsyncioEnvelope, SubscribeListener
-from tests.helper import pnconf_sub_copy, pnconf_enc_sub_copy
-from tests.integrational.vcr_asyncio_sleeper import get_sleeper, VCR599Listener, VCR599ReconnectionManager
+from pubnub.pubnub_asyncio import AsyncioEnvelope, PubNubAsyncio, SubscribeListener
+from tests.helper import pnconf_enc_sub_copy, pnconf_sub_copy
+from tests.integrational.vcr_asyncio_sleeper import (
+    VCR599Listener,
+    VCR599ReconnectionManager,
+    get_sleeper,
+)
 from tests.integrational.vcr_helper import pn_vcr
 
-pn.set_stream_logger('pubnub', logging.DEBUG)
+pn.set_stream_logger("pubnub", logging.DEBUG)
 
 
 async def patch_pubnub(pubnub):
-    pubnub._subscription_manager._reconnection_manager = VCR599ReconnectionManager(pubnub)
+    pubnub._subscription_manager._reconnection_manager = VCR599ReconnectionManager(
+        pubnub
+    )
 
 
-@pn_vcr.use_cassette('tests/integrational/fixtures/asyncio/subscription/sub_unsub.yaml',
-                     filter_query_parameters=['uuid', 'pnsdk'])
+@pn_vcr.use_cassette(
+    "tests/integrational/fixtures/asyncio/subscription/sub_unsub.yaml",
+    filter_query_parameters=["uuid", "pnsdk"],
+)
 @pytest.mark.asyncio
 async def test_subscribe_unsubscribe(event_loop):
     channel = "test-subscribe-asyncio-ch"
@@ -47,8 +56,10 @@ async def test_subscribe_unsubscribe(event_loop):
     await pubnub.stop()
 
 
-@pn_vcr.use_cassette('tests/integrational/fixtures/asyncio/subscription/sub_pub_unsub.yaml',
-                     filter_query_parameters=['pnsdk'])
+@pn_vcr.use_cassette(
+    "tests/integrational/fixtures/asyncio/subscription/sub_pub_unsub.yaml",
+    filter_query_parameters=["pnsdk"],
+)
 @pytest.mark.asyncio
 async def test_subscribe_publish_unsubscribe(event_loop):
     pubnub_sub = PubNubAsyncio(pnconf_sub_copy(), custom_event_loop=event_loop)
@@ -57,8 +68,8 @@ async def test_subscribe_publish_unsubscribe(event_loop):
     await patch_pubnub(pubnub_sub)
     await patch_pubnub(pubnub_pub)
 
-    pubnub_sub.config.uuid = 'test-subscribe-asyncio-uuid-sub'
-    pubnub_pub.config.uuid = 'test-subscribe-asyncio-uuid-pub'
+    pubnub_sub.config.uuid = "test-subscribe-asyncio-uuid-sub"
+    pubnub_pub.config.uuid = "test-subscribe-asyncio-uuid-pub"
 
     callback = VCR599Listener(1)
     channel = "test-subscribe-asyncio-ch"
@@ -68,13 +79,14 @@ async def test_subscribe_publish_unsubscribe(event_loop):
 
     await callback.wait_for_connect()
 
-    publish_future = asyncio.ensure_future(pubnub_pub.publish().channel(channel).message(message).future())
-    subscribe_message_future = asyncio.ensure_future(callback.wait_for_message_on(channel))
+    publish_future = asyncio.ensure_future(
+        pubnub_pub.publish().channel(channel).message(message).future()
+    )
+    subscribe_message_future = asyncio.ensure_future(
+        callback.wait_for_message_on(channel)
+    )
 
-    await asyncio.wait([
-        publish_future,
-        subscribe_message_future
-    ])
+    await asyncio.wait([publish_future, subscribe_message_future])
 
     publish_envelope = publish_future.result()
     subscribe_envelope = subscribe_message_future.result()
@@ -97,15 +109,18 @@ async def test_subscribe_publish_unsubscribe(event_loop):
 
 
 @pn_vcr.use_cassette(
-    'tests/integrational/fixtures/asyncio/subscription/sub_pub_unsub_enc.yaml',
-    filter_query_parameters=['pnsdk']
+    "tests/integrational/fixtures/asyncio/subscription/sub_pub_unsub_enc.yaml",
+    filter_query_parameters=["pnsdk"],
 )
 @pytest.mark.asyncio
 async def test_encrypted_subscribe_publish_unsubscribe(event_loop):
     pubnub = PubNubAsyncio(pnconf_enc_sub_copy(), custom_event_loop=event_loop)
-    pubnub.config.uuid = 'test-subscribe-asyncio-uuid'
+    pubnub.config.uuid = "test-subscribe-asyncio-uuid"
 
-    with patch("pubnub.crypto.PubNubCryptodome.get_initialization_vector", return_value="knightsofni12345"):
+    with patch(
+        "pubnub.crypto.PubNubCryptodome.get_initialization_vector",
+        return_value="knightsofni12345",
+    ):
         callback = VCR599Listener(1)
         channel = "test-subscribe-asyncio-ch"
         message = "hey"
@@ -114,13 +129,14 @@ async def test_encrypted_subscribe_publish_unsubscribe(event_loop):
 
         await callback.wait_for_connect()
 
-        publish_future = asyncio.ensure_future(pubnub.publish().channel(channel).message(message).future())
-        subscribe_message_future = asyncio.ensure_future(callback.wait_for_message_on(channel))
+        publish_future = asyncio.ensure_future(
+            pubnub.publish().channel(channel).message(message).future()
+        )
+        subscribe_message_future = asyncio.ensure_future(
+            callback.wait_for_message_on(channel)
+        )
 
-        await asyncio.wait([
-            publish_future,
-            subscribe_message_future
-        ])
+        await asyncio.wait([publish_future, subscribe_message_future])
 
         publish_envelope = publish_future.result()
         subscribe_envelope = subscribe_message_future.result()
@@ -141,8 +157,10 @@ async def test_encrypted_subscribe_publish_unsubscribe(event_loop):
     await pubnub.stop()
 
 
-@pn_vcr.use_cassette('tests/integrational/fixtures/asyncio/subscription/join_leave.yaml',
-                     filter_query_parameters=['pnsdk', 'l_cg'])
+@pn_vcr.use_cassette(
+    "tests/integrational/fixtures/asyncio/subscription/join_leave.yaml",
+    filter_query_parameters=["pnsdk", "l_cg"],
+)
 @pytest.mark.asyncio
 async def test_join_leave(event_loop):
     channel = "test-subscribe-asyncio-join-leave-ch"
@@ -166,7 +184,7 @@ async def test_join_leave(event_loop):
 
     envelope = await callback_presence.wait_for_presence_on(channel)
     assert envelope.channel == channel
-    assert envelope.event == 'join'
+    assert envelope.event == "join"
     assert envelope.uuid == pubnub_listener.uuid
 
     pubnub.add_listener(callback_messages)
@@ -175,7 +193,7 @@ async def test_join_leave(event_loop):
 
     envelope = await callback_presence.wait_for_presence_on(channel)
     assert envelope.channel == channel
-    assert envelope.event == 'join'
+    assert envelope.event == "join"
     assert envelope.uuid == pubnub.uuid
 
     pubnub.unsubscribe().channels(channel).execute()
@@ -184,7 +202,7 @@ async def test_join_leave(event_loop):
     envelope = await callback_presence.wait_for_presence_on(channel)
 
     assert envelope.channel == channel
-    assert envelope.event == 'leave'
+    assert envelope.event == "leave"
     assert envelope.uuid == pubnub.uuid
 
     pubnub_listener.unsubscribe().channels(channel).execute()
@@ -194,9 +212,11 @@ async def test_join_leave(event_loop):
     await pubnub_listener.stop()
 
 
-@get_sleeper('tests/integrational/fixtures/asyncio/subscription/cg_sub_unsub.yaml')
-@pn_vcr.use_cassette('tests/integrational/fixtures/asyncio/subscription/cg_sub_unsub.yaml',
-                     filter_query_parameters=['uuid', 'pnsdk', 'l_cg', 'l_pres'])
+@get_sleeper("tests/integrational/fixtures/asyncio/subscription/cg_sub_unsub.yaml")
+@pn_vcr.use_cassette(
+    "tests/integrational/fixtures/asyncio/subscription/cg_sub_unsub.yaml",
+    filter_query_parameters=["uuid", "pnsdk", "l_cg", "l_pres"],
+)
 @pytest.mark.asyncio
 async def test_cg_subscribe_unsubscribe(event_loop, sleeper=asyncio.sleep):
     ch = "test-subscribe-asyncio-channel"
@@ -204,8 +224,13 @@ async def test_cg_subscribe_unsubscribe(event_loop, sleeper=asyncio.sleep):
 
     pubnub = PubNubAsyncio(pnconf_sub_copy(), custom_event_loop=event_loop)
 
-    envelope = await pubnub.add_channel_to_channel_group().channel_group(gr).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
+    envelope = (
+        await pubnub.add_channel_to_channel_group()
+        .channel_group(gr)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
 
     await sleeper(3)
 
@@ -217,15 +242,22 @@ async def test_cg_subscribe_unsubscribe(event_loop, sleeper=asyncio.sleep):
     pubnub.unsubscribe().channel_groups(gr).execute()
     await callback_messages.wait_for_disconnect()
 
-    envelope = await pubnub.remove_channel_from_channel_group().channel_group(gr).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
+    envelope = (
+        await pubnub.remove_channel_from_channel_group()
+        .channel_group(gr)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
 
     await pubnub.stop()
 
 
-@get_sleeper('tests/integrational/fixtures/asyncio/subscription/cg_sub_pub_unsub.yaml')
-@pn_vcr.use_cassette('tests/integrational/fixtures/asyncio/subscription/cg_sub_pub_unsub.yaml',
-                     filter_query_parameters=['uuid', 'pnsdk', 'l_cg', 'l_pres', 'l_pub'])
+@get_sleeper("tests/integrational/fixtures/asyncio/subscription/cg_sub_pub_unsub.yaml")
+@pn_vcr.use_cassette(
+    "tests/integrational/fixtures/asyncio/subscription/cg_sub_pub_unsub.yaml",
+    filter_query_parameters=["uuid", "pnsdk", "l_cg", "l_pres", "l_pub"],
+)
 @pytest.mark.asyncio
 async def test_cg_subscribe_publish_unsubscribe(event_loop, sleeper=asyncio.sleep):
     ch = "test-subscribe-asyncio-channel"
@@ -234,8 +266,13 @@ async def test_cg_subscribe_publish_unsubscribe(event_loop, sleeper=asyncio.slee
 
     pubnub = PubNubAsyncio(pnconf_sub_copy(), custom_event_loop=event_loop)
 
-    envelope = await pubnub.add_channel_to_channel_group().channel_group(gr).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
+    envelope = (
+        await pubnub.add_channel_to_channel_group()
+        .channel_group(gr)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
 
     await sleeper(1)
 
@@ -245,14 +282,16 @@ async def test_cg_subscribe_publish_unsubscribe(event_loop, sleeper=asyncio.slee
     await callback_messages.wait_for_connect()
 
     subscribe_future = asyncio.ensure_future(callback_messages.wait_for_message_on(ch))
-    publish_future = asyncio.ensure_future(pubnub.publish().channel(ch).message(message).future())
+    publish_future = asyncio.ensure_future(
+        pubnub.publish().channel(ch).message(message).future()
+    )
     await asyncio.wait([subscribe_future, publish_future])
 
     sub_envelope = subscribe_future.result()
     pub_envelope = publish_future.result()
 
     assert pub_envelope.status.original_response[0] == 1
-    assert pub_envelope.status.original_response[1] == 'Sent'
+    assert pub_envelope.status.original_response[1] == "Sent"
 
     assert sub_envelope.channel == ch
     assert sub_envelope.subscription == gr
@@ -261,15 +300,22 @@ async def test_cg_subscribe_publish_unsubscribe(event_loop, sleeper=asyncio.slee
     pubnub.unsubscribe().channel_groups(gr).execute()
     await callback_messages.wait_for_disconnect()
 
-    envelope = await pubnub.remove_channel_from_channel_group().channel_group(gr).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
+    envelope = (
+        await pubnub.remove_channel_from_channel_group()
+        .channel_group(gr)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
 
     await pubnub.stop()
 
 
-@get_sleeper('tests/integrational/fixtures/asyncio/subscription/cg_join_leave.yaml')
-@pn_vcr.use_cassette('tests/integrational/fixtures/asyncio/subscription/cg_join_leave.yaml',
-                     filter_query_parameters=['pnsdk', 'l_cg', 'l_pres'])
+@get_sleeper("tests/integrational/fixtures/asyncio/subscription/cg_join_leave.yaml")
+@pn_vcr.use_cassette(
+    "tests/integrational/fixtures/asyncio/subscription/cg_join_leave.yaml",
+    filter_query_parameters=["pnsdk", "l_cg", "l_pres"],
+)
 @pytest.mark.asyncio
 async def test_cg_join_leave(event_loop, sleeper=asyncio.sleep):
     pubnub = PubNubAsyncio(pnconf_sub_copy(), custom_event_loop=event_loop)
@@ -281,8 +327,13 @@ async def test_cg_join_leave(event_loop, sleeper=asyncio.sleep):
     ch = "test-subscribe-asyncio-join-leave-cg-channel"
     gr = "test-subscribe-asyncio-join-leave-cg-group"
 
-    envelope = await pubnub.add_channel_to_channel_group().channel_group(gr).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
+    envelope = (
+        await pubnub.add_channel_to_channel_group()
+        .channel_group(gr)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
 
     await sleeper(1)
 
@@ -294,7 +345,7 @@ async def test_cg_join_leave(event_loop, sleeper=asyncio.sleep):
     await callback_presence.wait_for_connect()
 
     prs_envelope = await callback_presence.wait_for_presence_on(ch)
-    assert prs_envelope.event == 'join'
+    assert prs_envelope.event == "join"
     assert prs_envelope.uuid == pubnub_listener.uuid
     assert prs_envelope.channel == ch
     assert prs_envelope.subscription == gr
@@ -302,24 +353,32 @@ async def test_cg_join_leave(event_loop, sleeper=asyncio.sleep):
     pubnub.add_listener(callback_messages)
     pubnub.subscribe().channel_groups(gr).execute()
 
-    callback_messages_future = asyncio.ensure_future(callback_messages.wait_for_connect())
-    presence_messages_future = asyncio.ensure_future(callback_presence.wait_for_presence_on(ch))
+    callback_messages_future = asyncio.ensure_future(
+        callback_messages.wait_for_connect()
+    )
+    presence_messages_future = asyncio.ensure_future(
+        callback_presence.wait_for_presence_on(ch)
+    )
     await asyncio.wait([callback_messages_future, presence_messages_future])
     prs_envelope = presence_messages_future.result()
 
-    assert prs_envelope.event == 'join'
+    assert prs_envelope.event == "join"
     assert prs_envelope.uuid == pubnub.uuid
     assert prs_envelope.channel == ch
     assert prs_envelope.subscription == gr
 
     pubnub.unsubscribe().channel_groups(gr).execute()
 
-    callback_messages_future = asyncio.ensure_future(callback_messages.wait_for_disconnect())
-    presence_messages_future = asyncio.ensure_future(callback_presence.wait_for_presence_on(ch))
+    callback_messages_future = asyncio.ensure_future(
+        callback_messages.wait_for_disconnect()
+    )
+    presence_messages_future = asyncio.ensure_future(
+        callback_presence.wait_for_presence_on(ch)
+    )
     await asyncio.wait([callback_messages_future, presence_messages_future])
     prs_envelope = presence_messages_future.result()
 
-    assert prs_envelope.event == 'leave'
+    assert prs_envelope.event == "leave"
     assert prs_envelope.uuid == pubnub.uuid
     assert prs_envelope.channel == ch
     assert prs_envelope.subscription == gr
@@ -327,18 +386,30 @@ async def test_cg_join_leave(event_loop, sleeper=asyncio.sleep):
     pubnub_listener.unsubscribe().channel_groups(gr).execute()
     await callback_presence.wait_for_disconnect()
 
-    envelope = await pubnub.remove_channel_from_channel_group().channel_group(gr).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
+    envelope = (
+        await pubnub.remove_channel_from_channel_group()
+        .channel_group(gr)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
 
     await pubnub.stop()
     await pubnub_listener.stop()
 
 
-@get_sleeper('tests/integrational/fixtures/asyncio/subscription/unsubscribe_all.yaml')
+@get_sleeper("tests/integrational/fixtures/asyncio/subscription/unsubscribe_all.yaml")
 @pn_vcr.use_cassette(
-    'tests/integrational/fixtures/asyncio/subscription/unsubscribe_all.yaml',
-    filter_query_parameters=['pnsdk', 'l_cg', 'l_pres'],
-    match_on=['method', 'scheme', 'host', 'port', 'string_list_in_path', 'string_list_in_query'],
+    "tests/integrational/fixtures/asyncio/subscription/unsubscribe_all.yaml",
+    filter_query_parameters=["pnsdk", "l_cg", "l_pres"],
+    match_on=[
+        "method",
+        "scheme",
+        "host",
+        "port",
+        "string_list_in_path",
+        "string_list_in_query",
+    ],
 )
 @pytest.mark.asyncio
 async def test_unsubscribe_all(event_loop, sleeper=asyncio.sleep):
@@ -353,10 +424,20 @@ async def test_unsubscribe_all(event_loop, sleeper=asyncio.sleep):
     gr1 = "test-subscribe-asyncio-unsubscribe-all-gr1"
     gr2 = "test-subscribe-asyncio-unsubscribe-all-gr2"
 
-    envelope = await pubnub.add_channel_to_channel_group().channel_group(gr1).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
-    envelope = await pubnub.add_channel_to_channel_group().channel_group(gr2).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
+    envelope = (
+        await pubnub.add_channel_to_channel_group()
+        .channel_group(gr1)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
+    envelope = (
+        await pubnub.add_channel_to_channel_group()
+        .channel_group(gr2)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
 
     await sleeper(1)
 
@@ -376,9 +457,19 @@ async def test_unsubscribe_all(event_loop, sleeper=asyncio.sleep):
     assert len(pubnub.get_subscribed_channels()) == 0
     assert len(pubnub.get_subscribed_channel_groups()) == 0
 
-    envelope = await pubnub.remove_channel_from_channel_group().channel_group(gr1).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
-    envelope = await pubnub.remove_channel_from_channel_group().channel_group(gr2).channels(ch).future()
-    assert envelope.status.original_response['status'] == 200
+    envelope = (
+        await pubnub.remove_channel_from_channel_group()
+        .channel_group(gr1)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
+    envelope = (
+        await pubnub.remove_channel_from_channel_group()
+        .channel_group(gr2)
+        .channels(ch)
+        .future()
+    )
+    assert envelope.status.original_response["status"] == 200
 
     await pubnub.stop()

@@ -1,11 +1,14 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
-from pubnub.models.consumer.message_actions import PNGetMessageActionsResult, PNMessageAction
 from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.models.consumer.message_actions import (
+    PNGetMessageActionsResult,
+    PNMessageAction,
+)
 
 
 class GetMessageActions(Endpoint):
-    GET_MESSAGE_ACTIONS_PATH = '/v1/message-actions/%s/channel/%s'
+    GET_MESSAGE_ACTIONS_PATH = "/v1/message-actions/%s/channel/%s"
     MAX_LIMIT = 100
 
     def __init__(self, pubnub):
@@ -38,20 +41,20 @@ class GetMessageActions(Endpoint):
         params = {}
 
         if self._start is not None:
-            params['start'] = self._start
+            params["start"] = self._start
 
         if self._end is not None and self._start is None:
-            params['end'] = self._end
+            params["end"] = self._end
 
         if self._limit != GetMessageActions.MAX_LIMIT:
-            params['limit'] = self._limit
+            params["limit"] = self._limit
 
         return params
 
     def build_path(self):
         return GetMessageActions.GET_MESSAGE_ACTIONS_PATH % (
             self.pubnub.config.subscribe_key,
-            utils.url_encode(self._channel)
+            utils.url_encode(self._channel),
         )
 
     def http_method(self):
@@ -64,11 +67,11 @@ class GetMessageActions(Endpoint):
         self.validate_subscribe_key()
         self.validate_channel()
 
-    def create_response(self, envelope):   # pylint: disable=W0221
+    def create_response(self, envelope):  # pylint: disable=W0221
         result = envelope
-        result['actions'] = []
-        for action in result['data']:
-            result['actions'].append(PNMessageAction(action))
+        result["actions"] = []
+        for action in result["data"]:
+            result["actions"].append(PNMessageAction(action))
 
         return PNGetMessageActionsResult(result)
 
@@ -82,4 +85,4 @@ class GetMessageActions(Endpoint):
         return PNOperationType.PNGetMessageActions
 
     def name(self):
-        return 'Get message actions'
+        return "Get message actions"

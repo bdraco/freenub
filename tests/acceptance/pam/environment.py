@@ -1,13 +1,19 @@
 import requests
 
-from tests.acceptance import MOCK_SERVER_URL, CONTRACT_INIT_ENDPOINT, CONTRACT_EXPECT_ENDPOINT
+from tests.acceptance import (
+    CONTRACT_EXPECT_ENDPOINT,
+    CONTRACT_INIT_ENDPOINT,
+    MOCK_SERVER_URL,
+)
 
 
 def before_scenario(context, feature):
     for tag in feature.tags:
         if "contract" in tag:
             _, contract_name = tag.split("=")
-            response = requests.get(MOCK_SERVER_URL + CONTRACT_INIT_ENDPOINT + contract_name)
+            response = requests.get(
+                MOCK_SERVER_URL + CONTRACT_INIT_ENDPOINT + contract_name
+            )
             assert response
 
 

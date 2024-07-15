@@ -1,7 +1,7 @@
 from enum import Enum
 
 
-class HttpMethod(object):
+class HttpMethod:
     GET = 1
     POST = 2
     DELETE = 3
@@ -19,7 +19,7 @@ class HttpMethod(object):
             return "PATCH"
 
 
-class PNStatusCategory(object):
+class PNStatusCategory:
     PNUnknownCategory = 1
     PNAcknowledgmentCategory = 2
     PNAccessDeniedCategory = 3
@@ -39,7 +39,7 @@ class PNStatusCategory(object):
     PNInternalExceptionCategory = 17
 
 
-class PNOperationType(object):
+class PNOperationType:
     PNSubscribeOperation = 1
     PNUnsubscribeOperation = 2
     PNPublishOperation = 3
@@ -127,38 +127,38 @@ class PNOperationType(object):
     PNFetchSpaceMembershipsOperation = 86
 
 
-class PNHeartbeatNotificationOptions(object):
+class PNHeartbeatNotificationOptions:
     NONE = 1
     FAILURES = 2
     ALL = 3
 
 
-class PNReconnectionPolicy(object):
+class PNReconnectionPolicy:
     NONE = 1
     LINEAR = 2
     EXPONENTIAL = 3
 
 
-class PNPushType(object):
+class PNPushType:
     APNS = 1
     MPNS = 2
     GCM = 3
     APNS2 = 4
 
 
-class PNResourceType(object):
+class PNResourceType:
     CHANNEL = "channel"
     GROUP = "group"
     USER = "user"
     SPACE = "space"
 
 
-class PNMatchType(object):
+class PNMatchType:
     RESOURCE = "resource"
     PATTERN = "pattern"
 
 
-class PNPushEnvironment(object):
+class PNPushEnvironment:
     DEVELOPMENT = "development"
     PRODUCTION = "production"
 

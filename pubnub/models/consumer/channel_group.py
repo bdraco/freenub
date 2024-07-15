@@ -1,19 +1,19 @@
-class PNChannelGroupsAddChannelResult(object):
+class PNChannelGroupsAddChannelResult:
     def __str__(self):
         return "Channel successfully added"
 
 
-class PNChannelGroupsRemoveChannelResult(object):
+class PNChannelGroupsRemoveChannelResult:
     def __str__(self):
         return "Channel successfully removed"
 
 
-class PNChannelGroupsRemoveGroupResult(object):
+class PNChannelGroupsRemoveGroupResult:
     def __str__(self):
         return "Group successfully removed"
 
 
-class PNChannelGroupsListResult(object):
+class PNChannelGroupsListResult:
     def __init__(self, channels):
         self.channels = channels
 

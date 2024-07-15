@@ -1,7 +1,7 @@
-from pubnub.enums import PNOperationType, HttpMethod
-from pubnub.endpoints.endpoint import Endpoint
-from pubnub.models.consumer.v3.access_manager import PNRevokeTokenResult
 from pubnub import utils
+from pubnub.endpoints.endpoint import Endpoint
+from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.models.consumer.v3.access_manager import PNRevokeTokenResult
 
 
 class RevokeToken(Endpoint):
@@ -34,7 +34,10 @@ class RevokeToken(Endpoint):
         return {}
 
     def build_path(self):
-        return RevokeToken.REVOKE_TOKEN_PATH % (self.pubnub.config.subscribe_key, utils.url_encode(self.token))
+        return RevokeToken.REVOKE_TOKEN_PATH % (
+            self.pubnub.config.subscribe_key,
+            utils.url_encode(self.token),
+        )
 
     def operation_type(self):
         return PNOperationType.PNAccessManagerRevokeToken

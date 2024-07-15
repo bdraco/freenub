@@ -1,21 +1,27 @@
 import datetime
 import hmac
 import json
-import uuid as u
 import threading
 import urllib
+import uuid as u
 from hashlib import sha256
 
-from .enums import PNStatusCategory, PNOperationType, PNPushType, HttpMethod, PAMPermissions
-from .models.consumer.common import PNStatus
+from .enums import (
+    HttpMethod,
+    PAMPermissions,
+    PNOperationType,
+    PNPushType,
+    PNStatusCategory,
+)
 from .errors import PNERR_JSON_NOT_SERIALIZABLE
 from .exceptions import PubNubException
+from .models.consumer.common import PNStatus
 
 
 def get_data_for_user(data):
     try:
-        if 'message' in data and 'payload' in data:
-            return {'message': data['message'], 'payload': data['payload']}
+        if "message" in data and "payload" in data:
+            return {"message": data["message"], "payload": data["payload"]}
         else:
             return data
     except TypeError:
@@ -26,9 +32,7 @@ def write_value_as_string(data):
     try:
         return json.dumps(data)
     except TypeError:
-        raise PubNubException(
-            pn_error=PNERR_JSON_NOT_SERIALIZABLE
-        )
+        raise PubNubException(pn_error=PNERR_JSON_NOT_SERIALIZABLE)
 
 
 def url_encode(data):
@@ -36,7 +40,7 @@ def url_encode(data):
 
 
 def url_write(data):
-    """ Just wraps url_encode(write_value_as_string()) """
+    """Just wraps url_encode(write_value_as_string())"""
     return url_encode(write_value_as_string(data))
 
 
@@ -74,7 +78,7 @@ def extend_list(existing_items, new_items):
 
 
 def build_url(scheme, origin, path, params={}):
-    return urllib.parse.urlunsplit((scheme, origin, path, params, ''))
+    return urllib.parse.urlunsplit((scheme, origin, path, params, ""))
 
 
 def synchronized(func):
@@ -94,8 +98,10 @@ def is_subscribed_event(status):
 
 def is_unsubscribed_event(status):
     assert isinstance(status, PNStatus)
-    return status.category == PNStatusCategory.PNAcknowledgmentCategory \
+    return (
+        status.category == PNStatusCategory.PNAcknowledgmentCategory
         and status.operation == PNOperationType.PNUnsubscribeOperation
+    )
 
 
 def prepare_pam_arguments(unsorted_params):
@@ -107,7 +113,7 @@ def prepare_pam_arguments(unsorted_params):
         if i != 0:
             stringified_arguments += "&"
 
-        stringified_arguments += (key + "=" + pam_encode(str(unsorted_params[key])))
+        stringified_arguments += key + "=" + pam_encode(str(unsorted_params[key]))
         i += 1
 
     return stringified_arguments
@@ -117,14 +123,16 @@ def pam_encode(s_url):
     # !'()*~
     encoded = url_encode(s_url)
     if encoded is not None:
-        encoded = (encoded.replace("*", "%2A")
-                   .replace("!", "%21")
-                   .replace("'", "%27")
-                   .replace("(", "%28")
-                   .replace(")", "%29")
-                   .replace("[", "%5B")
-                   .replace("]", "%5D")
-                   .replace("~", "%7E"))
+        encoded = (
+            encoded.replace("*", "%2A")
+            .replace("!", "%21")
+            .replace("'", "%27")
+            .replace("(", "%28")
+            .replace(")", "%29")
+            .replace("[", "%5B")
+            .replace("]", "%5D")
+            .replace("~", "%7E")
+        )
 
     return encoded
 
@@ -132,11 +140,9 @@ def pam_encode(s_url):
 def sign_sha256(secret, sign_input):
     from base64 import urlsafe_b64encode
 
-    sign = urlsafe_b64encode(hmac.new(
-        secret.encode("utf-8"),
-        sign_input.encode("utf-8"),
-        sha256
-    ).digest())
+    sign = urlsafe_b64encode(
+        hmac.new(secret.encode("utf-8"), sign_input.encode("utf-8"), sha256).digest()
+    )
 
     return sign.decode("utf-8")
 
@@ -156,7 +162,7 @@ def strip_right(text, suffix):
     if not text.endswith(suffix):
         return text
 
-    return text[:len(text) - len(suffix)]
+    return text[: len(text) - len(suffix)]
 
 
 def datetime_now():
@@ -164,13 +170,15 @@ def datetime_now():
 
 
 def sign_request(endpoint, pn, custom_params, method, body):
-    custom_params['timestamp'] = str(pn.timestamp())
+    custom_params["timestamp"] = str(pn.timestamp())
 
     request_url = endpoint.get_path()
 
     encoded_query_string = prepare_pam_arguments(custom_params)
 
-    is_v2_signature = not (request_url.startswith("/publish") and method == HttpMethod.POST)
+    is_v2_signature = not (
+        request_url.startswith("/publish") and method == HttpMethod.POST
+    )
 
     signed_input = ""
     if not is_v2_signature:
@@ -191,7 +199,7 @@ def sign_request(endpoint, pn, custom_params, method, body):
         signature = signature.rstrip("=")
         signature = "v2." + signature
 
-    custom_params['signature'] = signature
+    custom_params["signature"] = signature
 
 
 def parse_resources(resource_list, resource_set_name, resources, patterns):
@@ -205,7 +213,9 @@ def parse_resources(resource_list, resource_set_name, resources, patterns):
                 determined_object = resources
 
             if resource_set_name in determined_object:
-                determined_object[resource_set_name][pn_resource.get_id()] = calculate_bitmask(pn_resource)
+                determined_object[resource_set_name][pn_resource.get_id()] = (
+                    calculate_bitmask(pn_resource)
+                )
             else:
                 resource_object[pn_resource.get_id()] = calculate_bitmask(pn_resource)
                 determined_object[resource_set_name] = resource_object
@@ -315,7 +325,7 @@ def parse_pam_permissions(resource):
             "delete": has_delete_permission(perms),
             "get": has_get_permission(perms),
             "update": has_update_permission(perms),
-            "join": has_join_permission(perms)
+            "join": has_join_permission(perms),
         }
 
     return new_res

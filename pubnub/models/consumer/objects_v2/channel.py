@@ -1,7 +1,7 @@
 from pubnub.models.consumer.objects_v2.page import PNPageable
 
 
-class PNSetChannelMetadataResult(object):
+class PNSetChannelMetadataResult:
     def __init__(self, result):
         self.data = result["data"]
         self.status = result["status"]
@@ -10,7 +10,7 @@ class PNSetChannelMetadataResult(object):
         return "Set Channel metatdata: %s" % self.data
 
 
-class PNGetChannelMetadataResult(object):
+class PNGetChannelMetadataResult:
     def __init__(self, result):
         self.data = result["data"]
         self.status = result["status"]
@@ -19,7 +19,7 @@ class PNGetChannelMetadataResult(object):
         return "Get Channel metatdata: %s" % self.data
 
 
-class PNRemoveChannelMetadataResult(object):
+class PNRemoveChannelMetadataResult:
     def __init__(self, result):
         self.data = result["data"]
         self.status = result["status"]
@@ -38,7 +38,7 @@ class PNGetAllChannelMetadataResult(PNPageable):
         return "Get all Channel metatdata: %s" % self.data
 
 
-class PNChannelMetadataResult(object):
+class PNChannelMetadataResult:
     def __init__(self, event, data):
         self.data = data
         self.event = event

@@ -1,12 +1,17 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
-from pubnub.errors import PNERR_MESSAGE_TIMETOKEN_MISSING, PNERR_MESSAGE_ACTION_TIMETOKEN_MISSING
-from pubnub.exceptions import PubNubException
 from pubnub.enums import HttpMethod, PNOperationType
+from pubnub.errors import (
+    PNERR_MESSAGE_ACTION_TIMETOKEN_MISSING,
+    PNERR_MESSAGE_TIMETOKEN_MISSING,
+)
+from pubnub.exceptions import PubNubException
 
 
 class RemoveMessageAction(Endpoint):
-    REMOVE_MESSAGE_ACTION_PATH = "/v1/message-actions/%s/channel/%s/message/%s/action/%s"
+    REMOVE_MESSAGE_ACTION_PATH = (
+        "/v1/message-actions/%s/channel/%s/message/%s/action/%s"
+    )
 
     def __init__(self, pubnub):
         Endpoint.__init__(self, pubnub)
@@ -37,7 +42,7 @@ class RemoveMessageAction(Endpoint):
             self.pubnub.config.subscribe_key,
             utils.url_encode(self._channel),
             self._message_timetoken,
-            self._action_timetoken
+            self._action_timetoken,
         )
 
     def http_method(self):
@@ -67,7 +72,6 @@ class RemoveMessageAction(Endpoint):
         return "Remove message action"
 
     def validate_timetokens(self):
-
         if self._message_timetoken is None:
             raise PubNubException(pn_error=PNERR_MESSAGE_TIMETOKEN_MISSING)
 

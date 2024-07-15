@@ -1,8 +1,8 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.errors import PNERR_CHANNELS_MISSING, PNERR_GROUP_MISSING
 from pubnub.exceptions import PubNubException
-from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.channel_group import PNChannelGroupsAddChannelResult
 
 
@@ -29,11 +29,13 @@ class AddChannelToChannelGroup(Endpoint):
         return self
 
     def custom_params(self):
-        return {'add': utils.join_items(self._channels)}
+        return {"add": utils.join_items(self._channels)}
 
     def build_path(self):
         return AddChannelToChannelGroup.ADD_PATH % (
-            self.pubnub.config.subscribe_key, utils.url_encode(self._channel_group))
+            self.pubnub.config.subscribe_key,
+            utils.url_encode(self._channel_group),
+        )
 
     def http_method(self):
         return HttpMethod.GET

@@ -1,7 +1,9 @@
-from pubnub.endpoints.objects_v2.objects_endpoint import ObjectsEndpoint, \
-    IncludeCustomEndpoint, UuidEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.objects_v2.objects_endpoint import (
+    IncludeCustomEndpoint,
+    ObjectsEndpoint,
+    UuidEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.objects_v2.uuid import PNGetUUIDMetadataResult
 
 
@@ -14,7 +16,10 @@ class GetUuid(ObjectsEndpoint, UuidEndpoint, IncludeCustomEndpoint):
         IncludeCustomEndpoint.__init__(self)
 
     def build_path(self):
-        return GetUuid.GET_UID_PATH % (self.pubnub.config.subscribe_key, self._effective_uuid())
+        return GetUuid.GET_UID_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._effective_uuid(),
+        )
 
     def validate_specific_params(self):
         self._validate_uuid()

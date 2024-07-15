@@ -5,7 +5,7 @@ from pubnub.models.consumer.signal import PNSignalResult
 
 
 class Signal(Endpoint):
-    SIGNAL_PATH = '/signal/%s/%s/0/%s/0/%s'
+    SIGNAL_PATH = "/signal/%s/%s/0/%s/0/%s"
 
     def __init__(self, pubnub):
         Endpoint.__init__(self, pubnub)
@@ -24,8 +24,10 @@ class Signal(Endpoint):
         stringified_message = utils.write_value_as_string(self._message)
         msg = utils.url_encode(stringified_message)
         return Signal.SIGNAL_PATH % (
-            self.pubnub.config.publish_key, self.pubnub.config.subscribe_key,
-            utils.url_encode(self._channel), msg
+            self.pubnub.config.publish_key,
+            self.pubnub.config.subscribe_key,
+            utils.url_encode(self._channel),
+            msg,
         )
 
     def custom_params(self):

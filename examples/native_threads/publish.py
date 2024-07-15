@@ -9,10 +9,9 @@ sys.path.append(PUBNUB_ROOT)
 
 import pubnub
 from examples import pnconf
-from pubnub.pubnub import PubNub, NonSubscribeListener
+from pubnub.pubnub import NonSubscribeListener, PubNub
 
-
-pubnub.set_stream_logger('pubnub', logging.DEBUG, stream=sys.stdout)
+pubnub.set_stream_logger("pubnub", logging.DEBUG, stream=sys.stdout)
 
 pnconf.enable_subscribe = True
 
@@ -21,10 +20,7 @@ pubnub = PubNub(pnconf)
 
 listener = NonSubscribeListener()
 
-pubnub.publish() \
-    .channel("blah") \
-    .message("hey") \
-    .pn_async(listener.callback)
+pubnub.publish().channel("blah").message("hey").pn_async(listener.callback)
 
 result = listener.await_result_and_reset(5)
 # FIX: returns None

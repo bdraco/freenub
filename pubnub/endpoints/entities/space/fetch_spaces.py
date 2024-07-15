@@ -1,12 +1,15 @@
-from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, IncludeCustomEndpoint, ListEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.entities.endpoint import (
+    EntitiesEndpoint,
+    IncludeCustomEndpoint,
+    ListEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.entities.space import PNFetchSpacesResult
 
 
 class FetchSpaces(EntitiesEndpoint, ListEndpoint, IncludeCustomEndpoint):
     FETCH_SPACES_PATH = "/v2/objects/%s/channels"
-    inclusions = ['status', 'type']
+    inclusions = ["status", "type"]
 
     def __init__(self, pubnub):
         EntitiesEndpoint.__init__(self, pubnub)

@@ -1,10 +1,10 @@
 from pubnub import utils
 from pubnub.endpoints.endpoint import Endpoint
+from pubnub.endpoints.mixins import TimeTokenOverrideMixin
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.errors import PNERR_MESSAGE_MISSING
 from pubnub.exceptions import PubNubException
 from pubnub.models.consumer.pubsub import PNPublishResult
-from pubnub.enums import HttpMethod, PNOperationType
-from pubnub.endpoints.mixins import TimeTokenOverrideMixin
 
 
 class Publish(Endpoint, TimeTokenOverrideMixin):
@@ -58,7 +58,13 @@ class Publish(Endpoint, TimeTokenOverrideMixin):
         if self._use_post is True:
             cipher = self.pubnub.config.cipher_key
             if cipher is not None:
-                return '"' + self.pubnub.config.crypto.encrypt(cipher, utils.write_value_as_string(self._message)) + '"'
+                return (
+                    '"'
+                    + self.pubnub.config.crypto.encrypt(
+                        cipher, utils.write_value_as_string(self._message)
+                    )
+                    + '"'
+                )
             else:
                 return utils.write_value_as_string(self._message)
         else:
@@ -66,9 +72,7 @@ class Publish(Endpoint, TimeTokenOverrideMixin):
 
     def encoded_params(self):
         if self._meta:
-            return {
-                "meta": utils.url_write(self._meta)
-            }
+            return {"meta": utils.url_write(self._meta)}
         else:
             return {}
 
@@ -76,10 +80,10 @@ class Publish(Endpoint, TimeTokenOverrideMixin):
         params = TimeTokenOverrideMixin.custom_params(self)
 
         if self._ttl:
-            params['ttl'] = self._ttl
+            params["ttl"] = self._ttl
 
         if self._meta:
-            params['meta'] = utils.write_value_as_string(self._meta)
+            params["meta"] = utils.write_value_as_string(self._meta)
 
         if self._should_store is not None:
             if self._should_store:
@@ -95,21 +99,32 @@ class Publish(Endpoint, TimeTokenOverrideMixin):
 
     def build_path(self):
         if self._use_post:
-            return Publish.PUBLISH_POST_PATH % (self.pubnub.config.publish_key,
-                                                self.pubnub.config.subscribe_key,
-                                                utils.url_encode(self._channel), 0)
+            return Publish.PUBLISH_POST_PATH % (
+                self.pubnub.config.publish_key,
+                self.pubnub.config.subscribe_key,
+                utils.url_encode(self._channel),
+                0,
+            )
         else:
             cipher = self.pubnub.config.cipher_key
             stringified_message = utils.write_value_as_string(self._message)
 
             if cipher is not None:
-                stringified_message = '"' + self.pubnub.config.crypto.encrypt(cipher, stringified_message) + '"'
+                stringified_message = (
+                    '"'
+                    + self.pubnub.config.crypto.encrypt(cipher, stringified_message)
+                    + '"'
+                )
 
             stringified_message = utils.url_encode(stringified_message)
 
-            return Publish.PUBLISH_GET_PATH % (self.pubnub.config.publish_key,
-                                               self.pubnub.config.subscribe_key,
-                                               utils.url_encode(self._channel), 0, stringified_message)
+            return Publish.PUBLISH_GET_PATH % (
+                self.pubnub.config.publish_key,
+                self.pubnub.config.subscribe_key,
+                utils.url_encode(self._channel),
+                0,
+                stringified_message,
+            )
 
     def http_method(self):
         if self._use_post is True:

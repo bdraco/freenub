@@ -1,12 +1,17 @@
-from pubnub.endpoints.entities.endpoint import EntitiesEndpoint, SpaceEndpoint, IncludeCustomEndpoint, \
-    CustomAwareEndpoint
-from pubnub.enums import PNOperationType
-from pubnub.enums import HttpMethod
+from pubnub.endpoints.entities.endpoint import (
+    CustomAwareEndpoint,
+    EntitiesEndpoint,
+    IncludeCustomEndpoint,
+    SpaceEndpoint,
+)
+from pubnub.enums import HttpMethod, PNOperationType
 from pubnub.models.consumer.entities.space import PNCreateSpaceResult
 from pubnub.utils import write_value_as_string
 
 
-class CreateSpace(EntitiesEndpoint, SpaceEndpoint, IncludeCustomEndpoint, CustomAwareEndpoint):
+class CreateSpace(
+    EntitiesEndpoint, SpaceEndpoint, IncludeCustomEndpoint, CustomAwareEndpoint
+):
     CREATE_SPACE_PATH = "/v2/objects/%s/channels/%s"
 
     def __init__(self, pubnub):
@@ -42,18 +47,21 @@ class CreateSpace(EntitiesEndpoint, SpaceEndpoint, IncludeCustomEndpoint, Custom
         self._validate_space_id()
 
     def build_path(self):
-        return CreateSpace.CREATE_SPACE_PATH % (self.pubnub.config.subscribe_key, self._space_id)
+        return CreateSpace.CREATE_SPACE_PATH % (
+            self.pubnub.config.subscribe_key,
+            self._space_id,
+        )
 
     def build_data(self):
         payload = {
             "name": self._name,
             "description": self._description,
-            "custom": self._custom
+            "custom": self._custom,
         }
         if self._status:
-            payload['status'] = self._status
+            payload["status"] = self._status
         if self._type:
-            payload['type'] = self._type
+            payload["type"] = self._type
 
         return write_value_as_string(payload)
 

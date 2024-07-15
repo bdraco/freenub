@@ -10,6 +10,8 @@ __pycache__/
 
 # Distribution / packaging
 .Python
+env/
+src/
 build/
 develop-eggs/
 dist/
@@ -27,6 +29,9 @@ share/python-wheels/
 .installed.cfg
 *.egg
 MANIFEST
+*.egg-info/
+.installed.cfg
+*.egg
 
 # PyInstaller
 #  Usually these files are written by a python script from a template
@@ -52,6 +57,8 @@ coverage.xml
 .hypothesis/
 .pytest_cache/
 cover/
+*,cover
+.hypothesis/
 
 # Translations
 *.mo
@@ -138,3 +145,25 @@ dmypy.json
 
 # Cython debug symbols
 cython_debug/
+target/
+
+#Ipython Notebook
+.ipynb_checkpoints
+
+# pyenv
+.python-version
+
+# Development Environment
+.idea
+.vscode
+.DS_Store
+
+# Twisted
+_trial_temp
+
+# jupyter dev notebook
+PubNubTwisted.ipynb
+
+# GitHub Actions #
+##################
+.github/.release

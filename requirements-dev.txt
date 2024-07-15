@@ -1,0 +1,13 @@
+pyyaml
+pytest-cov
+pycryptodomex
+flake8
+pytest
+pytest-asyncio
+aiohttp
+requests
+cbor2
+behave
+vcrpy
+urllib3<2
+busypie

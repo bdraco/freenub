@@ -1,0 +1,102 @@
+name: Tests
+
+on:
+  push:
+  workflow_dispatch:
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+defaults:
+  run:
+    shell: bash
+env:
+  PN_KEY_PUBLISH: ${{ secrets.PN_KEY_PUBLISH }}
+  PN_KEY_SUBSCRIBE: ${{ secrets.PN_KEY_SUBSCRIBE }}
+  PN_KEY_SECRET: ${{ secrets.PN_KEY_SECRET }}
+  PN_KEY_PAM_PUBLISH: ${{ secrets.PN_KEY_PAM_PUBLISH }}
+  PN_KEY_PAM_SUBSCRIBE: ${{ secrets.PN_KEY_PAM_SUBSCRIBE }}
+  PN_KEY_PAM_SECRET: ${{ secrets.PN_KEY_PAM_SECRET }}
+
+jobs:
+  tests:
+    name: Integration and Unit tests
+    runs-on:
+      group: Default Larger Runners
+      labels: ubuntu-latest-m
+    strategy:
+      fail-fast: true
+      matrix:
+        python: [3.7.17, 3.8.17, 3.9.17, 3.10.12, 3.11.4]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Checkout actions
+        uses: actions/checkout@v3
+        with:
+          repository: pubnub/client-engineering-deployment-tools
+          ref: v1
+          token: ${{ secrets.GH_TOKEN }}
+          path: .github/.release/actions
+      - name: Setup Python ${{ matrix.python }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python }}
+      - name: Build and run tests for Python ${{ matrix.python }}
+        run: |
+          ./scripts/install.sh
+          python scripts/run-tests.py
+      - name: Cancel workflow runs for commit on error
+        if: failure()
+        uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
+  acceptance-tests:
+    name: Acceptance tests
+    runs-on:
+      group: Default Larger Runners
+      labels: ubuntu-latest-m
+    steps:
+      - name: Checkout project
+        uses: actions/checkout@v3
+      - name: Checkout mock-server action
+        uses: actions/checkout@v3
+        with:
+          repository: pubnub/client-engineering-deployment-tools
+          ref: v1
+          token: ${{ secrets.GH_TOKEN }}
+          path: .github/.release/actions
+      - name: Setup Python 3.9
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.9.13'
+      - name: Run mock server action
+        uses: ./.github/.release/actions/actions/mock-server
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+      - name: Install Python dependencies and run acceptance tests
+        run: |
+            cp sdk-specifications/features/access/authorization-failure-reporting.feature tests/acceptance/pam
+            cp sdk-specifications/features/access/grant-token.feature tests/acceptance/pam
+            cp sdk-specifications/features/access/revoke-token.feature tests/acceptance/pam
+
+            sudo pip3 install -r requirements-dev.txt
+            behave --junit tests/acceptance/pam
+      - name: Expose acceptance tests reports
+        uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: acceptance-test-reports
+          path: ./reports
+          retention-days: 7
+      - name: Cancel workflow runs for commit on error
+        if: failure()
+        uses: ./.github/.release/actions/actions/utils/fast-jobs-failure
+  all-tests:
+    name: Tests
+    runs-on:
+      group: Default Larger Runners
+      labels: ubuntu-latest-m
+    needs: [tests, acceptance-tests]
+    steps:
+      - name: Tests summary
+        run: echo -e "\033[38;2;95;215;0m\033[1mAll tests successfully passed"

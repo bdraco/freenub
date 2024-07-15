@@ -3,6 +3,8 @@ import os
 
 PUBNUB_ROOT = os.path.dirname(os.path.abspath(__file__))
 
+__version__ = "9.0.0"
+
 
 def set_stream_logger(
     name="pubnub", level=logging.ERROR, format_string=None, stream=None

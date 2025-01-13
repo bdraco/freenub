@@ -144,8 +144,7 @@ class Grant(Endpoint):
         if self._uuids and not self._auth_keys:
             raise PubNubException(
                 pn_error=PNERR_PAM_INVALID_ARGUMENTS,
-                errormsg="UUIDs grant management require "
-                "providing non empty authKeys",
+                errormsg="UUIDs grant management require providing non empty authKeys",
             )
 
         if (

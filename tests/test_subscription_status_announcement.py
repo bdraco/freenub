@@ -126,8 +126,12 @@ class AsyncioSubscribeStub:
             return PubNubAsyncioException(result=None, status=cancelled_status())
 
 
-@pytest.fixture
-def asyncio_subscribe(monkeypatch):
+@pytest_asyncio.fixture
+async def asyncio_subscribe(monkeypatch):
+    # Async so the queue is built inside the running loop. On Python 3.9
+    # `asyncio.Queue()` binds `get_event_loop()` at construction, and a queue
+    # built from a sync fixture belongs to a different loop than the test, so
+    # `queue.get()` awaits a foreign future and raises.
     AsyncioSubscribeStub.queue = asyncio.Queue()
     AsyncioSubscribeStub.request_count = 0
     monkeypatch.setattr(pubnub_asyncio, "Subscribe", AsyncioSubscribeStub)
@@ -159,6 +163,9 @@ async def async_client(asyncio_subscribe):
         yield pubnub, recorder, asyncio_subscribe
     finally:
         await pubnub.stop()
+        # `stop()` cancels only the newest loop task; let the superseded ones
+        # see their cancellation before the loop closes under them.
+        await asyncio.sleep(0)
 
 
 async def deliver_subscribe_response(stub, timetoken=1000):

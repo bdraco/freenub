@@ -273,7 +273,7 @@ class NativeSubscriptionManager(SubscriptionManager):
         self._start_subscribe_loop()
         # Check the instance flag to determine if we want to perform the presence heartbeat
         # This is False by default
-        if self._pubnub.config.enable_presence_heartbeat is True:
+        if self._pubnub.config.enable_presence_heartbeat:
             self._register_heartbeat_timer()
 
     def disconnect(self):

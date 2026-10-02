@@ -433,7 +433,10 @@ class AsyncioSubscriptionManager(SubscriptionManager):
         # TODO: method is synchronized in Java
         self._should_stop = False
         self._subscribe_loop_task = asyncio.ensure_future(self._start_subscribe_loop())
-        self._register_heartbeat_timer()
+        # Check the instance flag to determine if we want to perform the presence heartbeat
+        # This is False by default
+        if self._pubnub.config.enable_presence_heartbeat:
+            self._register_heartbeat_timer()
 
     def disconnect(self):
         # TODO: method is synchronized in Java

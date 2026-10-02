@@ -188,12 +188,18 @@ class NativeSubscriptionManager(SubscriptionManager):
 
         class NativeReconnectionCallback(ReconnectionCallback):
             def on_reconnect(self):
-                subscription_manager.reconnect()
+                # A recovered connection is reported as PNReconnectedCategory,
+                # so the subscribe loop is restarted without arming the
+                # PNConnectedCategory announcement.
+                subscription_manager.reconnect(announce_status=False)
 
                 pn_status = PNStatus()
                 pn_status.category = PNStatusCategory.PNReconnectedCategory
                 pn_status.error = False
 
+                # Still required: the latch is already clear if no subscribe has
+                # succeeded yet, which is the case when the connection was down
+                # from the start.
                 subscription_manager._subscription_status_announced = True
                 subscription_manager._listener_manager.announce_status(pn_status)
 
@@ -268,8 +274,14 @@ class NativeSubscriptionManager(SubscriptionManager):
     def _message_queue_put(self, message):
         self._message_queue.put(message)
 
-    def reconnect(self):
+    def reconnect(self, announce_status=True):
         self._should_stop = False
+        if announce_status:
+            # Clear the one-shot latch so the next successful subscribe
+            # announces PNConnectedCategory again. Callers that only restart
+            # the loop (adapt_unsubscribe_builder, adapt_state_builder) pass
+            # announce_status=False.
+            self._subscription_status_announced = False
         self._start_subscribe_loop()
         # Check the instance flag to determine if we want to perform the presence heartbeat
         # This is False by default

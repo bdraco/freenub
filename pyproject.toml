@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "freenub"
-version = "0.1.0"
+version = "0.1.1"
 description = "This is a fork of pubnub when it still had an MIT license"
 authors = ["J. Nick Koston <nick@koston.org>"]
 license = "MIT"

@@ -1,10 +1,16 @@
 # Changelog
 
-<!-- version list -->
+## v0.1.1 (2026-10-02)
+
+### Bug fixes
+
+
+- Honour enable_presence_heartbeat in asynciosubscriptionmanager ([`6e20961`](https://github.com/bdraco/freenub/commit/6e209615d70275c0f4163cdc52812ceeb8b02d02))
+
 
 ## v0.1.0 (2024-07-15)
 
-### Fix
+### Bug fixes
 
 
 - Changelog ([`e7eef79`](https://github.com/bdraco/freenub/commit/e7eef796986f0393931ff2d384a78537679da8d7))
@@ -21,9 +27,7 @@
 
 
 
-
-
-### Feature
+### Features
 
 
 - Refactor asynciotelemetrymanager to avoid creating a task every second ([`de99f0f`](https://github.com/bdraco/freenub/commit/de99f0f6ecd29e238f98aa800af03ff5b4ba4394))
@@ -1010,130 +1014,67 @@
 
 
 
+### Build system
 
 
+- Add custom gha large runner ([`f6b7e1d`](https://github.com/bdraco/freenub/commit/f6b7e1ddb9ef1e5ee31a7af473c6a0e35ef29938))
 
 
+- Flake linting runs once before tests and not after all python versions ([`484df21`](https://github.com/bdraco/freenub/commit/484df21c6717e3a95475a139335cd40a7db4c711))
 
 
+- Fix syntax error in job pre-condition ([`9cffc1f`](https://github.com/bdraco/freenub/commit/9cffc1ff2ab7df9e07f9edd9178af3ef867632d3))
 
 
+- Improve tests and validation workflows ([`9cffc1f`](https://github.com/bdraco/freenub/commit/9cffc1ff2ab7df9e07f9edd9178af3ef867632d3))
 
 
+- Revert changelogs of not released version ([`0f31919`](https://github.com/bdraco/freenub/commit/0f31919c51fba3faa9126e45a2580b0a2874b9f5))
 
 
+- Integrate with release notifications ([`6beedc6`](https://github.com/bdraco/freenub/commit/6beedc60da504e71312f11563f303046c31e468d))
 
 
+- Switch deployment to github actions ([`1ea3b5c`](https://github.com/bdraco/freenub/commit/1ea3b5c83cb7cfcd0eb82dbf73c668e1649c813f))
 
 
+### Testing
 
 
+- Migrate tests to github actions ([`342c981`](https://github.com/bdraco/freenub/commit/342c981bfcc99f4163fe6867abee1081ea92890b))
 
 
+- Migrate tests to github actions ([`342c981`](https://github.com/bdraco/freenub/commit/342c981bfcc99f4163fe6867abee1081ea92890b))
 
 
+### Bug fixes
 
 
+- Allow empty 'message' field in filemessageresult ([`554e72e`](https://github.com/bdraco/freenub/commit/554e72ef29a1d93fe099cbcd322c7ce1104f85c1))
 
 
+- Remove unwanted output while calling `fetch_messages` ([`84479c5`](https://github.com/bdraco/freenub/commit/84479c5d721891b0a53d04c1f14175f1a71d2add))
 
 
+- Remove unwanted output while calling `fetch_messages` ([`84479c5`](https://github.com/bdraco/freenub/commit/84479c5d721891b0a53d04c1f14175f1a71d2add))
 
 
+- Adapt acceptance testing code to the updated version of the testing infrastructure. ([`13e4fce`](https://github.com/bdraco/freenub/commit/13e4fce4a9f0fc8d7d3d27f595d0a19b57cd76a6))
 
 
+- Mock server http interface has been changed, hence ([`13e4fce`](https://github.com/bdraco/freenub/commit/13e4fce4a9f0fc8d7d3d27f595d0a19b57cd76a6))
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-### Test
-
-
-- Migrate tests to github actions (#112) ([`342c981`](https://github.com/bdraco/freenub/commit/342c981bfcc99f4163fe6867abee1081ea92890b))
-
-
-### Fix
-
-
-- Allow empty &#39;message&#39; field in filemessageresult (#125) ([`554e72e`](https://github.com/bdraco/freenub/commit/554e72ef29a1d93fe099cbcd322c7ce1104f85c1))
-
-
-- Remove unwanted output while calling `fetch_messages` (#111) ([`84479c5`](https://github.com/bdraco/freenub/commit/84479c5d721891b0a53d04c1f14175f1a71d2add))
-
-
-- Adapt acceptance testing code to the updated version of the testing infrastructure. (#106) ([`13e4fce`](https://github.com/bdraco/freenub/commit/13e4fce4a9f0fc8d7d3d27f595d0a19b57cd76a6))
+- Run tests for pr as well ([`13e4fce`](https://github.com/bdraco/freenub/commit/13e4fce4a9f0fc8d7d3d27f595d0a19b57cd76a6))
 
 
 ### Documentation
 
 
-- Fix changelogs (#109) ([`f6bd5ea`](https://github.com/bdraco/freenub/commit/f6bd5eae9ef29e731ce3ffc509ae28a3053f3b11))
+- Fix badge link ([`930d7b6`](https://github.com/bdraco/freenub/commit/930d7b6de77d3269d08c7e584e767c2f13ca004a))
+
+
+- Fix changelogs ([`f6bd5ea`](https://github.com/bdraco/freenub/commit/f6bd5eae9ef29e731ce3ffc509ae28a3053f3b11))
 
 
 - Change release version ([`970c28d`](https://github.com/bdraco/freenub/commit/970c28db5df0cf19116bb2fcefef625a42f7f134))
-
-
-### Build
-
-
-- Integrate with release notifications (#107) ([`6beedc6`](https://github.com/bdraco/freenub/commit/6beedc60da504e71312f11563f303046c31e468d))
-

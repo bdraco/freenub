@@ -1,5 +1,13 @@
 # Changelog
 
+## v0.1.2 (2026-10-02)
+
+### Bug fixes
+
+
+- Re-announce pnconnectedcategory after reconnect() ([`cea7403`](https://github.com/bdraco/freenub/commit/cea7403430df877c00bdb00cad9caafa180ad3b1))
+
+
 ## v0.1.1 (2026-10-02)
 
 ### Bug fixes

@@ -90,9 +90,9 @@ jobs:
         run: git switch -C "$BRANCH"
 
       - name: Test release
-        uses: python-semantic-release/python-semantic-release@v9.8.1
+        uses: python-semantic-release/python-semantic-release@v10.5.3
         with:
-          root_options: --noop
+          no_operation_mode: true
 
   # main only: real release + publish. The environment and OIDC/write
   # permissions live here so they are never granted on PR runs.
@@ -124,7 +124,7 @@ jobs:
         run: git switch -C "$BRANCH"
 
       - name: Release
-        uses: python-semantic-release/python-semantic-release@v9.8.1
+        uses: python-semantic-release/python-semantic-release@v10.5.3
         id: release
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}

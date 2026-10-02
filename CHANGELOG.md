@@ -1,5 +1,7 @@
 # Changelog
 
+<!-- version list -->
+
 ## v0.1.0 (2024-07-15)
 
 ### Fix

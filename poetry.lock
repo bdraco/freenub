@@ -154,15 +154,19 @@ docs = ["sphinx (>=1.6)", "sphinx-bootstrap-theme (>=0.6)"]
 
 [[package]]
 name = "busypie"
-version = "0.5.1"
+version = "0.6.1"
 description = "Easy and expressive busy-waiting for Python"
 optional = false
 python-versions = ">=3.6"
 groups = ["dev"]
 files = [
-    {file = "busypie-0.5.1-py3-none-any.whl", hash = "sha256:0f7d6a3e549357a8d59087985919af11276cd11a6be162dadd7f8d60a4718a86"},
-    {file = "busypie-0.5.1.tar.gz", hash = "sha256:5a6ec2a60973a9708a2b6aada5d9904ab73636f2432f19db2940c811af559d02"},
+    {file = "busypie-0.6.1-py3-none-any.whl", hash = "sha256:1b4673687d58249e791b4b0361a1e188fd1a35ffcacb9398437aed3394e3a3da"},
+    {file = "busypie-0.6.1.tar.gz", hash = "sha256:1662a6fa2e9685aeb7c662be9438b65f15c9c4cc28e64d071e01645ad9ce6af2"},
 ]
+
+[package.extras]
+dev = ["mypy (>=1.0)", "ruff (>=0.4)"]
+test = ["dataclasses (==0.6)", "pytest (==7.4.4)", "pytest-asyncio (==0.21.1)", "pytest-timeout (==2.4.0)"]
 
 [[package]]
 name = "cbor2"
@@ -1137,4 +1141,4 @@ multidict = ">=4.0"
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.11"
-content-hash = "f7f5dca936456ab8d93c3f217e4dd4536a9dda60798b8c7dae55745d50195de8"
+content-hash = "ffb72733a78d2997d0cc4633f7356d1021719dfdef73cd6c6b851164b07c97c4"

@@ -38,7 +38,7 @@ aiohttp = "^3.9.5"
 
 [tool.poetry.group.dev.dependencies]
 pytest = "^8.0.0"
-pytest-cov = "^5.0.0"
+pytest-cov = ">=5,<8"
 pyyaml = "^6.0.1"
 pytest-asyncio = "^0.23.7"
 behave = "^1.2.6"

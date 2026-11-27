@@ -66,6 +66,17 @@ class PNConfiguration:
         return self.scheme_extended() + self.origin
 
     def set_presence_timeout_with_custom_interval(self, timeout, interval):
+        if interval <= 0:
+            raise ValueError(
+                "heartbeat_interval must be greater than 0, got %r. PubNub "
+                "renews presence on this interval and the asyncio timer "
+                "divides by it, so 0 raises ZeroDivisionError on subscribe "
+                "and a negative value fires continuously. "
+                "set_presence_timeout() derives it as (timeout / 2) - 1, so "
+                "a presence timeout of 2 seconds or less lands here; use "
+                "set_presence_timeout_with_custom_interval() to set a "
+                "positive interval." % (interval,)
+            )
         self.heartbeat_default_values = False
         self._presence_timeout = timeout
         self._heartbeat_interval = interval
